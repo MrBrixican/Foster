@@ -1,11 +1,7 @@
 ﻿using Foster.Framework;
 using SDL2;
 using System;
-using System.Collections.Generic;
-using System.Drawing;
 using System.Numerics;
-using System.Runtime.InteropServices;
-using System.Text;
 
 namespace Foster.SDL2
 {
@@ -93,11 +89,17 @@ namespace Foster.SDL2
                 int w, h;
 
                 if (App.Graphics is IGraphicsOpenGL)
+                {
                     SDL.SDL_GL_GetDrawableSize(SDLWindowPtr, out w, out h);
+                }
                 else if (App.Graphics is IGraphicsVulkan)
+                {
                     SDL.SDL_Vulkan_GetDrawableSize(SDLWindowPtr, out w, out h);
+                }
                 else
+                {
                     SDL.SDL_GetWindowSize(SDLWindowPtr, out w, out h);
+                }
 
                 return new Point2(w, h);
             }
@@ -109,7 +111,9 @@ namespace Foster.SDL2
             {
                 float hidpiRes = 72f;
                 if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+                {
                     hidpiRes = 96;
+                }
 
                 var index = SDL.SDL_GetWindowDisplayIndex(SDLWindowPtr);
                 SDL.SDL_GetDisplayDPI(index, out float ddpi, out _, out _);
@@ -160,9 +164,13 @@ namespace Foster.SDL2
                 {
                     isFullscreen = value;
                     if (isFullscreen)
+                    {
                         SDL.SDL_SetWindowFullscreen(SDLWindowPtr, (uint)SDL.SDL_WindowFlags.SDL_WINDOW_FULLSCREEN_DESKTOP);
+                    }
                     else
+                    {
                         SDL.SDL_SetWindowFullscreen(SDLWindowPtr, (uint)0);
+                    }
                 }
             }
         }
@@ -176,9 +184,13 @@ namespace Foster.SDL2
                 {
                     isVisible = value;
                     if (isVisible)
+                    {
                         SDL.SDL_ShowWindow(SDLWindowPtr);
+                    }
                     else
+                    {
                         SDL.SDL_HideWindow(SDLWindowPtr);
+                    }
                 }
             }
         }
@@ -222,9 +234,9 @@ namespace Foster.SDL2
         {
             this.system = system;
 
-            var sdlWindowFlags = 
-                SDL.SDL_WindowFlags.SDL_WINDOW_ALLOW_HIGHDPI | 
-                SDL.SDL_WindowFlags.SDL_WINDOW_HIDDEN | 
+            var sdlWindowFlags =
+                SDL.SDL_WindowFlags.SDL_WINDOW_ALLOW_HIGHDPI |
+                SDL.SDL_WindowFlags.SDL_WINDOW_HIDDEN |
                 SDL.SDL_WindowFlags.SDL_WINDOW_RESIZABLE;
 
             if (flags.HasFlag(WindowFlags.Fullscreen))
@@ -238,24 +250,33 @@ namespace Foster.SDL2
                 sdlWindowFlags |= SDL.SDL_WindowFlags.SDL_WINDOW_OPENGL;
 
                 if (system.Windows.Count > 0)
+                {
                     SDL.SDL_GL_SetAttribute(SDL.SDL_GLattr.SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 1);
+                }
             }
 
             // create the window
             SDLWindowPtr = SDL.SDL_CreateWindow(title, 0x2FFF0000, 0x2FFF0000, width, height, sdlWindowFlags);
             if (SDLWindowPtr == IntPtr.Zero)
+            {
                 throw new Exception($"Failed to create a new Window: {SDL.SDL_GetError()}");
+            }
+
             SDLWindowID = SDL.SDL_GetWindowID(SDLWindowPtr);
 
             if (flags.HasFlag(WindowFlags.Transparent))
+            {
                 SDL.SDL_SetWindowOpacity(SDLWindowPtr, 0f);
+            }
 
             // scale to monitor for HiDPI displays
             if (flags.HasFlag(WindowFlags.ScaleToMonitor))
             {
                 float hidpiRes = 72f;
                 if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+                {
                     hidpiRes = 96;
+                }
 
                 var display = SDL.SDL_GetWindowDisplayIndex(SDLWindowPtr);
                 SDL.SDL_GetDisplayDPI(display, out var ddpi, out var hdpi, out var vdpi);

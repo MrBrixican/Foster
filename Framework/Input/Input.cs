@@ -69,9 +69,13 @@ namespace Foster.Framework
             {
                 var button = virtualButtons[i];
                 if (button.TryGetTarget(out var target))
+                {
                     target.Update();
+                }
                 else
+                {
                     virtualButtons.RemoveAt(i);
+                }
             }
         }
 
@@ -104,7 +108,9 @@ namespace Foster.Framework
         {
             uint id = (uint)key;
             if (id >= Keyboard.MaxKeys)
+            {
                 throw new ArgumentOutOfRangeException(nameof(key), "Value is out of Range for supported keys");
+            }
 
             nextState.Keyboard.down[id] = true;
             nextState.Keyboard.pressed[id] = true;
@@ -115,7 +121,9 @@ namespace Foster.Framework
         {
             uint id = (uint)key;
             if (id >= Keyboard.MaxKeys)
+            {
                 throw new ArgumentOutOfRangeException(nameof(key), "Value is out of Range for supported keys");
+            }
 
             nextState.Keyboard.down[id] = false;
             nextState.Keyboard.released[id] = true;
@@ -142,13 +150,17 @@ namespace Foster.Framework
         protected void OnJoystickConnect(uint index, string name, uint buttonCount, uint axisCount, bool isGamepad)
         {
             if (index < InputState.MaxControllers)
+            {
                 nextState.Controllers[(int)index].Connect(name, buttonCount, axisCount, isGamepad);
+            }
         }
 
         protected void OnJoystickDisconnect(uint index)
         {
             if (index < InputState.MaxControllers)
+            {
                 nextState.Controllers[(int)index].Disconnect();
+            }
         }
 
         protected void OnJoystickButtonDown(uint index, uint button)
@@ -211,7 +223,10 @@ namespace Foster.Framework
         protected float GetJoystickAxis(uint index, uint axis)
         {
             if (index < InputState.MaxControllers && axis < Controller.MaxAxis)
+            {
                 return nextState.Controllers[(int)index].axis[axis];
+            }
+
             return 0;
         }
 
@@ -227,7 +242,10 @@ namespace Foster.Framework
         protected float GetGamepadAxis(uint index, Axes axis)
         {
             if (index < InputState.MaxControllers && axis != Axes.None)
+            {
                 return nextState.Controllers[(int)index].axis[(int)axis];
+            }
+
             return 0;
         }
 

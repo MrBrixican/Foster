@@ -32,7 +32,7 @@ namespace Foster.Json
             if (reader.BaseStream.Position < reader.BaseStream.Length)
             {
                 var token = (JsonBinaryWriter.BinaryTokens)reader.ReadByte();
-                
+
                 switch (token)
                 {
                     case JsonBinaryWriter.BinaryTokens.Null:
@@ -133,14 +133,18 @@ namespace Foster.Json
             if (Read())
             {
                 if (Token == JsonToken.ObjectStart || Token == JsonToken.ObjectEnd)
+                {
                     reader.BaseStream.Seek(objectSize, SeekOrigin.Current);
+                }
             }
         }
 
         public void Dispose()
         {
             if (disposeStream)
+            {
                 reader.Dispose();
+            }
         }
     }
 }

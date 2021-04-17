@@ -22,7 +22,9 @@ namespace StbTrueTypeSharp
             var ap = (byte*)a;
             var bp = (byte*)b;
             for (long i = 0; i < size; ++i)
+            {
                 *ap++ = *bp++;
+            }
         }
 
         public static void memcpy(void* a, void* b, ulong size)
@@ -41,7 +43,9 @@ namespace StbTrueTypeSharp
             var bptr = (byte*)ptr;
             var bval = (byte)value;
             for (long i = 0; i < size; ++i)
+            {
                 *bptr++ = bval;
+            }
         }
 
         public static void memset(void* ptr, int value, ulong size)
@@ -99,7 +103,9 @@ namespace StbTrueTypeSharp
             var ptr = str;
 
             while (*ptr != '\0')
+            {
                 ptr++;
+            }
 
             return (ulong)ptr - (ulong)str - 1;
         }

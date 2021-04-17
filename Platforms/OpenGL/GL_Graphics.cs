@@ -1,7 +1,6 @@
 ﻿using Foster.Framework;
 using System;
 using System.Collections.Generic;
-using System.Text.Json.Serialization;
 using System.Threading;
 
 namespace Foster.OpenGL
@@ -104,11 +103,15 @@ namespace Foster.OpenGL
                     }
 
                     foreach (var context in disposedContexts)
+                    {
                         contextMetadata.Remove(context);
+                    }
                 }
 
                 if (changedContext)
+                {
                     System.SetCurrentGLContext(lastContext);
+                }
             }
         }
 
@@ -122,7 +125,10 @@ namespace Foster.OpenGL
             lock (list)
             {
                 for (int i = list.Count - 1; i >= 0; i--)
+                {
                     deleter(list[i]);
+                }
+
                 list.Clear();
             }
         }
@@ -130,7 +136,10 @@ namespace Foster.OpenGL
         internal ContextMeta GetContextMeta(ISystemOpenGL.Context context)
         {
             if (!contextMetadata.TryGetValue(context, out var meta))
+            {
                 contextMetadata[context] = meta = new ContextMeta();
+            }
+
             return meta;
         }
 
@@ -170,7 +179,10 @@ namespace Foster.OpenGL
                 lock (context)
                 {
                     if (context != System.GetCurrentGLContext())
+                    {
                         System.SetCurrentGLContext(context);
+                    }
+
                     GL.BindFramebuffer(GLEnum.FRAMEBUFFER, 0);
                     Clear(this, context, target, flags, color, depth, stencil, viewport);
                 }
@@ -261,7 +273,10 @@ namespace Foster.OpenGL
                 lock (context)
                 {
                     if (context != System.GetCurrentGLContext())
+                    {
                         System.SetCurrentGLContext(context);
+                    }
+
                     Draw(this, ref pass, context);
                 }
             }
@@ -305,7 +320,10 @@ namespace Foster.OpenGL
                     lastPass = pass;
                 }
                 else
+                {
                     lastPass = contextMeta.LastRenderState.Value;
+                }
+
                 contextMeta.LastRenderState = pass;
 
                 // Bind the Target
@@ -325,11 +343,15 @@ namespace Foster.OpenGL
 
                 // Use the Shader
                 if (pass.Material.Shader.Implementation is GL_Shader glShader)
+                {
                     glShader.Use(pass.Material);
+                }
 
                 // Bind the Mesh
                 if (pass.Mesh.Implementation is GL_Mesh glMesh)
+                {
                     glMesh.Bind(context, pass.Material);
+                }
 
                 // Blend Mode
                 {
@@ -434,11 +456,17 @@ namespace Foster.OpenGL
                         GL.Enable(GLEnum.CULL_FACE);
 
                         if (pass.CullMode == CullMode.Back)
+                        {
                             GL.CullFace(GLEnum.BACK);
+                        }
                         else if (pass.CullMode == CullMode.Front)
+                        {
                             GL.CullFace(GLEnum.FRONT);
+                        }
                         else
+                        {
                             GL.CullFace(GLEnum.FRONT_AND_BACK);
+                        }
                     }
                 }
 
@@ -477,7 +505,7 @@ namespace Foster.OpenGL
                         lastPass.Scissor = scissor;
                     }
                 }
-                GLEnum indexType = pass.IndexElementSize == IndexElementSize.ThirtyTwoBits? GLEnum.UNSIGNED_INT: GLEnum.UNSIGNED_SHORT;
+                GLEnum indexType = pass.IndexElementSize == IndexElementSize.ThirtyTwoBits ? GLEnum.UNSIGNED_INT : GLEnum.UNSIGNED_SHORT;
                 int indexSize = pass.IndexElementSize == IndexElementSize.ThirtyTwoBits ? sizeof(int) : sizeof(ushort);
 
                 // Draw the Mesh

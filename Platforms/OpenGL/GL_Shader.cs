@@ -1,8 +1,5 @@
 ﻿using Foster.Framework;
 using System;
-using System.Collections.Specialized;
-using System.Numerics;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 
@@ -55,7 +52,9 @@ namespace Foster.OpenGL
 
                     string? errorMessage = GL.GetShaderInfoLog(shaderId);
                     if (!string.IsNullOrEmpty(errorMessage))
+                    {
                         throw new Exception(errorMessage);
+                    }
 
                     GL.AttachShader(ID, shaderId);
                 }
@@ -73,7 +72,9 @@ namespace Foster.OpenGL
 
                     string? errorMessage = GL.GetShaderInfoLog(shaderId);
                     if (!string.IsNullOrEmpty(errorMessage))
+                    {
                         throw new Exception(errorMessage);
+                    }
 
                     GL.AttachShader(ID, shaderId);
                 }
@@ -82,7 +83,9 @@ namespace Foster.OpenGL
 
                 string? programError = GL.GetProgramInfoLog(ID);
                 if (!string.IsNullOrEmpty(programError))
+                {
                     throw new Exception(programError);
+                }
 
                 // get attributes
                 GL.GetProgramiv(ID, GLEnum.ACTIVE_ATTRIBUTES, out int attributeCount);
@@ -91,7 +94,9 @@ namespace Foster.OpenGL
                     GL.GetActiveAttrib(ID, (uint)i, out _, out _, out string name);
                     int location = GL.GetAttribLocation(ID, name);
                     if (location >= 0)
+                    {
                         Attributes.Add(name, new ShaderAttribute(name, (uint)location));
+                    }
                 }
 
                 // get uniforms
@@ -103,13 +108,16 @@ namespace Foster.OpenGL
                     if (location >= 0)
                     {
                         if (size > 1 && name.EndsWith("[0]"))
+                        {
                             name = name.Substring(0, name.Length - 3);
+                        }
+
                         Uniforms.Add(name, new GL_Uniform(this, name, size, location, type));
                     }
                 }
 
                 // dispose shaders
-                for (int i = 0; i < shaders.Length; i ++)
+                for (int i = 0; i < shaders.Length; i++)
                 {
                     if (shaders[i] != 0)
                     {
@@ -132,12 +140,14 @@ namespace Foster.OpenGL
             // upload uniform values
             int textureSlot = 0;
 
-            for (int p = 0; p < material.Parameters.Count; p ++)
+            for (int p = 0; p < material.Parameters.Count; p++)
             {
                 var parameter = material.Parameters[p];
 
                 if (!(parameter.Uniform is GL_Uniform uniform))
+                {
                     continue;
+                }
 
                 // Sampler 2D
                 if (uniform.Type == UniformType.Sampler)
@@ -163,43 +173,57 @@ namespace Foster.OpenGL
                 else if (uniform.Type == UniformType.Int && parameter.Value is int[] intArray)
                 {
                     fixed (int* ptr = intArray)
+                    {
                         GL.Uniform1iv(uniform.Location, uniform.Length, new IntPtr(ptr));
+                    }
                 }
                 // Float
                 else if (uniform.Type == UniformType.Float && parameter.Value is float[] floatArray)
                 {
                     fixed (float* ptr = floatArray)
+                    {
                         GL.Uniform1fv(uniform.Location, uniform.Length, new IntPtr(ptr));
+                    }
                 }
                 // Float2
                 else if (uniform.Type == UniformType.Float2 && parameter.Value is float[] float2Array)
                 {
                     fixed (float* ptr = float2Array)
+                    {
                         GL.Uniform2fv(uniform.Location, uniform.Length, new IntPtr(ptr));
+                    }
                 }
                 // Float3
                 else if (uniform.Type == UniformType.Float3 && parameter.Value is float[] float3Array)
                 {
                     fixed (float* ptr = float3Array)
+                    {
                         GL.Uniform3fv(uniform.Location, uniform.Length, new IntPtr(ptr));
+                    }
                 }
                 // Float4
                 else if (uniform.Type == UniformType.Float4 && parameter.Value is float[] float4Array)
                 {
                     fixed (float* ptr = float4Array)
+                    {
                         GL.Uniform4fv(uniform.Location, uniform.Length, new IntPtr(ptr));
+                    }
                 }
                 // Matrix3x2
                 else if (uniform.Type == UniformType.Matrix3x2 && parameter.Value is float[] matrix3x2Array)
                 {
                     fixed (float* ptr = matrix3x2Array)
+                    {
                         GL.UniformMatrix3x2fv(uniform.Location, uniform.Length, false, new IntPtr(ptr));
+                    }
                 }
                 // Matrix4x4
                 else if (uniform.Type == UniformType.Matrix4x4 && parameter.Value is float[] matrix4x4Array)
                 {
                     fixed (float* ptr = matrix4x4Array)
+                    {
                         GL.UniformMatrix4fv(uniform.Location, uniform.Length, false, new IntPtr(ptr));
+                    }
                 }
             }
         }

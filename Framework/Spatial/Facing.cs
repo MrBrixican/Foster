@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Diagnostics;
 
 namespace Foster.Framework
 {
@@ -44,9 +39,13 @@ namespace Foster.Framework
         public override bool Equals(object? obj)
         {
             if (obj == null || !(obj is Facing f))
+            {
                 return false;
+            }
             else
+            {
                 return this == f;
+            }
         }
 
         public byte ToByte()

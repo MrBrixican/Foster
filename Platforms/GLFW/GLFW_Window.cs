@@ -167,7 +167,9 @@ namespace Foster.GLFW
                             GLFW.SetWindowMonitor(pointer, monitor, 0, 0, w, h, (int)GLFW_Enum.GLFW_DONT_CARE);
                         }
                         else
+                        {
                             isFullscreen = false;
+                        }
                     }
                     else
                     {
@@ -184,9 +186,13 @@ namespace Foster.GLFW
             {
                 isVisible = value;
                 if (isVisible)
+                {
                     GLFW.ShowWindow(pointer);
+                }
                 else
+                {
                     GLFW.HideWindow(pointer);
+                }
             }
         }
 
@@ -195,9 +201,14 @@ namespace Foster.GLFW
             get
             {
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                {
                     return GLFW.GetWin32Window(pointer);
+                }
                 else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                {
                     return GLFW.GetCocoaWindow(pointer);
+                }
+
                 return IntPtr.Zero;
             }
         }
@@ -237,7 +248,9 @@ namespace Foster.GLFW
         {
             isFocused = (focused != 0);
             if (isFocused)
+            {
                 OnFocus?.Invoke();
+            }
         }
 
         private void OnCursorEnter(IntPtr window, int entered)
@@ -257,7 +270,9 @@ namespace Foster.GLFW
             {
                 var context = system.GetCurrentGLContext();
                 if (context == null || (context is GLFW_GLContext ctx && ctx.window != pointer))
+                {
                     system.SetCurrentGLContext(pointer);
+                }
 
                 GLFW.SwapInterval(VSync ? 1 : 0);
             }

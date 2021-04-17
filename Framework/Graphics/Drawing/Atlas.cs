@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Foster.Framework
 {
@@ -35,7 +34,9 @@ namespace Foster.Framework
                 foreach (var page in output.Pages)
                 {
                     if (premultiply)
+                    {
                         page.Premultiply();
+                    }
 
                     Pages.Add(new Texture(page));
                 }
@@ -58,13 +59,18 @@ namespace Foster.Framework
             get
             {
                 if (Subtextures.TryGetValue(name, out var subtex))
+                {
                     return subtex;
+                }
+
                 return null;
             }
             set
             {
                 if (value != null)
+                {
                     Subtextures[name] = value;
+                }
             }
         }
 

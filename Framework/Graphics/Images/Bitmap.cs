@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
-using System.Drawing;
 using System.IO;
 
 namespace Foster.Framework
@@ -33,9 +31,14 @@ namespace Foster.Framework
         public Bitmap(int width, int height, Color[] pixels)
         {
             if (width <= 0 || height <= 0)
+            {
                 throw new Exception("Width and Height must be larger than 0");
+            }
+
             if (pixels.Length < width * height)
+            {
                 throw new Exception("Pixels array doesn't fit the Bitmap size");
+            }
 
             Pixels = pixels;
             Width = width;
@@ -45,9 +48,13 @@ namespace Foster.Framework
         public Bitmap(Stream stream)
         {
             if (Images.Read(stream, out Width, out Height, out var pixels) && pixels != null)
+            {
                 Pixels = pixels;
+            }
             else
+            {
                 throw new NotSupportedException("Stream is either an invalid or not supported image format");
+            }
         }
 
         public Bitmap(string path)
@@ -55,9 +62,13 @@ namespace Foster.Framework
             using var stream = File.OpenRead(path);
 
             if (Images.Read(stream, out Width, out Height, out var pixels) && pixels != null)
+            {
                 Pixels = pixels;
+            }
             else
+            {
                 throw new NotSupportedException("Stream is either an invalid or not supported image format");
+            }
 
             stream.Close();
         }
@@ -73,7 +84,7 @@ namespace Foster.Framework
                 {
                     byte* rgba = (byte*)ptr;
 
-                    for (int i = 0, len = Pixels.Length * 4; i < len ; i += 4)
+                    for (int i = 0, len = Pixels.Length * 4; i < len; i += 4)
                     {
                         rgba[i + 0] = (byte)(rgba[i + 0] * rgba[i + 3] / 255);
                         rgba[i + 1] = (byte)(rgba[i + 1] * rgba[i + 3] / 255);
@@ -121,16 +132,36 @@ namespace Foster.Framework
             var dst = dest.Span;
 
             // can't be outside of the source image
-            if (sourceRect.Left < 0) sourceRect.Left = 0;
-            if (sourceRect.Top < 0) sourceRect.Top = 0;
-            if (sourceRect.Right > Width) sourceRect.Right = Width;
-            if (sourceRect.Bottom > Height) sourceRect.Bottom = Height;
+            if (sourceRect.Left < 0)
+            {
+                sourceRect.Left = 0;
+            }
+
+            if (sourceRect.Top < 0)
+            {
+                sourceRect.Top = 0;
+            }
+
+            if (sourceRect.Right > Width)
+            {
+                sourceRect.Right = Width;
+            }
+
+            if (sourceRect.Bottom > Height)
+            {
+                sourceRect.Bottom = Height;
+            }
 
             // can't be larger than our destination
             if (sourceRect.Width > destSize.X - destPosition.X)
+            {
                 sourceRect.Width = destSize.X - destPosition.X;
+            }
+
             if (sourceRect.Height > destSize.Y - destPosition.Y)
+            {
                 sourceRect.Height = destSize.Y - destPosition.Y;
+            }
 
             for (int y = 0; y < sourceRect.Height; y++)
             {

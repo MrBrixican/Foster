@@ -1,7 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 
 namespace Foster.Framework
-{    
+{
     /// <summary>
     /// Stores an Input State
     /// </summary>
@@ -44,7 +44,9 @@ namespace Foster.Framework
 
             controllers = new Controller[MaxControllers];
             for (int i = 0; i < controllers.Length; i++)
+            {
                 controllers[i] = new Controller(input);
+            }
 
             Controllers = new ReadOnlyCollection<Controller>(controllers);
             Keyboard = new Keyboard(input);
@@ -56,7 +58,9 @@ namespace Foster.Framework
             for (int i = 0; i < Controllers.Count; i++)
             {
                 if (Controllers[i].Connected)
+                {
                     Controllers[i].Step();
+                }
             }
             Keyboard.Step();
             Mouse.Step();
@@ -67,7 +71,9 @@ namespace Foster.Framework
             for (int i = 0; i < Controllers.Count; i++)
             {
                 if (other.Controllers[i].Connected || (Controllers[i].Connected != other.Controllers[i].Connected))
+                {
                     Controllers[i].Copy(other.Controllers[i]);
+                }
             }
 
             Keyboard.Copy(other.Keyboard);

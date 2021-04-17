@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
-using System.Reflection.Metadata.Ecma335;
 using System.Runtime.CompilerServices;
 
 namespace Foster.Framework
@@ -69,10 +68,14 @@ namespace Foster.Framework
             private void AssertParameters(UniformType expected, int index)
             {
                 if (Type != expected)
+                {
                     throw new Exception($"Parameter {Name} isn't a {expected}");
+                }
 
                 if (index < 0 || index > Length)
+                {
                     throw new IndexOutOfRangeException($"Paramater {Name} Index is out range");
+                }
             }
 
             public void SetTexture(Texture? value) => SetTexture(0, value);
@@ -81,7 +84,9 @@ namespace Foster.Framework
                 AssertParameters(UniformType.Sampler, index);
 
                 if (Value is Texture?[] textures)
+                {
                     textures[index] = value;
+                }
             }
 
             public Texture? GetTexture(int index = 0)
@@ -89,7 +94,9 @@ namespace Foster.Framework
                 AssertParameters(UniformType.Sampler, index);
 
                 if (Value is Texture?[] textures)
+                {
                     return textures[index];
+                }
 
                 return null;
             }
@@ -100,7 +107,9 @@ namespace Foster.Framework
                 AssertParameters(UniformType.Int, index);
 
                 if (Value is int[] values)
+                {
                     values[index] = value;
+                }
             }
 
             public int GetInt(int index = 0)
@@ -108,7 +117,9 @@ namespace Foster.Framework
                 AssertParameters(UniformType.Int, index);
 
                 if (Value is int[] values)
+                {
                     return values[index];
+                }
 
                 return 0;
             }
@@ -119,7 +130,9 @@ namespace Foster.Framework
                 AssertParameters(UniformType.Float, index);
 
                 if (Value is float[] values)
+                {
                     values[index] = value;
+                }
             }
 
             public float GetFloat(int index = 0)
@@ -127,7 +140,9 @@ namespace Foster.Framework
                 AssertParameters(UniformType.Float, index);
 
                 if (Value is float[] values)
+                {
                     return values[index];
+                }
 
                 return 0;
             }
@@ -376,7 +391,9 @@ namespace Foster.Framework
         public bool TryGetParameter(string name, [MaybeNullWhen(false)] out Parameter parameter)
         {
             if (parametersByName.TryGetValue(name, out parameter!))
+            {
                 return true;
+            }
 
             return false;
         }

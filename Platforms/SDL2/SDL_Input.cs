@@ -2,7 +2,6 @@
 using SDL2;
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Foster.SDL2
 {
@@ -24,7 +23,10 @@ namespace Foster.SDL2
             for (int i = 0; i < sdlCursors.Length; i++)
             {
                 if (sdlCursors[i] != IntPtr.Zero)
+                {
                     SDL.SDL_FreeCursor(sdlCursors[i]);
+                }
+
                 sdlCursors[i] = IntPtr.Zero;
             }
         }
@@ -43,7 +45,9 @@ namespace Foster.SDL2
             };
 
             if (sdlCursors[index] == IntPtr.Zero)
+            {
                 sdlCursors[index] = SDL.SDL_CreateSystemCursor((SDL.SDL_SystemCursor)index);
+            }
 
             SDL.SDL_SetCursor(sdlCursors[index]);
         }
@@ -51,7 +55,10 @@ namespace Foster.SDL2
         public override string? GetClipboardString()
         {
             if (SDL.SDL_HasClipboardText() == SDL.SDL_bool.SDL_TRUE)
+            {
                 return SDL.SDL_GetClipboardText();
+            }
+
             return null;
         }
 
@@ -118,13 +125,17 @@ namespace Foster.SDL2
             {
                 var index = e.jbutton.which;
                 if (SDL.SDL_IsGameController(index) == SDL.SDL_bool.SDL_FALSE)
+                {
                     OnJoystickButtonDown((uint)index, e.jbutton.button);
+                }
             }
             else if (e.type == SDL.SDL_EventType.SDL_JOYBUTTONUP)
             {
                 var index = e.jbutton.which;
                 if (SDL.SDL_IsGameController(index) == SDL.SDL_bool.SDL_FALSE)
+                {
                     OnJoystickButtonUp((uint)index, e.jbutton.button);
+                }
             }
             else if (e.type == SDL.SDL_EventType.SDL_JOYAXISMOTION)
             {
@@ -181,12 +192,18 @@ namespace Foster.SDL2
                 {
                     var keycode = e.key.keysym.sym;
                     if (!KeycodeToKeys.TryGetValue(keycode, out Keys key))
+                    {
                         key = Keys.Unknown;
+                    }
 
                     if (e.type == SDL.SDL_EventType.SDL_KEYDOWN)
+                    {
                         OnKeyDown(key);
+                    }
                     else
+                    {
                         OnKeyUp(key);
+                    }
                 }
             }
             // text
@@ -196,7 +213,9 @@ namespace Foster.SDL2
                 {
                     int index = 0;
                     while (e.text.text[index] != 0)
+                    {
                         OnText((char)(e.text.text[index++]));
+                    }
                 }
             }
         }

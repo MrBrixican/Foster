@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Text.Unicode;
 
 namespace Foster.Framework
 {
@@ -25,7 +24,9 @@ namespace Foster.Framework
             Span<char> range = stackalloc char[to - from + 1];
 
             for (var i = 0; i < range.Length; i++)
+            {
                 range[i] = (char)(from + i);
+            }
 
             return new string(range);
         }
@@ -133,7 +134,9 @@ namespace Foster.Framework
                     nameID);
 
                 if (length > 0)
+                {
                     return new string(ptr, 0, length, Encoding.BigEndianUnicode);
+                }
 
                 return "Unknown";
             }
@@ -150,7 +153,9 @@ namespace Foster.Framework
         public float GetScale(int height)
         {
             if (Disposed)
+            {
                 throw new Exception("Cannot get Font data as it is disposed");
+            }
 
             return StbTrueType.stbtt_ScaleForPixelHeight(fontInfo, height);
         }
@@ -163,7 +168,9 @@ namespace Foster.Framework
             if (!glyphs.TryGetValue(unicode, out var glyph))
             {
                 if (Disposed)
+                {
                     throw new Exception("Cannot get Font data as it is disposed");
+                }
 
                 glyph = StbTrueType.stbtt_FindGlyphIndex(fontInfo, unicode);
                 glyphs[unicode] = glyph;
@@ -180,7 +187,9 @@ namespace Foster.Framework
             Disposed = true;
 
             if (fontHandle.IsAllocated)
+            {
                 fontHandle.Free();
+            }
         }
 
         private static byte[] ReadAllBytes(Stream stream)

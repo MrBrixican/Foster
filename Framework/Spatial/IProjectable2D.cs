@@ -25,9 +25,13 @@ namespace Foster.Framework
             b.Project(axis, out float min1, out float max1);
 
             if (Math.Abs(min1 - max0) < Math.Abs(max1 - min0))
+            {
                 amount = min1 - max0;
+            }
             else
+            {
                 amount = max1 - min0;
+            }
 
             return (min0 < max1 && max0 > min1);
         }

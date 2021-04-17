@@ -1,5 +1,4 @@
-﻿using System;
-namespace Foster.Framework
+﻿namespace Foster.Framework
 {
     /// <summary>
     /// Texture Format

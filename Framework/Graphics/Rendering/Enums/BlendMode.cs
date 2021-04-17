@@ -42,13 +42,13 @@ namespace Foster.Framework
 
     public enum BlendMask : byte
     {
-        None    = 0,
-        Red     = 1,
-        Green   = 2,
-        Blue    = 4,
-        Alpha   = 8,
-        RGB     = Red | Green | Blue,
-        RGBA    = Red | Green | Blue | Alpha,
+        None = 0,
+        Red = 1,
+        Green = 2,
+        Blue = 4,
+        Alpha = 8,
+        RGB = Red | Green | Blue,
+        RGBA = Red | Green | Blue | Alpha,
     }
 
     /// <summary>
@@ -75,8 +75,8 @@ namespace Foster.Framework
         }
 
         public BlendMode(
-            BlendOperations colorOperation, BlendFactors colorSource, BlendFactors colorDestination, 
-            BlendOperations alphaOperation, BlendFactors alphaSource, BlendFactors alphaDestination, 
+            BlendOperations colorOperation, BlendFactors colorSource, BlendFactors colorDestination,
+            BlendOperations alphaOperation, BlendFactors alphaSource, BlendFactors alphaDestination,
             BlendMask mask, Color color)
         {
             ColorOperation = colorOperation;

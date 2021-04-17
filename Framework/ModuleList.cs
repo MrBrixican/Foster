@@ -35,7 +35,9 @@ namespace Foster.Framework
                 var module = Instantiate(type);
 
                 if (immediateStart)
+                {
                     StartupModule(module, true);
+                }
             }
             else
             {
@@ -49,16 +51,22 @@ namespace Foster.Framework
         private Module Instantiate(Type type)
         {
             if (!(Activator.CreateInstance(type) is Module module))
+            {
                 throw new Exception("Type must inheirt from Module");
+            }
 
             // add Module to lookup
             while (type != typeof(Module) && type != typeof(AppModule))
             {
                 if (!modulesByType.ContainsKey(type))
+                {
                     modulesByType[type] = module;
+                }
 
                 if (type.BaseType == null)
+                {
                     break;
+                }
 
                 type = type.BaseType;
             }
@@ -66,7 +74,10 @@ namespace Foster.Framework
             // insert in order
             var insert = 0;
             while (insert < modules.Count && (modules[insert]?.Priority ?? int.MinValue) <= module.Priority)
+            {
                 insert++;
+            }
+
             modules.Insert(insert, module);
 
             // registered
@@ -82,7 +93,9 @@ namespace Foster.Framework
         public void Remove(Module module)
         {
             if (!module.IsRegistered)
+            {
                 throw new Exception("Module is not already registered");
+            }
 
             module.Shutdown();
             module.Disposed();
@@ -94,10 +107,14 @@ namespace Foster.Framework
             while (type != typeof(Module))
             {
                 if (modulesByType[type] == module)
+                {
                     modulesByType.Remove(type);
+                }
 
                 if (type.BaseType == null)
+                {
                     break;
+                }
 
                 type = type.BaseType;
             }
@@ -141,7 +158,9 @@ namespace Foster.Framework
         public T Get<T>() where T : Module
         {
             if (!modulesByType.TryGetValue(typeof(T), out var module))
+            {
                 throw new Exception($"App is does not have a {typeof(T).Name} Module registered");
+            }
 
             return (T)module;
         }
@@ -152,7 +171,9 @@ namespace Foster.Framework
         public Module Get(Type type)
         {
             if (!modulesByType.TryGetValue(type, out var module))
+            {
                 throw new Exception($"App is does not have a {type.Name} Module registered");
+            }
 
             return module;
         }
@@ -189,7 +210,9 @@ namespace Foster.Framework
             for (int i = 0; i < modules.Count; i++)
             {
                 if (modules[i] is AppModule module)
+                {
                     module.ApplicationStarted();
+                }
             }
         }
 
@@ -198,7 +221,9 @@ namespace Foster.Framework
             for (int i = 0; i < modules.Count; i++)
             {
                 if (modules[i] is AppModule module)
+                {
                     module.FirstWindowCreated();
+                }
             }
         }
 
@@ -210,18 +235,24 @@ namespace Foster.Framework
 
             // run startup on on App Modules
             for (int i = 0; i < modules.Count; i++)
+            {
                 StartupModule(modules[i], false);
+            }
 
             // instantiate remaining modules that are registered
             for (int i = 0; i < registered.Count; i++)
+            {
                 Instantiate(registered[i]);
+            }
 
             // further modules will be instantiated immediately
             immediateInit = true;
 
             // call started on all modules
             for (int i = 0; i < modules.Count; i++)
+            {
                 StartupModule(modules[i], true);
+            }
 
             // further modules will have Startup called immediately
             immediateStart = true;
@@ -246,10 +277,14 @@ namespace Foster.Framework
         internal void Shutdown()
         {
             for (int i = modules.Count - 1; i >= 0; i--)
+            {
                 modules[i]?.Shutdown();
+            }
 
             for (int i = modules.Count - 1; i >= 0; i--)
+            {
                 modules[i]?.Disposed();
+            }
 
             registered.Clear();
             modules.Clear();
@@ -261,52 +296,70 @@ namespace Foster.Framework
             // remove null module entries
             int toRemove;
             while ((toRemove = modules.IndexOf(null)) >= 0)
+            {
                 modules.RemoveAt(toRemove);
+            }
 
             for (int i = 0; i < modules.Count; i++)
+            {
                 modules[i]?.FrameStart();
+            }
         }
 
         internal void FixedUpdate()
         {
             for (int i = 0; i < modules.Count; i++)
+            {
                 modules[i]?.FixedUpdate();
+            }
         }
 
         internal void Update()
         {
             for (int i = 0; i < modules.Count; i++)
+            {
                 modules[i]?.Update();
+            }
         }
 
         internal void FrameEnd()
         {
             for (int i = 0; i < modules.Count; i++)
+            {
                 modules[i]?.FrameEnd();
+            }
         }
 
         internal void BeforeRender()
         {
             for (int i = 0; i < modules.Count; i++)
+            {
                 modules[i]?.BeforeRender();
+            }
         }
 
         internal void AfterRender()
         {
             for (int i = 0; i < modules.Count; i++)
+            {
                 modules[i]?.AfterRender();
+            }
         }
 
         internal void BeforeRenderWindow(Window window)
         {
             for (int i = 0; i < modules.Count; i++)
+            {
                 modules[i]?.BeforeRenderWindow(window);
+            }
         }
 
         internal void AfterRenderWindow(Window window)
         {
             for (int i = 0; i < modules.Count; i++)
+            {
                 modules[i]?.AfterRenderWindow(window);
+            }
         }
 
         public IEnumerator<Module> GetEnumerator()
@@ -315,7 +368,9 @@ namespace Foster.Framework
             {
                 var module = modules[i];
                 if (module != null)
+                {
                     yield return module;
+                }
             }
         }
 
@@ -325,7 +380,9 @@ namespace Foster.Framework
             {
                 var module = modules[i];
                 if (module != null)
+                {
                     yield return module;
+                }
             }
         }
     }

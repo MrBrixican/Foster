@@ -33,14 +33,19 @@ namespace Foster.GLFW
             for (int jid = 0; jid <= (int)GLFW_Enum.JOYSTICK_LAST; jid++)
             {
                 if (GLFW.JoystickPresent(jid) != 0)
+                {
                     OnJoystickCallback(jid, GLFW_Enum.CONNECTED);
+                }
             }
         }
 
         internal void Dispose()
         {
             foreach (var kv in delegateTracker)
+            {
                 StopListening(kv.Key);
+            }
+
             delegateTracker.Clear();
         }
 
@@ -71,7 +76,9 @@ namespace Foster.GLFW
         private T TrackDelegate<T>(IntPtr windowPtr, T method) where T : Delegate
         {
             if (!delegateTracker.TryGetValue(windowPtr, out var list))
+            {
                 delegateTracker[windowPtr] = list = new List<Delegate>();
+            }
 
             list.Add(method);
 
@@ -82,10 +89,12 @@ namespace Foster.GLFW
         {
             var cursor = GetCursor(cursors);
 
-            for (int i = 0; i < App.System.Windows.Count; i ++)
+            for (int i = 0; i < App.System.Windows.Count; i++)
             {
                 if (App.System.Windows[i].Implementation is GLFW_Window window)
+                {
                     GLFW.SetCursor(window.pointer, cursor);
+                }
             }
         }
 
@@ -99,7 +108,9 @@ namespace Foster.GLFW
             clipboardText = value;
 
             if (App.System.Windows[0].Implementation is GLFW_Window window)
+            {
                 GLFW.SetClipboardString(window.pointer, value);
+            }
         }
 
         private IntPtr GetCursor(Cursors fosterCursor)
@@ -158,11 +169,17 @@ namespace Foster.GLFW
         {
             MouseButtons mb = MouseButtons.Unknown;
             if (button == 0)
+            {
                 mb = MouseButtons.Left;
+            }
             else if (button == 1)
+            {
                 mb = MouseButtons.Right;
+            }
             else if (button == 2)
+            {
                 mb = MouseButtons.Middle;
+            }
 
             if (action == 1)
             {
@@ -171,7 +188,10 @@ namespace Foster.GLFW
             else if (action == 0)
             {
                 if (!ignoreMouseUp[button])
+                {
                     OnMouseUp(mb);
+                }
+
                 ignoreMouseUp[button] = false;
             }
         }
@@ -208,9 +228,13 @@ namespace Foster.GLFW
             {
                 var ptr = GLFW.GetClipboardString(windows[0]);
                 if (ptr == IntPtr.Zero)
+                {
                     clipboardText = null;
+                }
                 else
+                {
                     clipboardText = Marshal.PtrToStringUTF8(ptr);
+                }
             }
         }
 
@@ -249,7 +273,9 @@ namespace Foster.GLFW
                             var next = gamepadState.Axes[i];
 
                             if (Math.Abs(current - next) > AXIS_EPSILON)
+                            {
                                 OnGamepadAxis(index, axis, next);
+                            }
                         }
                     }
                     else
@@ -281,7 +307,9 @@ namespace Foster.GLFW
                                 var next = axes[i];
 
                                 if (Math.Abs(current - next) > AXIS_EPSILON)
+                                {
                                     OnJoystickAxis(index, axis, next);
+                                }
                             }
                         }
                     }

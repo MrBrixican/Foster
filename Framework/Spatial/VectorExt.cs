@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Numerics;
-using System.Text;
 
 namespace Foster.Framework
 {
@@ -85,7 +83,10 @@ namespace Foster.Framework
         public static Vector2 Normalized(this Vector2 vector)
         {
             if (vector.X == 0 && vector.Y == 0)
+            {
                 return Vector2.Zero;
+            }
+
             return Vector2.Normalize(vector);
         }
 
@@ -95,7 +96,10 @@ namespace Foster.Framework
         public static Vector3 Normalized(this Vector3 vector)
         {
             if (vector.X == 0 && vector.Y == 0 && vector.Z == 0)
+            {
                 return Vector3.Zero;
+            }
+
             return Vector3.Normalize(vector);
         }
 
@@ -105,7 +109,9 @@ namespace Foster.Framework
         public static Vector2 FourWayNormal(this Vector2 vector)
         {
             if (vector == Vector2.Zero)
+            {
                 return vector;
+            }
 
             vector = Calc.AngleToVector(Calc.Snap(vector.Angle(), Calc.HalfPI));
             if (MathF.Abs(vector.X) < .1f)
@@ -128,7 +134,9 @@ namespace Foster.Framework
         public static Vector2 EightWayNormal(this Vector2 vector)
         {
             if (vector == Vector2.Zero)
+            {
                 return vector;
+            }
 
             vector = Calc.AngleToVector(Calc.Snap(vector.Angle(), Calc.PI / 4));
             if (MathF.Abs(vector.X) < .1f)

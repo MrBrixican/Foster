@@ -61,11 +61,15 @@ namespace Foster.Framework
                 {
                     // Circular Hierarchy isn't allowed
                     if (value != null && value.Parent == this)
+                    {
                         throw new Exception("Circular Transform Heritage is not allowed");
+                    }
 
                     // Remove our OnChanged listener from the existing parent
                     if (parent != null)
+                    {
                         parent.OnChanged -= MakeDirty;
+                    }
 
                     // store state
                     var position = Position;
@@ -83,7 +87,9 @@ namespace Foster.Framework
 
                     // Add our OnChanged listener to the new parent
                     if (parent != null)
+                    {
                         parent.OnChanged += MakeDirty;
+                    }
 
                     // we have changed
                     OnChanged?.Invoke();
@@ -99,16 +105,22 @@ namespace Foster.Framework
             get
             {
                 if (dirty)
+                {
                     Update();
+                }
 
                 return position;
             }
             set
             {
                 if (parent == null)
+                {
                     LocalPosition = value;
+                }
                 else
+                {
                     LocalPosition = Vector3.Transform(value, WorldToLocalMatrix);
+                }
             }
         }
 
@@ -163,7 +175,9 @@ namespace Foster.Framework
             get
             {
                 if (dirty)
+                {
                     Update();
+                }
 
                 return scale;
             }
@@ -176,19 +190,31 @@ namespace Foster.Framework
                 else
                 {
                     if (parent.Scale.X == 0)
+                    {
                         value.X = 0;
+                    }
                     else
+                    {
                         value.X /= parent.Scale.X;
+                    }
 
                     if (parent.Scale.Y == 0)
+                    {
                         value.Y = 0;
+                    }
                     else
+                    {
                         value.Y /= parent.Scale.Y;
+                    }
 
                     if (parent.Scale.Z == 0)
+                    {
                         value.Z = 0;
+                    }
                     else
+                    {
                         value.Z /= parent.Scale.Z;
+                    }
 
                     LocalScale = value;
                 }
@@ -219,16 +245,22 @@ namespace Foster.Framework
             get
             {
                 if (dirty)
+                {
                     Update();
+                }
 
                 return rotation;
             }
             set
             {
                 if (parent == null)
+                {
                     LocalRotation = value;
+                }
                 else
+                {
                     LocalRotation = value / parent.Rotation;
+                }
             }
         }
 
@@ -256,7 +288,10 @@ namespace Foster.Framework
             get
             {
                 if (dirty)
+                {
                     Update();
+                }
+
                 return localMatrix;
             }
         }
@@ -269,7 +304,10 @@ namespace Foster.Framework
             get
             {
                 if (dirty)
+                {
                     Update();
+                }
+
                 return worldMatrix;
             }
         }
@@ -282,7 +320,10 @@ namespace Foster.Framework
             get
             {
                 if (dirty)
+                {
                     Update();
+                }
+
                 return worldToLocalMatrix;
             }
         }
@@ -291,7 +332,7 @@ namespace Foster.Framework
         {
             dirty = false;
 
-            localMatrix = 
+            localMatrix =
                 Matrix4x4.CreateTranslation(localPosition) *
                 Matrix4x4.CreateFromQuaternion(localRotation) *
                 Matrix4x4.CreateScale(localScale);

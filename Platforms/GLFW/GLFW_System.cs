@@ -64,7 +64,9 @@ namespace Foster.GLFW
             {
                 var monitorPtrs = GLFW.GetMonitors(out int count);
                 for (int i = 0; i < count; i++)
+                {
                     monitors.Add(new GLFW_Monitor(monitorPtrs[i]));
+                }
             }
 
             // Init Input
@@ -76,7 +78,9 @@ namespace Foster.GLFW
             input.Dispose();
 
             foreach (var window in windowPointers)
+            {
                 GLFW.SetWindowShouldClose(window, true);
+            }
 
             Poll(); // this will actually close the Windows
         }
@@ -97,7 +101,9 @@ namespace Foster.GLFW
 
             // Update Monitors
             foreach (GLFW_Monitor monitor in monitors)
+            {
                 monitor.FetchProperties();
+            }
 
             // update input
             input.AfterUpdate();
@@ -134,7 +140,9 @@ namespace Foster.GLFW
                         {
                             var ptr = GetVKProcAddress(vkInstance, "vkDestroySurfaceKHR");
                             if (ptr != null)
+                            {
                                 vkDestroySurfaceKHR = (VkDestroySurfaceKHR)Marshal.GetDelegateForFunctionPointer(ptr, typeof(VkDestroySurfaceKHR));
+                            }
                         }
 
                         vkDestroySurfaceKHR?.Invoke(vkInstance, vkSurfaces[windowPointers[i]], IntPtr.Zero);
@@ -150,7 +158,9 @@ namespace Foster.GLFW
         protected override Window.Platform CreateWindow(string title, int width, int height, WindowFlags flags = WindowFlags.None)
         {
             if (Thread.CurrentThread.ManagedThreadId != MainThreadId)
+            {
                 throw new Exception("Creating a Window must be called from the Main Thread");
+            }
 
             // create GLFW Window
             var ptr = CreateGlfwWindow(title, width, height, flags);
@@ -181,11 +191,15 @@ namespace Foster.GLFW
 
             IntPtr shared = IntPtr.Zero;
             if (App.Graphics is IGraphicsOpenGL && windowPointers.Count > 0)
+            {
                 shared = windowPointers[0];
+            }
 
             var monitor = IntPtr.Zero;
             if (flags.HasFlag(WindowFlags.Fullscreen))
+            {
                 monitor = GLFW.GetPrimaryMonitor();
+            }
 
             // create the GLFW Window and return thr pointer
             var ptr = GLFW.CreateWindow(width, height, title, monitor, shared);
@@ -203,14 +217,18 @@ namespace Foster.GLFW
                 var result = GLFW.CreateWindowSurface(vkInstance, ptr, IntPtr.Zero, out var surface);
 
                 if (result != GLFW_VkResult.Success)
+                {
                     throw new Exception($"Unable to create a Vulkan Surface, {result}");
+                }
 
                 vkSurfaces.Add(ptr, surface);
             }
 
             // show window
             if (!flags.HasFlag(WindowFlags.Hidden))
+            {
                 GLFW.ShowWindow(ptr);
+            }
 
             return ptr;
         }
@@ -243,7 +261,9 @@ namespace Foster.GLFW
             var ptr = GLFW.GetCurrentContext();
 
             if (ptr != IntPtr.Zero)
+            {
                 return glContexts[ptr];
+            }
 
             return null;
         }
@@ -251,9 +271,13 @@ namespace Foster.GLFW
         public void SetCurrentGLContext(ISystemOpenGL.Context? context)
         {
             if (context is GLFW_GLContext ctx && ctx != null)
+            {
                 GLFW.MakeContextCurrent(ctx.window);
+            }
             else
+            {
                 GLFW.MakeContextCurrent(IntPtr.Zero);
+            }
         }
 
         internal void SetCurrentGLContext(IntPtr window)
@@ -290,7 +314,9 @@ namespace Foster.GLFW
                 {
                     var str = Marshal.PtrToStringAnsi(new IntPtr(ptr[i]));
                     if (str != null)
+                    {
                         list.Add(str);
+                    }
                 }
 
                 return new List<string>(list);

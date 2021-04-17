@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using System.Text;
 
 namespace Foster.Vulkan
 {
@@ -11,13 +10,17 @@ namespace Foster.Vulkan
         public NativeStringArray(string[] array) : base(array.Length)
         {
             for (int i = 0; i < array.Length; i++)
+            {
                 this[i] = array[i];
+            }
         }
 
         public NativeStringArray(List<string> array) : base(array.Count)
         {
             for (int i = 0; i < array.Count; i++)
+            {
                 this[i] = array[i];
+            }
         }
     }
 
@@ -46,7 +49,9 @@ namespace Foster.Vulkan
             get
             {
                 if (index < 0 || index >= Length)
+                {
                     throw new IndexOutOfRangeException();
+                }
 
                 return array[index];
             }
@@ -54,7 +59,9 @@ namespace Foster.Vulkan
             set
             {
                 if (index < 0 || index >= Length)
+                {
                     throw new IndexOutOfRangeException();
+                }
 
                 array[index] = value;
                 ((byte**)Pointer)[index] = value;

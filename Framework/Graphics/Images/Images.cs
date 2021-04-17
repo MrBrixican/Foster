@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
-using System.Text;
 
 namespace Foster.Framework
 {
@@ -38,8 +36,13 @@ namespace Foster.Framework
         public static bool IsValid(Stream stream)
         {
             for (int i = 0; i < Formats.Count; i++)
+            {
                 if (Formats[i].IsValid(stream))
+                {
                     return true;
+                }
+            }
+
             return false;
         }
 

@@ -49,7 +49,9 @@ namespace Foster.Framework
             {
                 var axis = a.GetAxis(i);
                 if (!a.AxisOverlaps(b, axis, out float amount))
+                {
                     return false;
+                }
 
                 if (Math.Abs(amount) < distance)
                 {
@@ -63,7 +65,9 @@ namespace Foster.Framework
             {
                 var axis = (a.GetPoint(i) - b.Position).Normalized();
                 if (!a.AxisOverlaps(b, axis, out float amount))
+                {
                     return false;
+                }
 
                 if (Math.Abs(amount) < distance)
                 {
@@ -90,7 +94,9 @@ namespace Foster.Framework
                 {
                     var axis = a.GetAxis(i);
                     if (!a.AxisOverlaps(b, axis, out float amount))
+                    {
                         return false;
+                    }
 
                     if (Math.Abs(amount) < distance)
                     {
@@ -106,7 +112,9 @@ namespace Foster.Framework
                 {
                     var axis = b.GetAxis(i);
                     if (!a.AxisOverlaps(b, axis, out float amount))
+                    {
                         return false;
+                    }
 
                     if (Math.Abs(amount) < distance)
                     {

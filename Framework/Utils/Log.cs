@@ -52,7 +52,9 @@ namespace Foster.Framework
         {
             var directory = Path.GetDirectoryName(file);
             if (directory != null && !Directory.Exists(directory))
+            {
                 Directory.CreateDirectory(directory);
+            }
 
             var builder = new StringBuilder();
             builder.AppendLine($"{title} ERROR LOG");
@@ -61,7 +63,9 @@ namespace Foster.Framework
             builder.AppendLine();
 
             if (File.Exists(file))
+            {
                 builder.Append(File.ReadAllText(file));
+            }
 
             File.WriteAllText(file, builder.ToString());
         }
@@ -87,13 +91,17 @@ namespace Foster.Framework
             }
 
             if (!consoleOnly)
+            {
                 log.Append(text);
+            }
         }
 
         private static void AppendLine()
         {
             if (PrintToConsole)
+            {
                 Console.WriteLine();
+            }
 
             log.AppendLine();
         }

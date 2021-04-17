@@ -1,5 +1,4 @@
-﻿using System;
-namespace Foster.Framework
+﻿namespace Foster.Framework
 {
     /// <summary>
     /// Compare Methods used during Rendering

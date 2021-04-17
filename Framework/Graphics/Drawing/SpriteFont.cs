@@ -140,7 +140,9 @@ namespace Foster.Framework
 
                     // pack bmp
                     if (fontSize.Render(ch.Unicode, buffer, out int w, out int h))
+                    {
                         packer.AddPixels(name, w, h, buffer);
+                    }
 
                     // create character
                     var sprChar = new Character(ch.Unicode, new Subtexture(), new Vector2(ch.OffsetX, ch.OffsetY), ch.Advance);
@@ -151,7 +153,9 @@ namespace Foster.Framework
                     {
                         var kerning = fontSize.GetKerning(ch.Unicode, ch2.Unicode);
                         if (Math.Abs(kerning) > 0.000001f)
+                        {
                             sprChar.Kerning[ch2.Unicode] = kerning;
+                        }
                     }
                 }
 
@@ -170,10 +174,14 @@ namespace Foster.Framework
                     foreach (var entry in output.Entries.Values)
                     {
                         if (entry.Page != i)
+                        {
                             continue;
+                        }
 
                         if (Charset.TryGetValue(entry.Name[0], out var character))
+                        {
                             character.Image.Reset(texture, entry.Source, entry.Frame);
+                        }
                     }
 
                 }
@@ -201,13 +209,18 @@ namespace Foster.Framework
                 if (text[i] == '\n')
                 {
                     if (line > width)
+                    {
                         width = line;
+                    }
+
                     line = 0;
                     continue;
                 }
 
                 if (!Charset.TryGetValue(text[i], out var ch))
+                {
                     continue;
+                }
 
                 line += ch.Advance;
             }
@@ -218,7 +231,9 @@ namespace Foster.Framework
         public float HeightOf(string text)
         {
             if (string.IsNullOrEmpty(text))
+            {
                 return 0;
+            }
 
             return HeightOf(text.AsSpan());
         }
@@ -226,14 +241,18 @@ namespace Foster.Framework
         public float HeightOf(ReadOnlySpan<char> text)
         {
             if (text.Length <= 0)
+            {
                 return 0;
+            }
 
             var height = Height;
 
             for (int i = 0; i < text.Length; i++)
             {
                 if (text[i] == '\n')
+                {
                     height += LineHeight;
+                }
             }
 
             return height;

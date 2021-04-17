@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Text;
 
 namespace Foster.Framework
 {
@@ -47,7 +46,7 @@ namespace Foster.Framework
 
         }
 
-        public FrameBuffer(Graphics graphics, int width, int height) 
+        public FrameBuffer(Graphics graphics, int width, int height)
             : this(graphics, width, height, TextureFormat.Color)
         {
 
@@ -59,7 +58,9 @@ namespace Foster.Framework
             this.height = height;
 
             if (width <= 0 || height <= 0)
+            {
                 throw new Exception("FrameBuffer must have a size larger than 0");
+            }
 
             Implementation = graphics.CreateFrameBuffer(width, height, attachments);
             Attachments = new ReadOnlyCollection<Texture>(Implementation.Attachments);
@@ -69,7 +70,9 @@ namespace Foster.Framework
         public void Resize(int width, int height)
         {
             if (width <= 0 || height <= 0)
+            {
                 throw new Exception("FrameBuffer must have a size larger than 0");
+            }
 
             if (this.width != width || this.height != height)
             {
@@ -83,7 +86,9 @@ namespace Foster.Framework
         public void Dispose()
         {
             foreach (var texture in Attachments)
+            {
                 texture.Dispose();
+            }
 
             Implementation.Dispose();
         }

@@ -51,13 +51,13 @@ namespace Foster.Framework
         /// <summary>
         /// Clears the Color of the Target
         /// </summary>
-        public void Clear(RenderTarget target, Color color) => 
+        public void Clear(RenderTarget target, Color color) =>
             Clear(target, Framework.Clear.Color, color, 0, 0, new RectInt(0, 0, target.RenderWidth, target.RenderHeight));
 
         /// <summary>
         /// Clears the Target
         /// </summary>
-        public void Clear(RenderTarget target, Color color, float depth, int stencil) => 
+        public void Clear(RenderTarget target, Color color, float depth, int stencil) =>
             Clear(target, Framework.Clear.All, color, depth, stencil, new RectInt(0, 0, target.RenderWidth, target.RenderHeight));
 
         /// <summary>
@@ -66,7 +66,9 @@ namespace Foster.Framework
         public void Clear(RenderTarget target, Clear flags, Color color, float depth, int stencil, RectInt viewport)
         {
             if (!target.Renderable)
+            {
                 throw new Exception("Render Target cannot currently be drawn to");
+            }
 
             var bounds = new RectInt(0, 0, target.RenderWidth, target.RenderHeight);
             var clamped = viewport.OverlapRect(bounds);
@@ -86,22 +88,34 @@ namespace Foster.Framework
         public void Render(ref RenderPass pass)
         {
             if (!pass.Target.Renderable)
+            {
                 throw new Exception("Render Target cannot currently be drawn to");
+            }
 
             if (!(pass.Target is FrameBuffer) && !(pass.Target is Window))
+            {
                 throw new Exception("RenderTarget must be a Render Texture or a Window");
+            }
 
             if (pass.Mesh == null)
+            {
                 throw new Exception("Mesh cannot be null when drawing");
+            }
 
             if (pass.Material == null)
+            {
                 throw new Exception("Material cannot be null when drawing");
+            }
 
             if (pass.Mesh.InstanceCount > 0 && (pass.Mesh.InstanceFormat == null || (pass.Mesh.InstanceCount < pass.Mesh.InstanceCount)))
+            {
                 throw new Exception("Trying to draw more Instances than exist in the Mesh");
+            }
 
             if (pass.Mesh.IndexCount < pass.MeshIndexStart + pass.MeshIndexCount)
+            {
                 throw new Exception("Trying to draw more Indices than exist in the Mesh");
+            }
 
             if (pass.Viewport != null)
             {

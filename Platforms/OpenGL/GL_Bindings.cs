@@ -120,7 +120,9 @@ namespace Foster.OpenGL
         {
             var addr = system.GetGLProcAddress(name);
             if (addr != IntPtr.Zero && (Marshal.GetDelegateForFunctionPointer(addr, typeof(T)) is T del))
+            {
                 def = del;
+            }
         }
 
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]

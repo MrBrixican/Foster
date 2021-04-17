@@ -4,7 +4,7 @@ using System.Numerics;
 using System.Runtime.InteropServices;
 
 namespace Foster.Framework
-{    
+{
     /// <summary>
     /// Color Data
     /// </summary>
@@ -215,9 +215,14 @@ namespace Foster.Framework
         {
             // skip past useless string data (ex. if the string was 0xffffff or #ffffff)
             if (value.Length > 0 && value[0] == '#')
+            {
                 value = value.Slice(1);
+            }
+
             if (value.Length > 1 && value[0] == '0' && (value[1] == 'x' || value[1] == 'X'))
+            {
                 value = value.Slice(2);
+            }
 
             var color = Black;
 
@@ -228,22 +233,34 @@ namespace Foster.Framework
                     case 'R':
                     case 'r':
                         if (byte.TryParse(value.Slice(i * 2, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var r))
+                        {
                             color.R = r;
+                        }
+
                         break;
                     case 'G':
                     case 'g':
                         if (byte.TryParse(value.Slice(i * 2, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var g))
+                        {
                             color.G = g;
+                        }
+
                         break;
                     case 'B':
                     case 'b':
                         if (byte.TryParse(value.Slice(i * 2, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var b))
+                        {
                             color.B = b;
+                        }
+
                         break;
                     case 'A':
                     case 'a':
                         if (byte.TryParse(value.Slice(i * 2, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var a))
+                        {
                             color.A = a;
+                        }
+
                         break;
                 }
             }

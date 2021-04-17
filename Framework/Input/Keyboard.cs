@@ -8,7 +8,7 @@ namespace Foster.Framework
     /// </summary>
     public class Keyboard
     {
-        
+
         public const int MaxKeys = 400;
 
         internal readonly bool[] pressed = new bool[MaxKeys];
@@ -82,8 +82,12 @@ namespace Foster.Framework
         public bool Pressed(ReadOnlySpan<Keys> keys)
         {
             for (int i = 0; i < keys.Length; i++)
+            {
                 if (pressed[(int)keys[i]])
+                {
                     return true;
+                }
+            }
 
             return false;
         }
@@ -94,8 +98,12 @@ namespace Foster.Framework
         public bool Down(ReadOnlySpan<Keys> keys)
         {
             for (int i = 0; i < keys.Length; i++)
+            {
                 if (down[(int)keys[i]])
+                {
                     return true;
+                }
+            }
 
             return false;
         }
@@ -106,8 +114,12 @@ namespace Foster.Framework
         public bool Released(ReadOnlySpan<Keys> keys)
         {
             for (int i = 0; i < keys.Length; i++)
+            {
                 if (released[(int)keys[i]])
+                {
                     return true;
+                }
+            }
 
             return false;
         }
@@ -126,9 +138,11 @@ namespace Foster.Framework
         public bool Repeated(Keys key, float delay, float interval)
         {
             if (Pressed(key))
+            {
                 return true;
+            }
 
-            var time = timestamp[(int)key] / (float) TimeSpan.TicksPerSecond;
+            var time = timestamp[(int)key] / (float)TimeSpan.TicksPerSecond;
 
             return Down(key) && (Time.Duration.TotalSeconds - time) > delay && Time.OnInterval(interval, time);
         }

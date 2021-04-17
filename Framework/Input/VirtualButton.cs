@@ -25,13 +25,17 @@ namespace Foster.Framework
             public bool Pressed(float buffer, long lastBufferConsumedTime)
             {
                 if (Input.Keyboard.Pressed(Key))
+                {
                     return true;
+                }
 
                 var timestamp = Input.Keyboard.Timestamp(Key);
                 var time = Time.Duration.Ticks;
-                
+
                 if (time - timestamp <= TimeSpan.FromSeconds(buffer).Ticks && timestamp > lastBufferConsumedTime)
+                {
                     return true;
+                }
 
                 return false;
             }
@@ -56,13 +60,17 @@ namespace Foster.Framework
             public bool Pressed(float buffer, long lastBufferConsumedTime)
             {
                 if (Input.Mouse.Pressed(MouseButton))
+                {
                     return true;
+                }
 
                 var timestamp = Input.Mouse.Timestamp(MouseButton);
                 var time = Time.Duration.Ticks;
 
                 if (time - timestamp <= TimeSpan.FromSeconds(buffer).Ticks && timestamp > lastBufferConsumedTime)
+                {
                     return true;
+                }
 
                 return false;
             }
@@ -88,13 +96,17 @@ namespace Foster.Framework
             public bool Pressed(float buffer, long lastBufferConsumedTime)
             {
                 if (Input.Controllers[Index].Pressed(Button))
+                {
                     return true;
+                }
 
                 var timestamp = Input.Controllers[Index].Timestamp(Button);
                 var time = Time.Duration.Ticks;
 
                 if (time - timestamp <= TimeSpan.FromSeconds(buffer).Ticks && timestamp > lastBufferConsumedTime)
+                {
                     return true;
+                }
 
                 return false;
             }
@@ -125,12 +137,16 @@ namespace Foster.Framework
             public bool Pressed(float buffer, long lastBufferConsumedTime)
             {
                 if (Pressed())
+                {
                     return true;
+                }
 
                 var time = Time.Duration.Ticks;
 
                 if (time - pressedTimestamp <= TimeSpan.FromSeconds(buffer).Ticks && pressedTimestamp > lastBufferConsumedTime)
+                {
                     return true;
+                }
 
                 return false;
             }
@@ -140,11 +156,15 @@ namespace Foster.Framework
                 get
                 {
                     if (Math.Abs(Threshold) <= AXIS_EPSILON)
+                    {
                         return Math.Abs(Input.Controllers[Index].Axis(Axis)) > AXIS_EPSILON;
+                    }
 
                     if (Threshold < 0)
+                    {
                         return Input.Controllers[Index].Axis(Axis) <= Threshold;
-                    
+                    }
+
                     return Input.Controllers[Index].Axis(Axis) >= Threshold;
                 }
             }
@@ -154,10 +174,14 @@ namespace Foster.Framework
                 get
                 {
                     if (Math.Abs(Threshold) <= AXIS_EPSILON)
+                    {
                         return Math.Abs(Input.LastState.Controllers[Index].Axis(Axis)) > AXIS_EPSILON && Math.Abs(Input.Controllers[Index].Axis(Axis)) < AXIS_EPSILON;
+                    }
 
                     if (Threshold < 0)
+                    {
                         return Input.LastState.Controllers[Index].Axis(Axis) <= Threshold && Input.Controllers[Index].Axis(Axis) > Threshold;
+                    }
 
                     return Input.LastState.Controllers[Index].Axis(Axis) >= Threshold && Input.Controllers[Index].Axis(Axis) < Threshold;
                 }
@@ -171,18 +195,24 @@ namespace Foster.Framework
             private bool Pressed()
             {
                 if (Math.Abs(Threshold) <= AXIS_EPSILON)
+                {
                     return (Math.Abs(Input.LastState.Controllers[Index].Axis(Axis)) < AXIS_EPSILON && Math.Abs(Input.Controllers[Index].Axis(Axis)) > AXIS_EPSILON);
+                }
 
                 if (Threshold < 0)
+                {
                     return (Input.LastState.Controllers[Index].Axis(Axis) > Threshold && Input.Controllers[Index].Axis(Axis) <= Threshold);
-                
+                }
+
                 return (Input.LastState.Controllers[Index].Axis(Axis) < Threshold && Input.Controllers[Index].Axis(Axis) >= Threshold);
             }
 
             public void Update()
             {
                 if (Pressed())
+                {
                     pressedTimestamp = Input.Controllers[Index].Timestamp(Axis);
+                }
             }
 
             public AxisNode(Input input, int controller, Axes axis, float threshold)
@@ -207,8 +237,12 @@ namespace Foster.Framework
             get
             {
                 for (int i = 0; i < Nodes.Count; i++)
+                {
                     if (Nodes[i].Pressed(Buffer, lastBufferConsumeTime))
+                    {
                         return true;
+                    }
+                }
 
                 return false;
             }
@@ -219,8 +253,12 @@ namespace Foster.Framework
             get
             {
                 for (int i = 0; i < Nodes.Count; i++)
+                {
                     if (Nodes[i].Down)
+                    {
                         return true;
+                    }
+                }
 
                 return false;
             }
@@ -231,8 +269,12 @@ namespace Foster.Framework
             get
             {
                 for (int i = 0; i < Nodes.Count; i++)
+                {
                     if (Nodes[i].Released)
+                    {
                         return true;
+                    }
+                }
 
                 return false;
             }
@@ -243,8 +285,12 @@ namespace Foster.Framework
             get
             {
                 for (int i = 0; i < Nodes.Count; i++)
+                {
                     if (Nodes[i].Pressed(Buffer, lastBufferConsumeTime) || Nodes[i].Repeated(RepeatDelay, RepeatInterval))
+                    {
                         return true;
+                    }
+                }
 
                 return false;
             }
@@ -273,21 +319,30 @@ namespace Foster.Framework
         public VirtualButton Add(params Keys[] keys)
         {
             foreach (var key in keys)
+            {
                 Nodes.Add(new KeyNode(Input, key));
+            }
+
             return this;
         }
 
         public VirtualButton Add(params MouseButtons[] buttons)
         {
             foreach (var button in buttons)
+            {
                 Nodes.Add(new MouseButtonNode(Input, button));
+            }
+
             return this;
         }
 
         public VirtualButton Add(int controller, params Buttons[] buttons)
         {
             foreach (var button in buttons)
+            {
                 Nodes.Add(new ButtonNode(Input, controller, button));
+            }
+
             return this;
         }
 
@@ -304,8 +359,10 @@ namespace Foster.Framework
 
         internal void Update()
         {
-            for (int i = 0; i < Nodes.Count; i ++)
+            for (int i = 0; i < Nodes.Count; i++)
+            {
                 Nodes[i].Update();
+            }
         }
 
     }

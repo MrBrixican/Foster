@@ -64,18 +64,27 @@ namespace Foster.Framework
                 while ((index = remaining.IndexOf('\n')) >= 0 || (remaining.Length > 0 && eof))
                 {
                     if (index <= 0)
+                    {
                         index = remaining.Length;
+                    }
 
                     var line = remaining.Slice(0, index);
                     remaining = remaining.Slice(Math.Min(remaining.Length, index + 1));
 
                     while (line.Length > 0 && char.IsWhiteSpace(line[0]))
+                    {
                         line = line.Slice(1);
+                    }
+
                     while (line.Length > 0 && char.IsWhiteSpace(line[line.Length - 1]))
+                    {
                         line = line.Slice(0, line.Length - 1);
+                    }
 
                     if (line.Length <= 0)
+                    {
                         continue;
+                    }
 
                     // obj
                     if (line[0] == 'o' && line.Length > 3)
@@ -89,19 +98,25 @@ namespace Foster.Framework
                         if (line[1] == 'n')
                         {
                             if (Calc.ParseVector3(line.Slice(3), ' ', out var normal))
+                            {
                                 Normals.Add(normal);
+                            }
                         }
                         // tex-coord
                         else if (line[1] == 't')
                         {
                             if (Calc.ParseVector2(line.Slice(3), ' ', out var texcoord))
+                            {
                                 Texcoords.Add(texcoord);
+                            }
                         }
                         // position
                         else
                         {
                             if (Calc.ParseVector3(line.Slice(2), ' ', out var position))
+                            {
                                 Positions.Add(position);
+                            }
                         }
                     }
                     else if (line[0] == 'f' && line.Length > 3)
@@ -127,11 +142,17 @@ namespace Foster.Framework
                                 if (sub.Length > 0)
                                 {
                                     if (i == 0)
+                                    {
                                         vertex.PositionIndex = int.Parse(sub) - 1;
+                                    }
                                     else if (i == 1)
+                                    {
                                         vertex.NormalIndex = int.Parse(sub) - 1;
+                                    }
                                     else if (i == 2)
+                                    {
                                         vertex.TexcoordIndex = int.Parse(sub) - 1;
+                                    }
                                 }
 
                                 i++;
@@ -155,7 +176,9 @@ namespace Foster.Framework
 
                 // reached the end
                 if (read < offset.Length)
+                {
                     eof = true;
+                }
             }
         }
 

@@ -1,6 +1,5 @@
 ﻿using Foster.Framework;
 using System;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -21,7 +20,9 @@ namespace Foster.Vulkan
         {
             var addr = system.GetVKProcAddress(vkInstance, name);
             if (addr != IntPtr.Zero && (Marshal.GetDelegateForFunctionPointer(addr, typeof(T)) is T del))
+            {
                 def = del;
+            }
         }
 
         public static uint MAKE_VERSION(int major, int minor, int patch)
@@ -43,7 +44,9 @@ namespace Foster.Vulkan
         {
             int length = 0;
             while (length < 4096 && ptr[length] != 0)
+            {
                 length++;
+            }
 
             return Encoding.UTF8.GetString(ptr, length);
         }

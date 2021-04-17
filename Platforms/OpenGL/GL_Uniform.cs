@@ -7,7 +7,7 @@ namespace Foster.OpenGL
     {
         public readonly GL_Shader Shader;
 
-        public GL_Uniform(GL_Shader shader, string name, int length, int location, GLEnum type) 
+        public GL_Uniform(GL_Shader shader, string name, int length, int location, GLEnum type)
             : base(name, location, length, ToFosterType(type))
         {
             Shader = shader;

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Runtime.InteropServices;
-using System.Threading;
 
 namespace Foster.Framework
 {
@@ -88,7 +87,9 @@ namespace Foster.Framework
             {
                 var result = Environment.GetEnvironmentVariable("HOME");
                 if (!string.IsNullOrEmpty(result))
+                {
                     return Path.Combine(result, "Library", "Application Support", applicationName);
+                }
             }
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) ||
                      RuntimeInformation.IsOSPlatform(OSPlatform.FreeBSD))
@@ -102,7 +103,9 @@ namespace Foster.Framework
                 {
                     result = Environment.GetEnvironmentVariable("HOME");
                     if (!string.IsNullOrEmpty(result))
+                    {
                         return Path.Combine(result, ".local", "share", applicationName);
+                    }
                 }
             }
 

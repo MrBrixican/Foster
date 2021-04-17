@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.IO;
 using System.Runtime.InteropServices;
 
@@ -105,10 +103,14 @@ namespace Foster.Framework
         public Texture(Graphics graphics, int width, int height, TextureFormat format = TextureFormat.Color)
         {
             if (format == TextureFormat.None)
+            {
                 throw new Exception("Invalid Texture Format");
+            }
 
             if (width <= 0 || height <= 0)
+            {
                 throw new Exception("Texture must have a size larger than 0");
+            }
 
             this.graphics = graphics;
             Width = width;
@@ -121,25 +123,25 @@ namespace Foster.Framework
             Filter = DefaultTextureFilter;
         }
 
-        public Texture(int width, int height, TextureFormat format = TextureFormat.Color) 
+        public Texture(int width, int height, TextureFormat format = TextureFormat.Color)
             : this(App.Graphics, width, height, format)
         {
 
         }
 
-        public Texture(Bitmap bitmap) 
+        public Texture(Bitmap bitmap)
             : this(App.Graphics, bitmap.Width, bitmap.Height, TextureFormat.Color)
         {
             Implementation.SetData<Color>(bitmap.Pixels);
         }
 
-        public Texture(string path) 
+        public Texture(string path)
             : this(new Bitmap(path))
         {
 
         }
 
-        public Texture(Stream stream) 
+        public Texture(Stream stream)
             : this(new Bitmap(stream))
         {
 
@@ -148,7 +150,9 @@ namespace Foster.Framework
         public void Resize(int width, int height)
         {
             if (width <= 0 || height <= 0)
+            {
                 throw new Exception("Texture must have a size larger than 0");
+            }
 
             if (Width != width || Height != height)
             {
@@ -185,7 +189,9 @@ namespace Foster.Framework
         public void SetData<T>(ReadOnlyMemory<T> buffer)
         {
             if (Marshal.SizeOf<T>() * buffer.Length < Size)
+            {
                 throw new Exception("Buffer is smaller than the Size of the Texture");
+            }
 
             Implementation.SetData(buffer);
         }
@@ -196,7 +202,9 @@ namespace Foster.Framework
         public void GetData<T>(Memory<T> buffer)
         {
             if (Marshal.SizeOf<T>() * buffer.Length < Size)
+            {
                 throw new Exception("Buffer is smaller than the Size of the Texture");
+            }
 
             Implementation.GetData(buffer);
         }
@@ -265,7 +273,7 @@ namespace Foster.Framework
                     var a = y * Width;
                     var b = (Height - y - 1) * Width;
 
-                    for (int x = 0; x < Width; x ++, a++, b++)
+                    for (int x = 0; x < Width; x++, a++, b++)
                     {
                         var temp = color[a];
                         color[a] = color[b];

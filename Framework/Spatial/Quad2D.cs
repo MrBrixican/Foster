@@ -76,7 +76,10 @@ namespace Foster.Framework
             get
             {
                 if (dirty)
+                {
                     UpdateQuad();
+                }
+
                 return normalAB;
             }
         }
@@ -86,7 +89,10 @@ namespace Foster.Framework
             get
             {
                 if (dirty)
+                {
                     UpdateQuad();
+                }
+
                 return normalBC;
             }
         }
@@ -96,7 +102,10 @@ namespace Foster.Framework
             get
             {
                 if (dirty)
+                {
                     UpdateQuad();
+                }
+
                 return normalCD;
             }
         }
@@ -106,7 +115,10 @@ namespace Foster.Framework
             get
             {
                 if (dirty)
+                {
                     UpdateQuad();
+                }
+
                 return normalDA;
             }
         }

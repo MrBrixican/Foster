@@ -194,7 +194,9 @@ namespace Foster.Framework
                 // Magic number (0xA5E0)
                 var magic = WORD();
                 if (magic != 0xA5E0)
+                {
                     throw new Exception("File is not in .ase format");
+                }
 
                 // Frames / Width / Height / Color Mode
                 frameCount = WORD();
@@ -295,7 +297,9 @@ namespace Foster.Framework
 
                             var count = width * height * (int)Mode;
                             if (count > temp.Length)
+                            {
                                 temp = new byte[count];
+                            }
 
                             // RAW
                             if (celType == 0)
@@ -344,7 +348,9 @@ namespace Foster.Framework
 
                         // draw to frame if visible
                         if (cel.Layer.Visible)
+                        {
                             CelToFrame(frame, cel);
+                        }
 
                         last = cel;
                         frame.Cels.Add(cel);
@@ -363,7 +369,9 @@ namespace Foster.Framework
                             palette[start + p] = new Color(BYTE(), BYTE(), BYTE(), BYTE()).Premultiply();
 
                             if (Calc.IsBitSet(hasName, 0))
+                            {
                                 STRING();
+                            }
                         }
                     }
                     // USERDATA
@@ -375,11 +383,15 @@ namespace Foster.Framework
 
                             // has text
                             if (Calc.IsBitSet(flags, 0))
+                            {
                                 last.UserDataText = STRING();
+                            }
 
                             // has color
                             if (Calc.IsBitSet(flags, 1))
+                            {
                                 last.UserDataColor = new Color(BYTE(), BYTE(), BYTE(), BYTE()).Premultiply();
+                            }
                         }
                     }
                     // TAG
@@ -433,8 +445,10 @@ namespace Foster.Framework
 
                             // pivot point
                             if (Calc.IsBitSet(flags, 1))
+                            {
                                 slice.Pivot = new Point2((int)DWORD(), (int)DWORD());
-                            
+                            }
+
                             last = slice;
                             Slices.Add(slice);
                         }
@@ -519,8 +533,10 @@ namespace Foster.Framework
             }
             else if (mode == Modes.Indexed)
             {
-                for (int p = 0;  p < len; p++)
+                for (int p = 0; p < len; p++)
+                {
                     pixels[p] = palette[bytes[p]];
+                }
             }
         }
 
@@ -534,7 +550,9 @@ namespace Foster.Framework
 
             var blend = BlendModes[0];
             if (cel.Layer.BlendMode < BlendModes.Length)
+            {
                 blend = BlendModes[cel.Layer.BlendMode];
+            }
 
             for (int sx = Math.Max(0, -cel.X), right = Math.Min(cel.Width, frame.Sprite.Width - cel.X); sx < right; sx++)
             {
@@ -544,7 +562,9 @@ namespace Foster.Framework
                 for (int sy = Math.Max(0, -cel.Y), bottom = Math.Min(cel.Height, frame.Sprite.Height - cel.Y); sy < bottom; sy++, dy += frame.Sprite.Width)
                 {
                     if (dx + dy >= 0 && dx + dy < pxLen)
+                    {
                         blend(ref frame.Bitmap.Pixels[dx + dy], cel.Pixels[sx + sy * cel.Width], opacity);
+                    }
                 }
             }
         }
@@ -555,7 +575,9 @@ namespace Foster.Framework
         public void Pack(string namingFormat, Packer packer)
         {
             if (!namingFormat.Contains("{0}"))
+            {
                 throw new Exception("naming format must contain {0} for frame index");
+            }
 
             int frameIndex = 0;
             foreach (var frame in Frames)

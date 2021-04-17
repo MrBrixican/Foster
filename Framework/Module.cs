@@ -1,8 +1,4 @@
-﻿
-using System.Collections;
-using System.Collections.Generic;
-
-namespace Foster.Framework
+﻿namespace Foster.Framework
 {
     /// <summary>
     /// Foster Module, used to get callbacks during Application Events

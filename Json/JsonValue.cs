@@ -156,7 +156,10 @@ namespace Foster.Json
         public T Enum<T>(T defaultValue = default) where T : struct, IConvertible
         {
             if (System.Enum.TryParse<T>(String, true, out var value))
+            {
                 return value;
+            }
+
             return defaultValue;
         }
 
@@ -412,11 +415,16 @@ namespace Foster.Json
                 if (IsNumber)
                 {
                     if (Value is decimal value)
+                    {
                         return value;
+                    }
+
                     return Convert.ToDecimal(Value, NumberFormatInfo.InvariantInfo);
                 }
                 else if (IsString && Value is string value && decimal.TryParse(value, out var n))
+                {
                     return n;
+                }
 
                 return 0;
             }
@@ -429,11 +437,16 @@ namespace Foster.Json
                 if (IsNumber)
                 {
                     if (Value is float value)
+                    {
                         return value;
+                    }
+
                     return Convert.ToSingle(Value, NumberFormatInfo.InvariantInfo);
                 }
                 else if (IsString && Value is string value && float.TryParse(value, out var n))
+                {
                     return n;
+                }
 
                 return 0;
             }
@@ -446,11 +459,16 @@ namespace Foster.Json
                 if (IsNumber)
                 {
                     if (Value is double value)
+                    {
                         return value;
+                    }
+
                     return Convert.ToDouble(Value, NumberFormatInfo.InvariantInfo);
                 }
                 else if (IsString && Value is string value && double.TryParse(value, out var n))
+                {
                     return n;
+                }
 
                 return 0;
             }
@@ -463,11 +481,16 @@ namespace Foster.Json
                 if (IsNumber)
                 {
                     if (Value is short value)
+                    {
                         return value;
+                    }
+
                     return Convert.ToInt16(Value, NumberFormatInfo.InvariantInfo);
                 }
                 else if (IsString && Value is string value && short.TryParse(value, out var n))
+                {
                     return n;
+                }
 
                 return 0;
             }
@@ -480,11 +503,16 @@ namespace Foster.Json
                 if (IsNumber)
                 {
                     if (Value is byte value)
+                    {
                         return value;
+                    }
+
                     return Convert.ToByte(Value, NumberFormatInfo.InvariantInfo);
                 }
                 else if (IsString && Value is string value && byte.TryParse(value, out var n))
+                {
                     return n;
+                }
 
                 return 0;
             }
@@ -497,11 +525,16 @@ namespace Foster.Json
                 if (IsNumber)
                 {
                     if (Value is char value)
+                    {
                         return value;
+                    }
+
                     return Convert.ToChar(Value, NumberFormatInfo.InvariantInfo);
                 }
                 else if (IsString && Value is string value && char.TryParse(value, out var n))
+                {
                     return n;
+                }
 
                 return (char)0;
             }
@@ -514,11 +547,16 @@ namespace Foster.Json
                 if (IsNumber)
                 {
                     if (Value is ushort value)
+                    {
                         return value;
+                    }
+
                     return Convert.ToUInt16(Value, NumberFormatInfo.InvariantInfo);
                 }
                 else if (IsString && Value is string value && ushort.TryParse(value, out var n))
+                {
                     return n;
+                }
 
                 return 0;
             }
@@ -531,11 +569,16 @@ namespace Foster.Json
                 if (IsNumber)
                 {
                     if (Value is int value)
+                    {
                         return value;
+                    }
+
                     return Convert.ToInt32(Value, NumberFormatInfo.InvariantInfo);
                 }
                 else if (IsString && Value is string value && int.TryParse(value, out var n))
+                {
                     return n;
+                }
 
                 return 0;
             }
@@ -548,11 +591,16 @@ namespace Foster.Json
                 if (IsNumber)
                 {
                     if (Value is uint value)
+                    {
                         return value;
+                    }
+
                     return Convert.ToUInt32(Value, NumberFormatInfo.InvariantInfo);
                 }
                 else if (IsString && Value is string value && uint.TryParse(value, out var n))
+                {
                     return n;
+                }
 
                 return 0;
             }
@@ -565,11 +613,16 @@ namespace Foster.Json
                 if (IsNumber)
                 {
                     if (Value is long value)
+                    {
                         return value;
+                    }
+
                     return Convert.ToInt64(Value, NumberFormatInfo.InvariantInfo);
                 }
                 else if (IsString && Value is string value && long.TryParse(value, out var n))
+                {
                     return n;
+                }
 
                 return 0;
             }
@@ -582,11 +635,16 @@ namespace Foster.Json
                 if (IsNumber)
                 {
                     if (Value is ulong value)
+                    {
                         return value;
+                    }
+
                     return Convert.ToUInt64(Value, NumberFormatInfo.InvariantInfo);
                 }
                 else if (IsString && Value is string value && ulong.TryParse(value, out var n))
+                {
                     return n;
+                }
 
                 return 0;
             }
@@ -597,9 +655,14 @@ namespace Foster.Json
             get
             {
                 if (IsString && Value is string str)
+                {
                     return str;
+                }
                 else if (Value != null)
+                {
                     return Value.ToString() ?? "";
+                }
+
                 return "";
             }
         }
@@ -609,7 +672,10 @@ namespace Foster.Json
             get
             {
                 if (IsBinary && Value is byte[] bytes)
+                {
                     return bytes;
+                }
+
                 return JsonNull.binary;
             }
         }
@@ -634,16 +700,24 @@ namespace Foster.Json
         public override int GetHashedValue()
         {
             if (IsString)
+            {
                 return Calc.StaticStringHash(String);
+            }
 
             if (IsNumber)
+            {
                 return Int;
+            }
 
             if (IsBool)
+            {
                 return (Bool ? 1 : 0);
+            }
 
             if (IsBinary)
+            {
                 return (int)Calc.Adler32(0, Bytes);
+            }
 
             return 0;
         }
@@ -651,34 +725,67 @@ namespace Foster.Json
         public override JsonValue Clone()
         {
             if (IsString)
+            {
                 return String;
+            }
 
             if (IsNumber)
             {
                 if (Value is float Float)
+                {
                     return Float;
+                }
+
                 if (Value is double Double)
+                {
                     return Double;
+                }
+
                 if (Value is byte Byte)
+                {
                     return Byte;
+                }
+
                 if (Value is char Char)
+                {
                     return Char;
+                }
+
                 if (Value is short Short)
+                {
                     return Short;
+                }
+
                 if (Value is ushort UShort)
+                {
                     return UShort;
+                }
+
                 if (Value is int Int)
+                {
                     return Int;
+                }
+
                 if (Value is uint UInt)
+                {
                     return UInt;
+                }
+
                 if (Value is long Long)
+                {
                     return Long;
+                }
+
                 if (Value is ulong ULong)
+                {
                     return ULong;
+                }
             }
 
             if (IsBool)
+            {
                 return Bool;
+            }
 
             if (IsBinary)
             {

@@ -103,7 +103,9 @@ namespace Foster.Framework
         public bool Repeated(Buttons button, float delay, float interval)
         {
             if (Pressed(button))
+            {
                 return true;
+            }
 
             if (Down(button))
             {

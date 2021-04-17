@@ -5,9 +5,9 @@ using System.Runtime.InteropServices;
 
 namespace Foster.Vulkan
 {
-    using VkFlags = UInt32;
     using VkBool32 = UInt32;
     using VkDeviceSize = UInt64;
+    using VkFlags = UInt32;
     using VkSampleMask = UInt32;
 
     #region VK Core
@@ -4407,7 +4407,7 @@ namespace Foster.Vulkan
         Warning = 0x00000100,
         Error = 0x00001000,
     }
-    
+
     [Flags]
     internal enum VkDebugUtilsMessageTypeFlagsEXT
     {

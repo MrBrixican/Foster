@@ -67,7 +67,9 @@ namespace Foster.Framework
             set
             {
                 if (Implementation.Fullscreen)
+                {
                     Implementation.Fullscreen = false;
+                }
 
                 Implementation.Position = value;
             }
@@ -82,7 +84,9 @@ namespace Foster.Framework
             set
             {
                 if (Implementation.Fullscreen)
+                {
                     Implementation.Fullscreen = false;
+                }
 
                 Implementation.Size = value;
             }

@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using System.Text;
 
 namespace Foster.Vulkan
 {
@@ -26,7 +24,9 @@ namespace Foster.Vulkan
         public void Dispose()
         {
             if (handle.IsAllocated)
+            {
                 handle.Free();
+            }
         }
 
         public static implicit operator byte*(NativeValue value) => value.Pointer;

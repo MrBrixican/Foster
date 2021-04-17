@@ -26,7 +26,7 @@ namespace Foster.Json
             UShort,
             Int,
             UInt,
-            Long ,
+            Long,
             ULong,
             Decimal,
             Float,
@@ -97,7 +97,9 @@ namespace Foster.Json
         public override void Key(string name)
         {
             if (string.IsNullOrEmpty(name))
+            {
                 throw new Exception("Object Key cannot be empty");
+            }
 
             writer.Write((byte)BinaryTokens.ObjectKey);
             writer.Write(name);

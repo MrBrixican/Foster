@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Text;
 
 namespace Foster.Framework
@@ -33,13 +31,19 @@ namespace Foster.Framework
         public ShaderSource(string vertexSource, string fragmentSource, string? geomSource = null)
         {
             if (!string.IsNullOrEmpty(vertexSource))
+            {
                 Vertex = Encoding.UTF8.GetBytes(vertexSource);
+            }
 
             if (!string.IsNullOrEmpty(fragmentSource))
+            {
                 Fragment = Encoding.UTF8.GetBytes(fragmentSource);
+            }
 
             if (!string.IsNullOrEmpty(geomSource))
+            {
                 Geometry = Encoding.UTF8.GetBytes(geomSource);
+            }
         }
 
         public ShaderSource(Stream vertexSource, Stream fragmentSource, Stream? geomSource = null)

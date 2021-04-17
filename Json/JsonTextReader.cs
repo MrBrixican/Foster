@@ -58,13 +58,18 @@ namespace Foster.Json
             {
                 // skip whitespace and characters we don't care about
                 if (char.IsWhiteSpace(next) || next == ':' || next == ',')
+                {
                     continue;
+                }
 
                 // a comment
                 if (next == '#' || (next == '/' && (PeekChar(out var p) && p == '/')))
                 {
                     while (StepChar(out next) && next != '\n' && next != '\r')
+                    {
                         continue;
+                    }
+
                     continue;
                 }
 
@@ -129,11 +134,18 @@ namespace Foster.Json
                                 {
                                     StepChar(out next);
                                     if (next == 'n')
+                                    {
                                         builder.Append('\n');
+                                    }
                                     else if (next == 'r')
+                                    {
                                         builder.Append('\r');
+                                    }
                                     else
+                                    {
                                         builder.Append(next);
+                                    }
+
                                     continue;
                                 }
 
@@ -166,11 +178,15 @@ namespace Foster.Json
                     if (char.IsWhiteSpace(next))
                     {
                         while (PeekChar(out next) && char.IsWhiteSpace(next))
+                        {
                             SkipChar();
+                        }
                     }
 
                     if (PeekChar(out next) && next == ':')
+                    {
                         isKey = true;
+                    }
                 }
 
                 // is a key
@@ -306,7 +322,9 @@ namespace Foster.Json
         public void Dispose()
         {
             if (disposeStream)
+            {
                 reader.Dispose();
+            }
         }
     }
 }

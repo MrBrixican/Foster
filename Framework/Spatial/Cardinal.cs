@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Numerics;
 
 namespace Foster.Framework
@@ -98,9 +95,13 @@ namespace Foster.Framework
         public override bool Equals(object? obj)
         {
             if (obj == null || !(obj is Cardinal c))
+            {
                 return false;
+            }
             else
+            {
                 return this == c;
+            }
         }
 
         public override string ToString()
@@ -128,7 +129,10 @@ namespace Foster.Framework
         public static Cardinal FromVector(Vector2 dir)
         {
             if (Math.Abs(dir.X) > Math.Abs(dir.Y))
+            {
                 return dir.X < 0 ? Left : Right;
+            }
+
             return dir.Y < 0 ? Up : Down;
         }
 

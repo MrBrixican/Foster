@@ -1,10 +1,5 @@
 ﻿using Foster.Framework;
-using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.IO;
-using System.Text;
 
 namespace Foster.Json
 {
@@ -24,7 +19,10 @@ namespace Foster.Json
             get
             {
                 if (Value.TryGetValue(key, out var value))
+                {
                     return value;
+                }
+
                 return JsonNull.nul;
             }
             set
@@ -56,7 +54,10 @@ namespace Foster.Json
         {
             var clone = new JsonObject();
             foreach (var (key, value) in Value)
+            {
                 clone[key] = value.Clone();
+            }
+
             return clone;
         }
     }

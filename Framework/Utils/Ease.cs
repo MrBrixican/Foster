@@ -64,22 +64,40 @@ namespace Foster.Framework
         {
             t = 1 - t;
             if (t < B1)
+            {
                 return 1 - 7.5625f * t * t;
+            }
+
             if (t < B2)
+            {
                 return 1 - (7.5625f * (t - B3) * (t - B3) + .75f);
+            }
+
             if (t < B4)
+            {
                 return 1 - (7.5625f * (t - B5) * (t - B5) + .9375f);
+            }
+
             return 1 - (7.5625f * (t - B6) * (t - B6) + .984375f);
         };
 
         public static readonly Easer BounceOut = (float t) =>
         {
             if (t < B1)
+            {
                 return 7.5625f * t * t;
+            }
+
             if (t < B2)
+            {
                 return 7.5625f * (t - B3) * (t - B3) + .75f;
+            }
+
             if (t < B4)
+            {
                 return 7.5625f * (t - B5) * (t - B5) + .9375f;
+            }
+
             return 7.5625f * (t - B6) * (t - B6) + .984375f;
         };
 
@@ -89,20 +107,38 @@ namespace Foster.Framework
             {
                 t = 1 - t * 2;
                 if (t < B1)
+                {
                     return (1 - 7.5625f * t * t) / 2;
+                }
+
                 if (t < B2)
+                {
                     return (1 - (7.5625f * (t - B3) * (t - B3) + .75f)) / 2;
+                }
+
                 if (t < B4)
+                {
                     return (1 - (7.5625f * (t - B5) * (t - B5) + .9375f)) / 2;
+                }
+
                 return (1 - (7.5625f * (t - B6) * (t - B6) + .984375f)) / 2;
             }
             t = t * 2 - 1;
             if (t < B1)
+            {
                 return (7.5625f * t * t) / 2 + .5f;
+            }
+
             if (t < B2)
+            {
                 return (7.5625f * (t - B3) * (t - B3) + .75f) / 2 + .5f;
+            }
+
             if (t < B4)
+            {
                 return (7.5625f * (t - B5) * (t - B5) + .9375f) / 2 + .5f;
+            }
+
             return (7.5625f * (t - B6) * (t - B6) + .984375f) / 2 + .5f;
         };
 
@@ -119,9 +155,13 @@ namespace Foster.Framework
         public static float UpDown(float eased)
         {
             if (eased <= .5f)
+            {
                 return eased * 2;
+            }
             else
+            {
                 return 1 - (eased - .5f) * 2;
+            }
         }
     }
 }

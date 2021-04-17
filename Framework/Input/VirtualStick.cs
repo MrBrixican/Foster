@@ -33,7 +33,10 @@ namespace Foster.Framework
             {
                 var result = new Vector2(Horizontal.Value, Vertical.Value);
                 if (CircularDeadzone != 0 && result.Length() < CircularDeadzone)
+                {
                     return Vector2.Zero;
+                }
+
                 return result;
             }
         }

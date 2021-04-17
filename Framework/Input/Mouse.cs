@@ -28,7 +28,9 @@ namespace Foster.Framework
         public bool Repeated(MouseButtons button, float delay, float interval)
         {
             if (Pressed(button))
+            {
                 return true;
+            }
 
             var time = timestamp[(int)button] / (float)TimeSpan.TicksPerSecond;
 

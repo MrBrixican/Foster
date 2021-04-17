@@ -69,7 +69,10 @@ namespace Foster.Framework
             public float Value(bool deadzone)
             {
                 if (!deadzone || Math.Abs(Input.Controllers[Index].Axis(Axis)) >= Deadzone)
+                {
                     return Input.Controllers[Index].Axis(Axis) * (Positive ? 1 : -1);
+                }
+
                 return 0f;
             }
 
@@ -78,7 +81,10 @@ namespace Foster.Framework
                 get
                 {
                     if (Math.Abs(Input.Controllers[Index].Axis(Axis)) < Deadzone)
+                    {
                         return 0;
+                    }
+
                     return Input.Controllers[Index].Timestamp(Axis);
                 }
             }
@@ -123,7 +129,10 @@ namespace Foster.Framework
             if (OverlapBehaviour == Overlaps.CancelOut)
             {
                 foreach (var input in Nodes)
+                {
                     value += input.Value(deadzone);
+                }
+
                 value = Calc.Clamp(value, -1, 1);
             }
             else if (OverlapBehaviour == Overlaps.TakeNewer)

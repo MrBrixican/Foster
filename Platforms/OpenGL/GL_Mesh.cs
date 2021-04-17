@@ -84,7 +84,9 @@ namespace Foster.OpenGL
             static void UploadBufferData(ref uint id, GLEnum type, ReadOnlySequence<T> data, ref long currentBufferSize)
             {
                 if (id == 0)
+                {
                     id = GL.GenBuffer();
+                }
 
                 GL.BindBuffer(type, id);
 
@@ -117,13 +119,18 @@ namespace Foster.OpenGL
             {
                 // create new array if it's needed on this context
                 if (!vertexArrays.TryGetValue(context, out uint id))
+                {
                     vertexArrays.Add(context, id = GL.GenVertexArray());
+                }
 
                 GL.BindVertexArray(id);
 
                 // we will need to change attribute pointers probably
                 if (lastMaterial != null && lastMaterial.Shader != material.Shader)
+                {
                     bindedArrays.Clear();
+                }
+
                 lastMaterial = material;
 
                 // rebind data if needed
@@ -139,7 +146,9 @@ namespace Foster.OpenGL
                             GL.BindBuffer(GLEnum.ARRAY_BUFFER, vertexBuffer);
 
                             if (TrySetupAttribPointer(attribute, lastVertexFormat, 0))
+                            {
                                 continue;
+                            }
                         }
 
                         if (lastInstanceFormat != null)
@@ -147,7 +156,9 @@ namespace Foster.OpenGL
                             GL.BindBuffer(GLEnum.ARRAY_BUFFER, instanceBuffer);
 
                             if (TrySetupAttribPointer(attribute, lastInstanceFormat, 1))
+                            {
                                 continue;
+                            }
                         }
 
                         // nothing is using this so disable it
@@ -199,16 +210,24 @@ namespace Foster.OpenGL
         protected override void Dispose()
         {
             if (vertexBuffer > 0)
+            {
                 graphics.BuffersToDelete.Add(vertexBuffer);
+            }
 
             if (indexBuffer > 0)
+            {
                 graphics.BuffersToDelete.Add(indexBuffer);
+            }
 
             if (instanceBuffer > 0)
+            {
                 graphics.BuffersToDelete.Add(instanceBuffer);
+            }
 
             foreach (var kv in vertexArrays)
+            {
                 graphics.GetContextMeta(kv.Key).VertexArraysToDelete.Add(kv.Value);
+            }
 
             vertexArrays.Clear();
             bindedArrays.Clear();

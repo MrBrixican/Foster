@@ -42,9 +42,13 @@ namespace Foster.Framework
                 for (int k = 0; k < 8; k++)
                 {
                     if ((c & 1) != 0)
+                    {
                         c = 0xedb88320U ^ (c >> 1);
+                    }
                     else
+                    {
                         c >>= 1;
+                    }
                 }
                 crcTable[n] = c;
             }
@@ -96,7 +100,9 @@ namespace Foster.Framework
 
             // Check PNG Header
             if (!IsValid(stream))
+            {
                 throw new Exception("Stream is not PNG");
+            }
 
             // Skip PNG header
             stream.Seek(8, SeekOrigin.Current);
@@ -129,26 +135,42 @@ namespace Foster.Framework
                     hasTransparency = color == Colors.GreyscaleAlpha || color == Colors.TruecolorAlpha;
 
                     if (color == Colors.Greyscale || color == Colors.Indexed)
+                    {
                         components = 1;
+                    }
                     else if (color == Colors.GreyscaleAlpha)
+                    {
                         components = 2;
+                    }
                     else if (color == Colors.Truecolor)
+                    {
                         components = 3;
+                    }
                     else if (color == Colors.TruecolorAlpha)
+                    {
                         components = 4;
+                    }
 
                     // currently don't support interlacing as I'm actually not sure where the interlace step takes place lol
                     if (interlace == Interlace.Adam7)
+                    {
                         throw new NotImplementedException("Interlaced PNGs not implemented");
+                    }
 
                     if (depth != 1 && depth != 2 && depth != 4 && depth != 8 && depth != 16)
+                    {
                         throw new NotSupportedException($"{depth}-bit depth not supported");
+                    }
 
                     if (filter != 0)
+                    {
                         throw new NotSupportedException($"filter {filter} not supported");
+                    }
 
                     if (compression != 0)
+                    {
                         throw new NotSupportedException($"compression {compression} not supported");
+                    }
                 }
                 // PLTE Chunk (Indexed Palette)
                 else if (Check("PLTE", fourbytes))
@@ -198,13 +220,19 @@ namespace Foster.Framework
 
             // checks
             if (!hasIHDR)
+            {
                 throw new Exception("PNG Missing IHDR data");
+            }
 
             if (!hasIDAT)
+            {
                 throw new Exception("PNG Missing IDAT data");
+            }
 
             if (!hasPLTE && color == Colors.Indexed)
+            {
                 throw new Exception("PNG Missing PLTE data");
+            }
 
             // Parse the IDAT data into Pixels
             // It would be cool to do this line-by-line so we don't need to create a buffer to store the decompressed stream
@@ -395,7 +423,10 @@ namespace Foster.Framework
                 {
                     writer.Write(SwapEndian(buffer.Length));
                     for (int i = 0; i < title.Length; i++)
+                    {
                         writer.Write((byte)title[i]);
+                    }
+
                     writer.Write(buffer);
                 }
 
@@ -403,10 +434,14 @@ namespace Foster.Framework
                 {
                     uint crc = 0xFFFFFFFFU;
                     for (int n = 0; n < title.Length; n++)
+                    {
                         crc = crcTable[(crc ^ (byte)title[n]) & 0xFF] ^ (crc >> 8);
+                    }
 
                     for (int n = 0; n < buffer.Length; n++)
+                    {
                         crc = crcTable[(crc ^ buffer[n]) & 0xFF] ^ (crc >> 8);
+                    }
 
                     writer.Write(SwapEndian((int)(crc ^ 0xFFFFFFFFU)));
                 }
@@ -432,7 +467,10 @@ namespace Foster.Framework
                 if (!writeAll)
                 {
                     if (remainder > 0)
+                    {
                         zlib.Slice(offset).CopyTo(zlib);
+                    }
+
                     memory.Position = remainder;
                     memory.SetLength(remainder);
                 }
@@ -497,7 +535,9 @@ namespace Foster.Framework
 
                                 // write out chunks if we've hit out max IDAT chunk length
                                 if (zlibMemory.Position >= MaxIDATChunkLength)
+                                {
                                     WriteIDAT(writer, zlibMemory, false);
+                                }
                             }
 
                             pixelBuffer += width * 4;
@@ -507,7 +547,9 @@ namespace Foster.Framework
 
                 // zlib adler32 trailer
                 using (BinaryWriter bytes = new BinaryWriter(zlibMemory, Encoding.UTF8, true))
+                {
                     bytes.Write(SwapEndian((int)adler));
+                }
 
                 // write out remaining chunks
                 WriteIDAT(writer, zlibMemory, true);
@@ -527,9 +569,13 @@ namespace Foster.Framework
             int pc = Math.Abs(p - c);
 
             if (pa <= pb && pa <= pc)
+            {
                 return a;
+            }
             else if (pb <= pc)
+            {
                 return b;
+            }
 
             return c;
         }
@@ -538,12 +584,16 @@ namespace Foster.Framework
         private static bool Check(string name, Span<byte> buffer)
         {
             if (buffer.Length < name.Length)
+            {
                 return false;
+            }
 
             for (int i = 0; i < name.Length; i++)
             {
                 if ((char)buffer[i] != name[i])
+                {
                     return false;
+                }
             }
 
             return true;

@@ -58,7 +58,10 @@ namespace Foster.Json
                         {
                             ArrayBegin();
                             foreach (var item in value.Values)
+                            {
                                 Json(item);
+                            }
+
                             ArrayEnd();
                             return;
                         }

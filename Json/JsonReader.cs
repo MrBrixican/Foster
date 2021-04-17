@@ -41,11 +41,15 @@ namespace Foster.Json
                 }
 
                 if (Token != JsonToken.ObjectKey)
+                {
                     throw new Exception($"Expected Object Key");
+                }
 
                 var key = Value as string;
                 if (string.IsNullOrEmpty(key))
+                {
                     throw new Exception($"Invalid Object Key");
+                }
 
                 result[key] = ReadValue();
             }
@@ -58,8 +62,8 @@ namespace Foster.Json
         /// </summary>
         public bool TryReadObject([MaybeNullWhen(false)] out JsonValue obj)
         {
-            try 
-            { 
+            try
+            {
                 obj = ReadObject();
             }
             catch
@@ -68,7 +72,7 @@ namespace Foster.Json
 #pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
                 obj = null;
 #pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
-                return false; 
+                return false;
             }
 
             return true;
@@ -81,7 +85,10 @@ namespace Foster.Json
         {
             var arr = new JsonArray();
             while (Read() && Token != JsonToken.ArrayEnd)
+            {
                 arr.Add(CurrentValue());
+            }
+
             return arr;
         }
 
@@ -103,42 +110,84 @@ namespace Foster.Json
 
                 case JsonToken.Boolean:
                     if (Value is bool Bool)
+                    {
                         return Bool;
+                    }
+
                     break;
 
                 case JsonToken.Number:
                     if (Value is byte Byte)
+                    {
                         return Byte;
+                    }
+
                     if (Value is char Char)
+                    {
                         return Char;
+                    }
+
                     if (Value is short Short)
+                    {
                         return Short;
+                    }
+
                     if (Value is ushort UShort)
+                    {
                         return UShort;
+                    }
+
                     if (Value is int Int)
+                    {
                         return Int;
+                    }
+
                     if (Value is uint UInt)
+                    {
                         return UInt;
+                    }
+
                     if (Value is long Long)
+                    {
                         return Long;
+                    }
+
                     if (Value is ulong ULong)
+                    {
                         return ULong;
+                    }
+
                     if (Value is decimal Decimal)
+                    {
                         return Decimal;
+                    }
+
                     if (Value is float Float)
+                    {
                         return Float;
+                    }
+
                     if (Value is double Double)
+                    {
                         return Double;
+                    }
+
                     break;
 
                 case JsonToken.String:
                     if (Value is string String)
+                    {
                         return String;
+                    }
+
                     break;
 
                 case JsonToken.Binary:
                     if (Value is byte[] Bytes)
+                    {
                         return Bytes;
+                    }
+
                     break;
 
                 case JsonToken.ObjectStart:

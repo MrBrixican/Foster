@@ -1,7 +1,5 @@
 ﻿using Foster.Framework;
-using System;
 using System.Collections.Generic;
-using System.Threading;
 
 namespace Foster.OpenGL
 {
@@ -34,7 +32,9 @@ namespace Foster.OpenGL
             Dispose();
 
             for (int i = 0; i < Attachments.Count; i++)
+            {
                 Attachments[i].Resize(width, height);
+            }
         }
 
         public void Bind(ISystemOpenGL.Context context)
@@ -78,7 +78,10 @@ namespace Foster.OpenGL
             if (framebuffers.Count > 0)
             {
                 foreach (var kv in framebuffers)
+                {
                     graphics.GetContextMeta(kv.Key).FrameBuffersToDelete.Add(kv.Value);
+                }
+
                 framebuffers.Clear();
             }
         }

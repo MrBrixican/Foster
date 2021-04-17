@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Numerics;
-using System.Text;
 
 namespace Foster.Framework
 {
@@ -25,7 +23,7 @@ namespace Foster.Framework
         public Vector2 GetPoint(int index)
         {
             return new Vector2(
-                points[index * 2 + 0], 
+                points[index * 2 + 0],
                 points[index * 2 + 1]);
         }
 

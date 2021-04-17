@@ -117,7 +117,9 @@ namespace Foster.Framework
         public void AddBitmap(string name, Bitmap bitmap)
         {
             if (bitmap != null)
+            {
                 AddPixels(name, bitmap.Width, bitmap.Height, new ReadOnlySpan<Color>(bitmap.Pixels));
+            }
         }
 
         public void AddFile(string name, string path)
@@ -138,37 +140,57 @@ namespace Foster.Framework
             {
                 // TOP:
                 for (int y = 0; y < height; y++)
+                {
                     for (int x = 0, s = y * width; x < width; x++, s++)
+                    {
                         if (pixels[s].A > 0)
                         {
                             top = y;
                             goto LEFT;
                         }
-                    LEFT:
+                    }
+                }
+
+            LEFT:
                 for (int x = 0; x < width; x++)
+                {
                     for (int y = top, s = x + y * width; y < height; y++, s += width)
+                    {
                         if (pixels[s].A > 0)
                         {
                             left = x;
                             goto RIGHT;
                         }
-                    RIGHT:
+                    }
+                }
+
+            RIGHT:
                 for (int x = width - 1; x >= left; x--)
+                {
                     for (int y = top, s = x + y * width; y < height; y++, s += width)
+                    {
                         if (pixels[s].A > 0)
                         {
                             right = x + 1;
                             goto BOTTOM;
                         }
-                    BOTTOM:
+                    }
+                }
+
+            BOTTOM:
                 for (int y = height - 1; y >= top; y--)
+                {
                     for (int x = left, s = x + y * width; x < right; x++, s++)
+                    {
                         if (pixels[s].A > 0)
                         {
                             bottom = y + 1;
                             goto END;
                         }
-                    END:;
+                    }
+                }
+
+            END:;
             }
 
             // determine sizes
@@ -181,8 +203,12 @@ namespace Foster.Framework
                 {
                     var hash = 0;
                     for (int x = left; x < right; x++)
+                    {
                         for (int y = top; y < bottom; y++)
+                        {
                             hash = ((hash << 5) + hash) + (int)pixels[x + y * width].ABGR;
+                        }
+                    }
 
                     if (duplicateLookup.TryGetValue(hash, out var duplicate))
                     {
@@ -234,7 +260,9 @@ namespace Foster.Framework
         {
             // Already been packed
             if (!HasUnpackedData)
+            {
                 return Packed;
+            }
 
             // Reset
             Packed = new Output();
@@ -242,14 +270,18 @@ namespace Foster.Framework
 
             // Nothing to pack
             if (sources.Count <= 0)
+            {
                 return Packed;
+            }
 
             // sort the sources by size
             sources.Sort((a, b) => b.Packed.Width * b.Packed.Height - a.Packed.Width * a.Packed.Height);
 
             // make sure the largest isn't too large
             if (sources[0].Packed.Width > MaxSize || sources[0].Packed.Height > MaxSize)
+            {
                 throw new Exception("Source image is larger than max atlas size");
+            }
 
             // TODO: why do we sometimes need more than source images * 3?
             // for safety I've just made it 4 ... but it should really only be 3?
@@ -322,7 +354,9 @@ namespace Foster.Framework
 
                         // doesn't fit in this page
                         if (node == null)
+                        {
                             break;
+                        }
 
                         // add
                         node->Used = true;
@@ -342,9 +376,14 @@ namespace Foster.Framework
                         pageWidth = 2;
                         pageHeight = 2;
                         while (pageWidth < rootPtr->Rect.Width)
+                        {
                             pageWidth *= 2;
+                        }
+
                         while (pageHeight < rootPtr->Rect.Height)
+                        {
                             pageHeight *= 2;
+                        }
                     }
                     else
                     {
@@ -368,7 +407,9 @@ namespace Foster.Framework
                                 Packed.Entries[source.Name] = new Entry(source.Name, page, source.Packed, source.Frame);
 
                                 if (!source.Empty)
+                                {
                                     bmp.SetPixels(source.Packed, source.Buffer);
+                                }
                             }
                         }
                     }

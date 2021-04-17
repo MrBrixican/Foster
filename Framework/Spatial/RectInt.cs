@@ -294,7 +294,10 @@ namespace Foster.Framework
         {
             var r = this;
             while (count-- > 0)
+            {
                 r = r.RotateLeft(origin);
+            }
+
             return r;
         }
         public RectInt RotateLeft() => RotateLeft(Point2.Zero);
@@ -314,7 +317,10 @@ namespace Foster.Framework
         {
             var r = this;
             while (count-- > 0)
+            {
                 r = r.RotateRight(origin);
+            }
+
             return r;
         }
         public RectInt RotateRight() => RotateRight(Point2.Zero);
@@ -367,9 +373,13 @@ namespace Foster.Framework
         public static RectInt operator *(RectInt rect, Facing flipX)
         {
             if (flipX == Facing.Right)
+            {
                 return rect;
+            }
             else
+            {
                 return rect.MultiplyX(-1);
+            }
         }
 
         public static RectInt operator *(RectInt rect, int scaler)

@@ -33,7 +33,10 @@ namespace Foster.SDL2
 
             float hidpiRes = 72f;
             if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+            {
                 hidpiRes = 96;
+            }
+
             SDL.SDL_GetDisplayDPI(Index, out float ddpi, out _, out _);
             contentScale = Vector2.One * (ddpi / hidpiRes);
         }

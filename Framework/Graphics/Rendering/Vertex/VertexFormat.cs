@@ -23,7 +23,9 @@
 
             Stride = 0;
             for (int i = 0; i < Attributes.Length; i++)
+            {
                 Stride += Attributes[i].AttributeSize;
+            }
         }
 
         /// <summary>

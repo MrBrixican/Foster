@@ -1,5 +1,4 @@
-﻿using Foster.Framework;
-using System;
+﻿using System;
 using System.Runtime.InteropServices;
 
 namespace Foster.GLFW
@@ -431,7 +430,7 @@ namespace Foster.GLFW
         public static extern int VulkanSupported();
 
         [DllImport(DLL, EntryPoint = "glfwGetRequiredInstanceExtensions", CallingConvention = CallingConvention.Cdecl)]
-        public static extern IntPtr GetRequiredInstanceExtensions (out uint count);
+        public static extern IntPtr GetRequiredInstanceExtensions(out uint count);
 
         [DllImport(DLL, EntryPoint = "glfwGetInstanceProcAddress", CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr GetInstanceProcAddress(IntPtr instance, [MarshalAs(UnmanagedType.LPStr)] string procname);

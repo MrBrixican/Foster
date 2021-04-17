@@ -125,7 +125,10 @@ namespace Foster.Framework
         public static T Min<T>(T a, T b) where T : IComparable<T>
         {
             if (a.CompareTo(b) < 0)
+            {
                 return a;
+            }
+
             return b;
         }
         public static T Min<T>(T a, T b, T c) where T : IComparable<T>
@@ -140,7 +143,10 @@ namespace Foster.Framework
         public static T Max<T>(T a, T b) where T : IComparable<T>
         {
             if (a.CompareTo(b) > 0)
+            {
                 return a;
+            }
+
             return b;
         }
         public static T Max<T>(T a, T b, T c) where T : IComparable<T>
@@ -155,22 +161,32 @@ namespace Foster.Framework
         public static float Approach(float from, float target, float amount)
         {
             if (from > target)
+            {
                 return Math.Max(from - amount, target);
+            }
             else
+            {
                 return Math.Min(from + amount, target);
+            }
         }
 
         public static Vector2 Approach(Vector2 from, Vector2 target, float amount)
         {
             if (from == target)
+            {
                 return target;
+            }
             else
             {
                 var diff = target - from;
                 if (diff.LengthSquared() <= amount * amount)
+                {
                     return target;
+                }
                 else
+                {
                     return from + diff.Normalized() * amount;
+                }
             }
         }
 
@@ -192,9 +208,13 @@ namespace Foster.Framework
         public static float YoYo(float value)
         {
             if (value <= .5f)
+            {
                 return value * 2;
+            }
             else
+            {
                 return 1 - ((value - .5f) * 2);
+            }
         }
 
         public static float Map(float val, float min, float max, float newMin = 0, float newMax = 1)
@@ -231,7 +251,10 @@ namespace Foster.Framework
         {
             var diff = AngleDiff(val, target);
             if (Math.Abs(diff) < maxMove)
+            {
                 return target;
+            }
+
             return val + Clamp(diff, -maxMove, maxMove);
         }
 
@@ -278,10 +301,16 @@ namespace Foster.Framework
                 {
                     adler += buf[0];
                     if (adler >= BASE)
+                    {
                         adler -= BASE;
+                    }
+
                     sum2 += adler;
                     if (sum2 >= BASE)
+                    {
                         sum2 -= BASE;
+                    }
+
                     return adler | (sum2 << 16);
                 }
 
@@ -293,7 +322,10 @@ namespace Foster.Framework
                         sum2 += adler;
                     }
                     if (adler >= BASE)
+                    {
                         adler -= BASE;
+                    }
+
                     sum2 %= BASE;
                     return adler | (sum2 << 16);
                 }
@@ -401,7 +433,9 @@ namespace Foster.Framework
 
             Span<byte> buffer = stackalloc byte[1024];
             while ((next = stream.Read(buffer)) > 0)
+            {
                 adler = Adler32(adler, buffer.Slice(0, next));
+            }
 
             return adler;
         }
@@ -445,34 +479,46 @@ namespace Foster.Framework
                 var c = points[list[w]];
 
                 if (float.Epsilon > (((b.X - a.X) * (c.Y - a.Y)) - ((b.Y - a.Y) * (c.X - a.X))))
+                {
                     return false;
+                }
 
                 for (int p = 0; p < n; p++)
                 {
                     if ((p == u) || (p == v) || (p == w))
+                    {
                         continue;
+                    }
 
                     if (InsideTriangle(a, b, c, points[list[p]]))
+                    {
                         return false;
+                    }
                 }
 
                 return true;
             }
 
             if (points.Count < 3)
+            {
                 return;
+            }
 
             Span<int> list = (points.Count < 1000 ? stackalloc int[points.Count] : new int[points.Count]);
 
             if (Area() > 0)
             {
                 for (int v = 0; v < points.Count; v++)
+                {
                     list[v] = v;
+                }
             }
             else
             {
                 for (int v = 0; v < points.Count; v++)
+                {
                     list[v] = (points.Count - 1) - v;
+                }
             }
 
             var nv = points.Count;
@@ -481,17 +527,27 @@ namespace Foster.Framework
             for (int v = nv - 1; nv > 2;)
             {
                 if ((count--) <= 0)
+                {
                     return;
+                }
 
                 var u = v;
                 if (nv <= u)
+                {
                     u = 0;
+                }
+
                 v = u + 1;
                 if (nv <= v)
+                {
                     v = 0;
+                }
+
                 var w = v + 1;
                 if (nv <= w)
+                {
                     w = 0;
+                }
 
                 if (Snip(u, v, w, nv, list))
                 {
@@ -500,7 +556,9 @@ namespace Foster.Framework
                     populate.Add(list[w]);
 
                     for (int s = v, t = v + 1; t < nv; s++, t++)
+                    {
                         list[s] = list[t];
+                    }
 
                     nv--;
                     count = 2 * nv;
@@ -548,7 +606,9 @@ namespace Foster.Framework
 
                 if (float.TryParse(x, NumberStyles.Float, CultureInfo.InvariantCulture, out vector.X) &&
                     float.TryParse(y, NumberStyles.Float, CultureInfo.InvariantCulture, out vector.Y))
+                {
                     return true;
+                }
             }
 
             return false;
@@ -570,10 +630,12 @@ namespace Foster.Framework
                     var second = remaining.Slice(0, index);
                     var third = remaining.Slice(index + 1);
 
-                    if (float.TryParse(first, NumberStyles.Float, CultureInfo.InvariantCulture, out vector.X) && 
-                        float.TryParse(second, NumberStyles.Float, CultureInfo.InvariantCulture, out vector.Y) && 
+                    if (float.TryParse(first, NumberStyles.Float, CultureInfo.InvariantCulture, out vector.X) &&
+                        float.TryParse(second, NumberStyles.Float, CultureInfo.InvariantCulture, out vector.Y) &&
                         float.TryParse(third, NumberStyles.Float, CultureInfo.InvariantCulture, out vector.Z))
+                    {
                         return true;
+                    }
                 }
             }
 
@@ -594,7 +656,10 @@ namespace Foster.Framework
             {
                 var hash = 5381;
                 for (int i = 0; i < value.Length; i++)
+                {
                     hash = ((hash << 5) + hash) + value[i];
+                }
+
                 return hash;
             }
         }
@@ -614,7 +679,10 @@ namespace Foster.Framework
             {
                 Span<char> temp = stackalloc char[path.Length];
                 for (int i = 0; i < path.Length; i++)
+                {
                     temp[i] = path[i];
+                }
+
                 return NormalizePath(temp).ToString();
             }
         }
@@ -622,7 +690,12 @@ namespace Foster.Framework
         public static Span<char> NormalizePath(Span<char> path)
         {
             for (int i = 0; i < path.Length; i++)
-                if (path[i] == '\\') path[i] = '/';
+            {
+                if (path[i] == '\\')
+                {
+                    path[i] = '/';
+                }
+            }
 
             int length = path.Length;
             for (int i = 1, t = 1, l = length; t < l; i++, t++)
@@ -633,7 +706,9 @@ namespace Foster.Framework
                     length--;
                 }
                 else
+                {
                     path[i] = path[t];
+                }
             }
 
             return path.Slice(0, length);
@@ -656,7 +731,9 @@ namespace Foster.Framework
 
             var stream = assembly.GetManifestResourceStream(path);
             if (stream == null)
+            {
                 throw new Exception($"Embedded Resource '{resourceName}' doesn't exist");
+            }
 
             return stream;
         }

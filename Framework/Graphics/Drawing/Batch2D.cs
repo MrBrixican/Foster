@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Buffers;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Numerics;
-using System.Reflection.Metadata.Ecma335;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -112,7 +110,9 @@ namespace Foster.Framework
             Graphics = graphics;
 
             if (defaultBatchShader == null)
+            {
                 defaultBatchShader = new Shader(graphics, graphics.CreateShaderSourceBatch2D());
+            }
 
             DefaultShader = defaultBatchShader;
             DefaultMaterial = new Material(DefaultShader);
@@ -154,7 +154,9 @@ namespace Foster.Framework
         public void Render(RenderTarget target, Matrix4x4 matrix, RectInt? viewport = null, Color? clearColor = null)
         {
             if (clearColor != null)
+            {
                 App.Graphics.Clear(target, clearColor.Value);
+            }
 
             pass = new RenderPass(target, Mesh, DefaultMaterial);
             pass.Viewport = viewport;
@@ -176,7 +178,9 @@ namespace Foster.Framework
                 {
                     // remaining elements in the current batch
                     if (currentBatchInsert == i && currentBatch.Elements > 0)
+                    {
                         RenderBatch(currentBatch, matrix);
+                    }
 
                     // render the batch
                     RenderBatch(batches[i], matrix);
@@ -184,7 +188,9 @@ namespace Foster.Framework
 
                 // remaining elements in the current batch
                 if (currentBatchInsert == batches.Count && currentBatch.Elements > 0)
+                {
                     RenderBatch(currentBatch, matrix);
+                }
             }
         }
 
@@ -305,7 +311,9 @@ namespace Foster.Framework
         public void SetLayer(int layer)
         {
             if (currentBatch.Layer == layer)
+            {
                 return;
+            }
 
             // insert last batch
             if (currentBatch.Elements > 0)
@@ -318,7 +326,9 @@ namespace Foster.Framework
             // find the point to insert us
             var insert = 0;
             while (insert < batches.Count && batches[insert].Layer >= layer)
+            {
                 insert++;
+            }
 
             currentBatch.Layer = layer;
             currentBatchInsert = insert;
@@ -400,7 +410,9 @@ namespace Foster.Framework
 
             var startD = dashLength * offsetPercent * 2f;
             if (startD > dashLength)
+            {
                 startD -= dashLength * 2f;
+            }
 
             for (float d = startD; d < dist; d += dashLength * 2f)
             {
@@ -478,7 +490,9 @@ namespace Foster.Framework
             vertices[vertexCount + 3].Tex = t3;
 
             if (Graphics.OriginBottomLeft && (currentBatch.Texture?.IsFrameBuffer ?? false))
+            {
                 VerticalFlip(ref vertices[vertexCount + 0].Tex, ref vertices[vertexCount + 1].Tex, ref vertices[vertexCount + 2].Tex, ref vertices[vertexCount + 3].Tex);
+            }
 
             // COL
             vertices[vertexCount + 0].Col = color;
@@ -566,7 +580,9 @@ namespace Foster.Framework
             vertices[vertexCount + 3].Tex = t3;
 
             if (Graphics.OriginBottomLeft && (currentBatch.Texture?.IsFrameBuffer ?? false))
+            {
                 VerticalFlip(ref vertices[vertexCount + 0].Tex, ref vertices[vertexCount + 1].Tex, ref vertices[vertexCount + 2].Tex, ref vertices[vertexCount + 3].Tex);
+            }
 
             // COL
             vertices[vertexCount + 0].Col = c0;
@@ -791,7 +807,9 @@ namespace Foster.Framework
                 // set tris
                 {
                     while (indexCount + 30 >= indices.Length)
+                    {
                         Array.Resize(ref indices, indices.Length * 2);
+                    }
 
                     // top quad
                     {
@@ -886,27 +904,43 @@ namespace Foster.Framework
 
                 // top-left corner
                 if (r0 > 0)
+                {
                     SemiCircle(r0_br, up, -left, r0, Math.Max(3, (int)(r0 / 4)), color);
+                }
                 else
+                {
                     Quad(r0_tl, r0_tr, r0_br, r0_bl, color);
+                }
 
                 // top-right corner
                 if (r1 > 0)
+                {
                     SemiCircle(r1_bl, up, right, r1, Math.Max(3, (int)(r1 / 4)), color);
+                }
                 else
+                {
                     Quad(r1_tl, r1_tr, r1_br, r1_bl, color);
+                }
 
                 // bottom-right corner
                 if (r2 > 0)
+                {
                     SemiCircle(r2_tl, right, down, r2, Math.Max(3, (int)(r2 / 4)), color);
+                }
                 else
+                {
                     Quad(r2_tl, r2_tr, r2_br, r2_bl, color);
+                }
 
                 // bottom-left corner
                 if (r3 > 0)
+                {
                     SemiCircle(r3_tr, down, left, r3, Math.Max(3, (int)(r3 / 4)), color);
+                }
                 else
+                {
                     Quad(r3_tl, r3_tr, r3_br, r3_bl, color);
+                }
             }
 
         }
@@ -1187,7 +1221,9 @@ namespace Foster.Framework
                 }
 
                 if (!font.Charset.TryGetValue(text[i], out var ch))
+                {
                     continue;
+                }
 
                 if (ch.Image != null)
                 {
@@ -1196,7 +1232,9 @@ namespace Foster.Framework
                     if (i < text.Length - 1 && text[i + 1] != '\n')
                     {
                         if (ch.Kerning.TryGetValue(text[i + 1], out float kerning))
+                        {
                             at.X += kerning;
+                        }
                     }
 
                     Image(ch.Image, at, color, true);
@@ -1309,9 +1347,14 @@ namespace Foster.Framework
 
             // copy indices over
             while (indexCount + indexBuffer.Length >= indices.Length)
+            {
                 Array.Resize(ref indices, indices.Length * 2);
+            }
+
             for (int i = 0, n = indexCount; i < indexBuffer.Length; i++, n++)
+            {
                 indices[n] = vertexCount + indexBuffer[i];
+            }
 
             // increment
             vertexCount += vertexBuffer.Length;
@@ -1335,14 +1378,18 @@ namespace Foster.Framework
                 {
                     var color = (odd ? a : b);
                     if (color.A > 0)
+                    {
                         Rect(x, y, Math.Min(bounds.Right - x, cellWidth), Math.Min(bounds.Bottom - y, cellHeight), color);
+                    }
 
                     odd = !odd;
                     cells++;
                 }
 
                 if (cells % 2 == 0)
+                {
                     odd = !odd;
+                }
             }
         }
 
@@ -1354,7 +1401,9 @@ namespace Foster.Framework
         private void PushTriangle()
         {
             while (indexCount + 3 >= indices.Length)
+            {
                 Array.Resize(ref indices, indices.Length * 2);
+            }
 
             indices[indexCount + 0] = vertexCount + 0;
             indices[indexCount + 1] = vertexCount + 1;
@@ -1372,7 +1421,9 @@ namespace Foster.Framework
             int vert = vertexCount;
 
             while (index + 6 >= indices.Length)
+            {
                 Array.Resize(ref indices, indices.Length * 2);
+            }
 
             indices[index + 0] = vert + 0;
             indices[index + 1] = vert + 1;

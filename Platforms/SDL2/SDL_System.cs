@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Numerics;
-using System.Runtime.InteropServices;
-using System.Runtime.InteropServices.ComTypes;
-using System.Text;
-using Foster.Framework;
+﻿using Foster.Framework;
 using SDL2;
+using System;
+using System.Collections.Generic;
+using System.Runtime.InteropServices;
 
 namespace Foster.SDL2
 {
@@ -34,7 +30,9 @@ namespace Foster.SDL2
         protected override void ApplicationStarted()
         {
             if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+            {
                 SetProcessDPIAware();
+            }
 
             // init SDL
             if (SDL.SDL_Init(SDL.SDL_INIT_TIMER | SDL.SDL_INIT_VIDEO | SDL.SDL_INIT_JOYSTICK | SDL.SDL_INIT_GAMECONTROLLER | SDL.SDL_INIT_EVENTS) != 0)
@@ -55,8 +53,10 @@ namespace Foster.SDL2
 
             // Displays
             var numDisplays = SDL.SDL_GetNumVideoDisplays();
-            for (int i = 0; i < numDisplays; i ++)
+            for (int i = 0; i < numDisplays; i++)
+            {
                 monitors.Add(new SDL_Monitor(i));
+            }
         }
 
         protected override Window.Platform CreateWindow(string title, int width, int height, WindowFlags flags = WindowFlags.None)
@@ -90,7 +90,9 @@ namespace Foster.SDL2
                             }
 
                             if (window == null)
+                            {
                                 continue;
+                            }
 
                             switch (e.window.windowEvent)
                             {
@@ -120,7 +122,7 @@ namespace Foster.SDL2
                             };
                         }
                         break;
-                    
+
                     // Input Events
                     case SDL.SDL_EventType.SDL_KEYDOWN:
                     case SDL.SDL_EventType.SDL_KEYUP:
@@ -150,7 +152,10 @@ namespace Foster.SDL2
 
                 var error = SDL.SDL_GetError();
                 if (!string.IsNullOrEmpty(error))
+                {
                     Console.WriteLine(e.type + ": " + error);
+                }
+
                 SDL.SDL_ClearError();
             }
         }
@@ -165,7 +170,9 @@ namespace Foster.SDL2
         public ISystemOpenGL.Context CreateGLContext()
         {
             if (!(Windows[0].Implementation is SDL_Window window))
+            {
                 throw new Exception("All Windows have been closed and a Context cannot be created");
+            }
 
             return new SDL_GLContext(this, window.SDLWindowPtr);
         }
@@ -180,7 +187,9 @@ namespace Foster.SDL2
             var ptr = SDL.SDL_GL_GetCurrentContext();
 
             if (ptr != IntPtr.Zero)
+            {
                 return glContexts[ptr];
+            }
 
             return null;
         }
@@ -188,9 +197,13 @@ namespace Foster.SDL2
         public void SetCurrentGLContext(ISystemOpenGL.Context? context)
         {
             if (context is SDL_GLContext ctx && ctx != null)
+            {
                 SDL.SDL_GL_MakeCurrent(ctx.window, ctx.context);
+            }
             else
+            {
                 SDL.SDL_GL_MakeCurrent(IntPtr.Zero, IntPtr.Zero);
+            }
         }
 
         #endregion

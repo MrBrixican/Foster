@@ -1,7 +1,6 @@
 ﻿using Foster.Framework;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -42,7 +41,9 @@ namespace Foster.Vulkan
             VK.InitStaticDelegates(System);
 
             if (requestedValidationLayers.Length > 0)
+            {
                 FindValidationLayers(validationLayers);
+            }
 
             Instance = CreateVulkanInstance();
         }
@@ -59,11 +60,17 @@ namespace Foster.Vulkan
                     var message = VK.STRING(pCallbackData->pMessage);
 
                     if (messageSeverity.HasFlag(VkDebugUtilsMessageSeverityFlagsEXT.Error))
+                    {
                         Log.Error(Name, message);
+                    }
                     else if (messageSeverity.HasFlag(VkDebugUtilsMessageSeverityFlagsEXT.Warning))
+                    {
                         Log.Warning(Name, message);
+                    }
                     else
+                    {
                         Log.Message(Name, message);
+                    }
 
                     return VkConst.FALSE;
                 });
@@ -80,7 +87,10 @@ namespace Foster.Vulkan
 
                 int length = 0;
                 while (length < VkConst.MAX_PHYSICAL_DEVICE_NAME_SIZE && properties.deviceName[length] != 0)
+                {
                     length++;
+                }
+
                 DeviceName = Encoding.UTF8.GetString(properties.deviceName, length);
             }
 
@@ -116,7 +126,9 @@ namespace Foster.Vulkan
 
                 var result = VK.CreateDevice(PhysicalDevice, &createInfo, null, out Device);
                 if (result != VkResult.Success)
+                {
                     throw new Exception($"Failed to create Vulkan Logical Device, {result}");
+                }
 
                 // Get the Graphics Queue
                 VK.GetDeviceQueue(Device, graphicsFamilyIndex, 0, out GraphicsQueue);
@@ -134,16 +146,22 @@ namespace Foster.Vulkan
             {
                 var hasLayer = false;
                 for (int j = 0; j < availableLayerCount; j++)
+                {
                     if (requestedValidationLayers[i] == VK.STRING(availableLayers[j].layerName))
                     {
                         hasLayer = true;
                         break;
                     }
+                }
 
                 if (hasLayer)
+                {
                     appendTo.Add(requestedValidationLayers[i]);
+                }
                 else
+                {
                     Log.Warning(Name, $"Validation Layer {requestedValidationLayers[i]} requested but does not exist. You may need to install the Vulkan SDK.");
+                }
             }
         }
 
@@ -162,7 +180,9 @@ namespace Foster.Vulkan
 
             var result = VK.CreateDebugUtilsMessengerEXT(Instance, &createInfo, null, out var messenger);
             if (result != VkResult.Success)
+            {
                 throw new Exception(result.ToString());
+            }
 
             return messenger;
         }
@@ -200,7 +220,9 @@ namespace Foster.Vulkan
             // get the required Vulkan Extensions
             var exts = System.GetVKExtensions();
             if (HasValidationLayers)
+            {
                 exts.Add(VkConst.EXT_DEBUG_UTILS_EXTENSION_NAME);
+            }
 
             using var extensions = new NativeStringArray(exts);
             createInfo.enabledExtensionCount = extensions.Length;
@@ -209,7 +231,9 @@ namespace Foster.Vulkan
             // create instance
             var result = VK.CreateInstance(&createInfo, null, out var instance);
             if (result != VkResult.Success)
+            {
                 throw new Exception($"Failed to create Vulkan Instance, {result}");
+            }
 
             return instance;
         }
@@ -230,7 +254,9 @@ namespace Foster.Vulkan
                 for (int i = 0; i < deviceCount; i++)
                 {
                     if (IsValidPhysicalDevice(devices[i]))
+                    {
                         valid[validCount++] = devices[i];
+                    }
                 }
 
                 // find the best device
@@ -242,19 +268,23 @@ namespace Foster.Vulkan
                         VK.GetPhysicalDeviceProperties(devices[i], &properties);
 
                         if (properties.deviceType == VkPhysicalDeviceType.DiscreteGpu)
+                        {
                             return valid[i];
+                        }
                     }
 
                     return valid[0];
                 }
             }
-            
+
             throw new Exception("Failed to find any GPUs that support Vulkan");
 
             bool IsValidPhysicalDevice(VkPhysicalDevice device)
             {
                 if (!TryGetQueueFamilyIndex(device, VkQueueFlags.GraphicsBit, out _))
+                {
                     return false;
+                }
 
                 uint extensionCount;
                 VK.EnumerateDeviceExtensionProperties(device, null, &extensionCount, null);
@@ -267,11 +297,15 @@ namespace Foster.Vulkan
                     for (int j = 0; j < extensionCount && !hasExtension; j++)
                     {
                         if (str == VK.STRING(availableExtensions[j].extensionName))
+                        {
                             hasExtension = true;
+                        }
                     }
 
                     if (!hasExtension)
+                    {
                         return false;
+                    }
                 }
 
                 return true;
@@ -303,13 +337,19 @@ namespace Foster.Vulkan
         protected override void Disposed()
         {
             if (HasValidationLayers)
+            {
                 VK.DestroyDebugUtilsMessengerEXT(Instance, DebugMessenger, null);
+            }
 
             if (Device != IntPtr.Zero)
+            {
                 VK.DestroyDevice(Device, null);
+            }
 
             if (Instance != IntPtr.Zero)
+            {
                 VK.DestroyInstance(Instance, null);
+            }
 
             trackedDelegates.Clear();
         }

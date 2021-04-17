@@ -52,11 +52,19 @@ namespace Foster.Json
         private void Next(bool isValue = false, bool isKey = false, bool isBracket = false)
         {
             if (wasValue && (Strict || !Verbose))
+            {
                 writer.Write(",");
+            }
+
             if ((wasValue || (wasBracket && !isBracket) || isKey) && Verbose)
+            {
                 Newline();
+            }
+
             if (wasBracket && isBracket && Verbose)
+            {
                 writer.Write(" ");
+            }
 
             wasValue = isValue;
             wasBracket = isBracket;
@@ -66,7 +74,9 @@ namespace Foster.Json
         {
             writer.Write(NewlineString);
             for (int i = 0; i < depth; i++)
+            {
                 writer.Write(TabString);
+            }
         }
 
         private void ContainerBegin(char id)
@@ -83,9 +93,13 @@ namespace Foster.Json
             if (Verbose)
             {
                 if (wasBracket)
+                {
                     writer.Write(" ");
+                }
                 else
+                {
                     Newline();
+                }
             }
 
             writer.Write(id);
@@ -101,7 +115,9 @@ namespace Foster.Json
 
             writer.Write(":");
             if (Verbose)
+            {
                 writer.Write(" ");
+            }
         }
 
         public override void ObjectBegin()
@@ -240,8 +256,13 @@ namespace Foster.Json
         private bool StringContainsAny(string value, string chars)
         {
             for (int i = 0; i < chars.Length; i++)
+            {
                 if (value.Contains(chars[i]))
+                {
                     return true;
+                }
+            }
+
             return false;
         }
 

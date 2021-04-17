@@ -89,16 +89,22 @@ namespace Foster.Framework
             get
             {
                 if (dirty)
+                {
                     Update();
+                }
 
                 return position;
             }
             set
             {
                 if (parent == null)
+                {
                     LocalPosition = value;
+                }
                 else
+                {
                     LocalPosition = Vector2.Transform(value, WorldToLocalMatrix);
+                }
             }
         }
 
@@ -144,7 +150,9 @@ namespace Foster.Framework
             get
             {
                 if (dirty)
+                {
                     Update();
+                }
 
                 return scale;
             }
@@ -157,14 +165,22 @@ namespace Foster.Framework
                 else
                 {
                     if (parent.Scale.X == 0)
+                    {
                         value.X = 0;
+                    }
                     else
+                    {
                         value.X /= parent.Scale.X;
+                    }
 
                     if (parent.Scale.Y == 0)
+                    {
                         value.Y = 0;
+                    }
                     else
+                    {
                         value.Y /= parent.Scale.Y;
+                    }
 
                     LocalScale = value;
                 }
@@ -195,16 +211,22 @@ namespace Foster.Framework
             get
             {
                 if (dirty)
+                {
                     Update();
+                }
 
                 return rotation;
             }
             set
             {
                 if (parent == null)
+                {
                     LocalRotation = value;
+                }
                 else
+                {
                     LocalRotation = value - parent.Rotation;
+                }
             }
         }
 
@@ -232,7 +254,10 @@ namespace Foster.Framework
             get
             {
                 if (dirty)
+                {
                     Update();
+                }
+
                 return localMatrix;
             }
         }
@@ -245,7 +270,10 @@ namespace Foster.Framework
             get
             {
                 if (dirty)
+                {
                     Update();
+                }
+
                 return worldMatrix;
             }
         }
@@ -258,7 +286,10 @@ namespace Foster.Framework
             get
             {
                 if (dirty)
+                {
                     Update();
+                }
+
                 return worldToLocalMatrix;
             }
         }
@@ -275,11 +306,15 @@ namespace Foster.Framework
                 // Circular Hierarchy isn't allowed
                 // TODO: this only checks 1 parent, instead of the whole tree
                 if (value != null && value.Parent == this)
+                {
                     throw new Exception("Circular Transform Heritage is not allowed");
+                }
 
                 // Remove our OnChanged listener from the existing parent
                 if (parent != null)
+                {
                     parent.OnChanged -= MakeDirty;
+                }
 
                 // store state
                 var position = Position;
@@ -300,7 +335,9 @@ namespace Foster.Framework
 
                 // Add our OnChanged listener to the new parent
                 if (parent != null)
+                {
                     parent.OnChanged += MakeDirty;
+                }
 
                 // we have changed
                 OnChanged?.Invoke();
@@ -349,18 +386,28 @@ namespace Foster.Framework
             Matrix3x2 matrix;
 
             if (origin != Vector2.Zero)
+            {
                 matrix = Matrix3x2.CreateTranslation(-origin.X, -origin.Y);
+            }
             else
+            {
                 matrix = Matrix3x2.Identity;
+            }
 
             if (scale != Vector2.One)
+            {
                 matrix *= Matrix3x2.CreateScale(scale.X, scale.Y);
+            }
 
             if (rotation != 0)
+            {
                 matrix *= Matrix3x2.CreateRotation(rotation);
+            }
 
             if (position != Vector2.Zero)
+            {
                 matrix *= Matrix3x2.CreateTranslation(position.X, position.Y);
+            }
 
             return matrix;
         }

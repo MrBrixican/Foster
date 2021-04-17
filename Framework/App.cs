@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Diagnostics;
-using System.IO;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Threading;
 
@@ -80,13 +78,19 @@ namespace Foster.Framework
         public static void Start(string title, int width, int height, WindowFlags flags = WindowFlags.ScaleToMonitor, Action? callback = null)
         {
             if (Running)
+            {
                 throw new Exception("App is already running");
+            }
 
             if (Exiting)
+            {
                 throw new Exception("App is still exiting");
+            }
 
             if (string.IsNullOrWhiteSpace(Name))
+            {
                 Name = title;
+            }
 
             Log.Message($"Version: {Version}");
             Log.Message($"Platform: {RuntimeInformation.OSDescription} ({RuntimeInformation.OSArchitecture})");
@@ -116,7 +120,9 @@ namespace Foster.Framework
                 Modules.ApplicationStarted();
 
                 if (!Modules.Has<System>())
+                {
                     throw new Exception("App requires a System Module to be registered before it can Start");
+                }
 
                 // our primary Window
                 primaryWindow = new Window(System, title, width, height, flags);
@@ -144,7 +150,9 @@ namespace Foster.Framework
             {
                 var forceFixedTimestep = ForceFixedTimestep;
                 if (!forceFixedTimestep)
+                {
                     System.Input.Step();
+                }
 
                 Modules.FrameStart();
 
@@ -186,7 +194,9 @@ namespace Foster.Framework
 
                     // Do not allow any update to take longer than our maximum.
                     if (fixedAccumulator > Time.FixedMaxElapsedTime)
+                    {
                         fixedAccumulator = Time.FixedMaxElapsedTime;
+                    }
 
                     // do as many fixed updates as we can
                     while (fixedAccumulator >= fixedTarget)
@@ -208,7 +218,9 @@ namespace Foster.Framework
                         }
 
                         if (Exiting)
+                        {
                             break;
+                        }
                     }
                 }
 
@@ -228,7 +240,9 @@ namespace Foster.Framework
 
                 // Check if the Primary Window has been closed
                 if (primaryWindow == null || !primaryWindow.Opened)
+                {
                     Exit();
+                }
 
                 // render
                 if (!Exiting)
@@ -236,12 +250,20 @@ namespace Foster.Framework
                     Modules.BeforeRender();
 
                     for (int i = 0; i < System.Windows.Count; i++)
+                    {
                         if (System.Windows[i].Opened)
+                        {
                             System.Windows[i].Render();
+                        }
+                    }
 
                     for (int i = 0; i < System.Windows.Count; i++)
+                    {
                         if (System.Windows[i].Opened)
+                        {
                             System.Windows[i].Present();
+                        }
+                    }
 
                     Modules.AfterRender();
                 }

@@ -10,12 +10,12 @@
         /// <summary>
         /// The list of Attributes
         /// </summary>
-        public readonly VertexAttribute[] Attributes;
+        public VertexAttribute[] Attributes { get; }
 
         /// <summary>
         /// The stride of each Vertex (all the Attributes combined)
         /// </summary>
-        public readonly int Stride;
+        public int Stride { get; }
 
         public VertexFormat(params VertexAttribute[] attributes)
         {

@@ -8,12 +8,12 @@
         /// <summary>
         /// The name of the Attribute
         /// </summary>
-        public readonly string Name;
+        public string Name { get; }
 
         /// <summary>
         /// The Location of the Attribute in the Shader
         /// </summary>
-        public readonly uint Location;
+        public uint Location { get; }
 
         public ShaderAttribute(string name, uint location)
         {

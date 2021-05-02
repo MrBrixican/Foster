@@ -11,11 +11,11 @@ namespace Foster.Framework
     public class ModuleList : IEnumerable<Module>
     {
 
-        private readonly List<Type> registered = new List<Type>();
-        private readonly List<Module?> modules = new List<Module?>();
-        private readonly Dictionary<Type, Module> modulesByType = new Dictionary<Type, Module>();
-        private bool immediateInit;
-        private bool immediateStart;
+        private readonly List<Type> _registered = new List<Type>();
+        private readonly List<Module?> _modules = new List<Module?>();
+        private readonly Dictionary<Type, Module> _modulesByType = new Dictionary<Type, Module>();
+        private bool _immediateInit;
+        private bool _immediateStart;
 
         /// <summary>
         /// Registers a Module
@@ -30,18 +30,18 @@ namespace Foster.Framework
         /// </summary>
         public void Register(Type type)
         {
-            if (immediateInit)
+            if (_immediateInit)
             {
                 var module = Instantiate(type);
 
-                if (immediateStart)
+                if (_immediateStart)
                 {
                     StartupModule(module, true);
                 }
             }
             else
             {
-                registered.Add(type);
+                _registered.Add(type);
             }
         }
 
@@ -58,9 +58,9 @@ namespace Foster.Framework
             // add Module to lookup
             while (type != typeof(Module) && type != typeof(AppModule))
             {
-                if (!modulesByType.ContainsKey(type))
+                if (!_modulesByType.ContainsKey(type))
                 {
-                    modulesByType[type] = module;
+                    _modulesByType[type] = module;
                 }
 
                 if (type.BaseType == null)
@@ -73,12 +73,12 @@ namespace Foster.Framework
 
             // insert in order
             var insert = 0;
-            while (insert < modules.Count && (modules[insert]?.Priority ?? int.MinValue) <= module.Priority)
+            while (insert < _modules.Count && (_modules[insert]?.Priority ?? int.MinValue) <= module.Priority)
             {
                 insert++;
             }
 
-            modules.Insert(insert, module);
+            _modules.Insert(insert, module);
 
             // registered
             module.IsRegistered = true;
@@ -100,15 +100,15 @@ namespace Foster.Framework
             module.Shutdown();
             module.Disposed();
 
-            var index = modules.IndexOf(module);
-            modules[index] = null;
+            var index = _modules.IndexOf(module);
+            _modules[index] = null;
 
             var type = module.GetType();
             while (type != typeof(Module))
             {
-                if (modulesByType[type] == module)
+                if (_modulesByType[type] == module)
                 {
-                    modulesByType.Remove(type);
+                    _modulesByType.Remove(type);
                 }
 
                 if (type.BaseType == null)
@@ -127,7 +127,7 @@ namespace Foster.Framework
         /// </summary>
         public bool TryGet<T>(out T? module) where T : Module
         {
-            if (modulesByType.TryGetValue(typeof(T), out var m))
+            if (_modulesByType.TryGetValue(typeof(T), out var m))
             {
                 module = (T)m;
                 return true;
@@ -142,7 +142,7 @@ namespace Foster.Framework
         /// </summary>
         public bool TryGet(Type type, out Module? module)
         {
-            if (modulesByType.TryGetValue(type, out var m))
+            if (_modulesByType.TryGetValue(type, out var m))
             {
                 module = m;
                 return true;
@@ -157,7 +157,7 @@ namespace Foster.Framework
         /// </summary>
         public T Get<T>() where T : Module
         {
-            if (!modulesByType.TryGetValue(typeof(T), out var module))
+            if (!_modulesByType.TryGetValue(typeof(T), out var module))
             {
                 throw new Exception($"App is does not have a {typeof(T).Name} Module registered");
             }
@@ -170,7 +170,7 @@ namespace Foster.Framework
         /// </summary>
         public Module Get(Type type)
         {
-            if (!modulesByType.TryGetValue(type, out var module))
+            if (!_modulesByType.TryGetValue(type, out var module))
             {
                 throw new Exception($"App is does not have a {type.Name} Module registered");
             }
@@ -183,7 +183,7 @@ namespace Foster.Framework
         /// </summary>
         public bool Has<T>() where T : Module
         {
-            return modulesByType.ContainsKey(typeof(T));
+            return _modulesByType.ContainsKey(typeof(T));
         }
 
         /// <summary>
@@ -191,25 +191,25 @@ namespace Foster.Framework
         /// </summary>
         public bool Has(Type type)
         {
-            return modulesByType.ContainsKey(type);
+            return _modulesByType.ContainsKey(type);
         }
 
         internal void ApplicationStarted()
         {
             // create Application Modules
-            for (int i = 0; i < registered.Count; i++)
+            for (int i = 0; i < _registered.Count; i++)
             {
-                if (typeof(AppModule).IsAssignableFrom(registered[i]))
+                if (typeof(AppModule).IsAssignableFrom(_registered[i]))
                 {
-                    Instantiate(registered[i]);
-                    registered.RemoveAt(i);
+                    Instantiate(_registered[i]);
+                    _registered.RemoveAt(i);
                     i--;
                 }
             }
 
-            for (int i = 0; i < modules.Count; i++)
+            for (int i = 0; i < _modules.Count; i++)
             {
-                if (modules[i] is AppModule module)
+                if (_modules[i] is AppModule module)
                 {
                     module.ApplicationStarted();
                 }
@@ -218,9 +218,9 @@ namespace Foster.Framework
 
         internal void FirstWindowCreated()
         {
-            for (int i = 0; i < modules.Count; i++)
+            for (int i = 0; i < _modules.Count; i++)
             {
-                if (modules[i] is AppModule module)
+                if (_modules[i] is AppModule module)
                 {
                     module.FirstWindowCreated();
                 }
@@ -234,28 +234,28 @@ namespace Foster.Framework
             // Thus it has to iterate over modules and call Startup twice
 
             // run startup on on App Modules
-            for (int i = 0; i < modules.Count; i++)
+            for (int i = 0; i < _modules.Count; i++)
             {
-                StartupModule(modules[i], false);
+                StartupModule(_modules[i], false);
             }
 
             // instantiate remaining modules that are registered
-            for (int i = 0; i < registered.Count; i++)
+            for (int i = 0; i < _registered.Count; i++)
             {
-                Instantiate(registered[i]);
+                Instantiate(_registered[i]);
             }
 
             // further modules will be instantiated immediately
-            immediateInit = true;
+            _immediateInit = true;
 
             // call started on all modules
-            for (int i = 0; i < modules.Count; i++)
+            for (int i = 0; i < _modules.Count; i++)
             {
-                StartupModule(modules[i], true);
+                StartupModule(_modules[i], true);
             }
 
             // further modules will have Startup called immediately
-            immediateStart = true;
+            _immediateStart = true;
         }
 
         private static void StartupModule(Module? module, bool callAppMethods)
@@ -276,97 +276,97 @@ namespace Foster.Framework
 
         internal void Shutdown()
         {
-            for (int i = modules.Count - 1; i >= 0; i--)
+            for (int i = _modules.Count - 1; i >= 0; i--)
             {
-                modules[i]?.Shutdown();
+                _modules[i]?.Shutdown();
             }
 
-            for (int i = modules.Count - 1; i >= 0; i--)
+            for (int i = _modules.Count - 1; i >= 0; i--)
             {
-                modules[i]?.Disposed();
+                _modules[i]?.Disposed();
             }
 
-            registered.Clear();
-            modules.Clear();
-            modulesByType.Clear();
+            _registered.Clear();
+            _modules.Clear();
+            _modulesByType.Clear();
         }
 
         internal void FrameStart()
         {
             // remove null module entries
             int toRemove;
-            while ((toRemove = modules.IndexOf(null)) >= 0)
+            while ((toRemove = _modules.IndexOf(null)) >= 0)
             {
-                modules.RemoveAt(toRemove);
+                _modules.RemoveAt(toRemove);
             }
 
-            for (int i = 0; i < modules.Count; i++)
+            for (int i = 0; i < _modules.Count; i++)
             {
-                modules[i]?.FrameStart();
+                _modules[i]?.FrameStart();
             }
         }
 
         internal void FixedUpdate()
         {
-            for (int i = 0; i < modules.Count; i++)
+            for (int i = 0; i < _modules.Count; i++)
             {
-                modules[i]?.FixedUpdate();
+                _modules[i]?.FixedUpdate();
             }
         }
 
         internal void Update()
         {
-            for (int i = 0; i < modules.Count; i++)
+            for (int i = 0; i < _modules.Count; i++)
             {
-                modules[i]?.Update();
+                _modules[i]?.Update();
             }
         }
 
         internal void FrameEnd()
         {
-            for (int i = 0; i < modules.Count; i++)
+            for (int i = 0; i < _modules.Count; i++)
             {
-                modules[i]?.FrameEnd();
+                _modules[i]?.FrameEnd();
             }
         }
 
         internal void BeforeRender()
         {
-            for (int i = 0; i < modules.Count; i++)
+            for (int i = 0; i < _modules.Count; i++)
             {
-                modules[i]?.BeforeRender();
+                _modules[i]?.BeforeRender();
             }
         }
 
         internal void AfterRender()
         {
-            for (int i = 0; i < modules.Count; i++)
+            for (int i = 0; i < _modules.Count; i++)
             {
-                modules[i]?.AfterRender();
+                _modules[i]?.AfterRender();
             }
         }
 
         internal void BeforeRenderWindow(Window window)
         {
-            for (int i = 0; i < modules.Count; i++)
+            for (int i = 0; i < _modules.Count; i++)
             {
-                modules[i]?.BeforeRenderWindow(window);
+                _modules[i]?.BeforeRenderWindow(window);
             }
         }
 
         internal void AfterRenderWindow(Window window)
         {
-            for (int i = 0; i < modules.Count; i++)
+            for (int i = 0; i < _modules.Count; i++)
             {
-                modules[i]?.AfterRenderWindow(window);
+                _modules[i]?.AfterRenderWindow(window);
             }
         }
 
         public IEnumerator<Module> GetEnumerator()
         {
-            for (int i = 0; i < modules.Count; i++)
+            for (int i = 0; i < _modules.Count; i++)
             {
-                var module = modules[i];
+                var module = _modules[i];
                 if (module != null)
                 {
                     yield return module;
@@ -376,9 +376,9 @@ namespace Foster.Framework
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            for (int i = 0; i < modules.Count; i++)
+            for (int i = 0; i < _modules.Count; i++)
             {
-                var module = modules[i];
+                var module = _modules[i];
                 if (module != null)
                 {
                     yield return module;

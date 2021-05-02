@@ -11,20 +11,19 @@ namespace Foster.Framework
         public const int MaxButtons = 64;
         public const int MaxAxis = 64;
 
-        public readonly Input Input;
-
+        public Input Input { get; }
         public string Name { get; private set; } = "Unknown";
         public bool Connected { get; private set; } = false;
         public bool IsGamepad { get; private set; } = false;
         public int Buttons { get; private set; } = 0;
         public int Axes { get; private set; } = 0;
 
-        internal readonly bool[] pressed = new bool[MaxButtons];
-        internal readonly bool[] down = new bool[MaxButtons];
-        internal readonly bool[] released = new bool[MaxButtons];
-        internal readonly long[] timestamp = new long[MaxButtons];
-        internal readonly float[] axis = new float[MaxAxis];
-        internal readonly long[] axisTimestamp = new long[MaxAxis];
+        internal bool[] pressed { get; } = new bool[MaxButtons];
+        internal bool[] down { get; } = new bool[MaxButtons];
+        internal bool[] released { get; } = new bool[MaxButtons];
+        internal long[] timestamp { get; } = new long[MaxButtons];
+        internal float[] axis { get; } = new float[MaxAxis];
+        internal long[] axisTimestamp { get; } = new long[MaxAxis];
 
         internal void Connect(string name, uint buttonCount, uint axisCount, bool isGamepad)
         {

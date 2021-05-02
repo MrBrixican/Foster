@@ -26,9 +26,9 @@ namespace Foster.Framework
 
         public class Obj
         {
-            public readonly string Name;
-            public readonly List<Vertex> Vertices = new List<Vertex>();
-            public readonly List<Face> Faces = new List<Face>();
+            public string Name { get; }
+            public List<Vertex> Vertices { get; } = new List<Vertex>();
+            public List<Face> Faces { get; } = new List<Face>();
 
             public Obj(string name)
             {
@@ -41,12 +41,12 @@ namespace Foster.Framework
 
         }
 
-        public readonly List<Vector3> Positions = new List<Vector3>();
-        public readonly List<Vector3> Normals = new List<Vector3>();
-        public readonly List<Vector2> Texcoords = new List<Vector2>();
+        public List<Vector3> Positions { get; } = new List<Vector3>();
+        public List<Vector3> Normals { get; } = new List<Vector3>();
+        public List<Vector2> Texcoords { get; } = new List<Vector2>();
 
-        public Dictionary<string, Obj> Objects = new Dictionary<string, Obj>();
-        public Dictionary<string, Mtl> Materials = new Dictionary<string, Mtl>();
+        public Dictionary<string, Obj> Objects { get; set; } = new Dictionary<string, Obj>();
+        public Dictionary<string, Mtl> Materials { get; set; } = new Dictionary<string, Mtl>();
 
         public WavefrontObj(Stream stream)
         {

@@ -24,9 +24,9 @@ namespace Foster.Framework
     public class ShaderSource
     {
 
-        public byte[]? Vertex;
-        public byte[]? Fragment;
-        public byte[]? Geometry;
+        public byte[]? Vertex { get; }
+        public byte[]? Fragment { get; }
+        public byte[]? Geometry { get; }
 
         public ShaderSource(string vertexSource, string fragmentSource, string? geomSource = null)
         {

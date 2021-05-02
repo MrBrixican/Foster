@@ -24,9 +24,9 @@ namespace Foster.Framework
 
         public class KeyNode : INode
         {
-            public Input Input;
-            public Keys Key;
-            public bool Positive;
+            public Input Input { get; set; }
+            public Keys Key { get; set; }
+            public bool Positive { get; set; }
 
             public float Value(bool deadzone) => (Input.Keyboard.Down(Key) ? (Positive ? 1 : -1) : 0);
             public double Timestamp => Input.Keyboard.Timestamp(Key);
@@ -41,10 +41,10 @@ namespace Foster.Framework
 
         public class ButtonNode : INode
         {
-            public Input Input;
-            public int Index;
-            public Buttons Button;
-            public bool Positive;
+            public Input Input { get; set; }
+            public int Index { get; set; }
+            public Buttons Button { get; set; }
+            public bool Positive { get; set; }
 
             public float Value(bool deadzone) => (Input.Controllers[Index].Down(Button) ? (Positive ? 1 : -1) : 0);
             public double Timestamp => Input.Controllers[Index].Timestamp(Button);
@@ -60,11 +60,11 @@ namespace Foster.Framework
 
         public class AxisNode : INode
         {
-            public Input Input;
-            public int Index;
-            public Axes Axis;
-            public bool Positive;
-            public float Deadzone;
+            public Input Input { get; set; }
+            public int Index { get; set; }
+            public Axes Axis { get; set; }
+            public bool Positive { get; set; }
+            public float Deadzone { get; set; }
 
             public float Value(bool deadzone)
             {
@@ -105,9 +105,9 @@ namespace Foster.Framework
         public int IntValue => Math.Sign(Value);
         public int IntValueNoDeadzone => Math.Sign(ValueNoDeadzone);
 
-        public readonly Input Input;
-        public readonly List<INode> Nodes = new List<INode>();
-        public Overlaps OverlapBehaviour = Overlaps.CancelOut;
+        public Input Input { get; }
+        public List<INode> Nodes { get; } = new List<INode>();
+        public Overlaps OverlapBehaviour { get; set; } = Overlaps.CancelOut;
 
         private const float EPSILON = 0.00001f;
 

@@ -8,22 +8,22 @@
         /// <summary>
         /// The Name of the Uniform
         /// </summary>
-        public readonly string Name;
+        public string Name { get; }
 
         /// <summary>
         /// The Location of the Uniform in the Shader
         /// </summary>
-        public readonly int Location;
+        public int Location { get; }
 
         /// <summary>
         /// The Array length of the uniform
         /// </summary>
-        public readonly int Length;
+        public int Length { get; }
 
         /// <summary>
         /// The Type of Uniform
         /// </summary>
-        public readonly UniformType Type;
+        public UniformType Type { get; }
 
         public ShaderUniform(string name, int location, int length, UniformType type)
         {

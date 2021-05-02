@@ -20,7 +20,7 @@ namespace Foster.Framework
         /// <summary>
         /// A reference to the internal platform implementation of the Mesh
         /// </summary>
-        public readonly Platform Implementation;
+        public Platform Implementation { get; }
 
         /// <summary>
         /// Number of Vertices in the Mesh

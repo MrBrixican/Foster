@@ -28,17 +28,17 @@ namespace Foster.Framework
         /// <summary>
         /// Default Texture Filter used for all Textures
         /// </summary>
-        public static TextureFilter DefaultTextureFilter = TextureFilter.Linear;
+        public static TextureFilter DefaultTextureFilter { get; set; } = TextureFilter.Linear;
 
         /// <summary>
         /// A reference to the internal platform implementation of the Texture
         /// </summary>
-        public readonly Platform Implementation;
+        public Platform Implementation { get; }
 
         /// <summary>
         /// The Texture Data Format
         /// </summary>
-        public readonly TextureFormat Format;
+        public TextureFormat Format { get; }
 
         /// <summary>
         /// Gets the Width of the Texture
@@ -73,8 +73,8 @@ namespace Foster.Framework
         /// </summary>
         public TextureFilter Filter
         {
-            get => filter;
-            set => Implementation.SetFilter(filter = value);
+            get => _filter;
+            set => Implementation.SetFilter(_filter = value);
         }
 
         /// <summary>
@@ -82,8 +82,8 @@ namespace Foster.Framework
         /// </summary>
         public TextureWrap WrapX
         {
-            get => wrapX;
-            set => Implementation.SetWrap(wrapX = value, wrapY);
+            get => _wrapX;
+            set => Implementation.SetWrap(_wrapX = value, _wrapY);
         }
 
         /// <summary>
@@ -91,14 +91,14 @@ namespace Foster.Framework
         /// </summary>
         public TextureWrap WrapY
         {
-            get => wrapY;
-            set => Implementation.SetWrap(wrapX, wrapY = value);
+            get => _wrapY;
+            set => Implementation.SetWrap(_wrapX, _wrapY = value);
         }
 
-        private readonly Graphics graphics;
-        private TextureFilter filter = TextureFilter.Linear;
-        private TextureWrap wrapX = TextureWrap.Clamp;
-        private TextureWrap wrapY = TextureWrap.Clamp;
+        private readonly Graphics _graphics;
+        private TextureFilter _filter = TextureFilter.Linear;
+        private TextureWrap _wrapX = TextureWrap.Clamp;
+        private TextureWrap _wrapY = TextureWrap.Clamp;
 
         public Texture(Graphics graphics, int width, int height, TextureFormat format = TextureFormat.Color)
         {
@@ -112,7 +112,7 @@ namespace Foster.Framework
                 throw new Exception("Texture must have a size larger than 0");
             }
 
-            this.graphics = graphics;
+            this._graphics = graphics;
             Width = width;
             Height = height;
             Format = format;
@@ -266,7 +266,7 @@ namespace Foster.Framework
 
             // We may need to flip our buffer.
             // This is due to some rendering APIs drawing from the bottom left (OpenGL).
-            if (IsFrameBuffer && graphics.OriginBottomLeft)
+            if (IsFrameBuffer && _graphics.OriginBottomLeft)
             {
                 for (int y = 0; y < Height / 2; y++)
                 {

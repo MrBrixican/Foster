@@ -12,10 +12,10 @@ namespace Foster.Framework
 
         public class Format
         {
-            public readonly string Name;
-            public readonly IsValidDelegate IsValid;
-            public readonly ReadDelegate Read;
-            public readonly WriteDelegate Write;
+            public string Name { get; }
+            public IsValidDelegate IsValid { get; }
+            public ReadDelegate Read { get; }
+            public WriteDelegate Write { get; }
 
             public Format(string name, IsValidDelegate isValid, ReadDelegate read, WriteDelegate write)
             {
@@ -26,7 +26,7 @@ namespace Foster.Framework
             }
         }
 
-        public static readonly List<Format> Formats = new List<Format>();
+        public static List<Format> Formats { get; } = new List<Format>();
 
         static Images()
         {

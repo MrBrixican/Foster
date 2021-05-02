@@ -11,20 +11,20 @@ namespace Foster.Framework
 
         public const int MaxKeys = 400;
 
-        internal readonly bool[] pressed = new bool[MaxKeys];
-        internal readonly bool[] down = new bool[MaxKeys];
-        internal readonly bool[] released = new bool[MaxKeys];
-        internal readonly long[] timestamp = new long[MaxKeys];
+        internal bool[] pressed { get; } = new bool[MaxKeys];
+        internal bool[] down { get; } = new bool[MaxKeys];
+        internal bool[] released { get; } = new bool[MaxKeys];
+        internal long[] timestamp { get; } = new long[MaxKeys];
 
         /// <summary>
         /// The Input Module this Keyboard belong to
         /// </summary>
-        public readonly Input Input;
+        public Input Input { get; }
 
         /// <summary>
         /// Any Text that was typed over the last frame
         /// </summary>
-        public readonly StringBuilder Text = new StringBuilder();
+        public StringBuilder Text { get; } = new StringBuilder();
 
         internal Keyboard(Input input)
         {

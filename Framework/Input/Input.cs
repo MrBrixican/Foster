@@ -13,17 +13,17 @@ namespace Foster.Framework
         /// <summary>
         /// The Current Input State
         /// </summary>
-        public readonly InputState State;
+        public InputState State { get; }
 
         /// <summary>
         /// The Input State of the previous frame
         /// </summary>
-        public readonly InputState LastState;
+        public InputState LastState { get; }
 
         /// <summary>
         /// The Input State of the next frame
         /// </summary>
-        private readonly InputState nextState;
+        private readonly InputState _nextState;
 
         /// <summary>
         /// The Keyboard of the current State
@@ -43,38 +43,38 @@ namespace Foster.Framework
         /// <summary>
         /// Default delay before a key or button starts repeating
         /// </summary>
-        public float RepeatDelay = 0.4f;
+        public float RepeatDelay { get; set; } = 0.4f;
 
         /// <summary>
         /// Default interval that the repeat is triggered, in seconds
         /// </summary>
-        public float RepeatInterval = 0.03f;
+        public float RepeatInterval { get; set; } = 0.03f;
 
-        internal List<WeakReference<VirtualButton>> virtualButtons = new List<WeakReference<VirtualButton>>();
+        internal List<WeakReference<VirtualButton>> VirtualButtons { get; } = new List<WeakReference<VirtualButton>>();
 
         protected Input()
         {
             State = new InputState(this);
             LastState = new InputState(this);
-            nextState = new InputState(this);
+            _nextState = new InputState(this);
         }
 
         internal void Step()
         {
             LastState.Copy(State);
-            State.Copy(nextState);
-            nextState.Step();
+            State.Copy(_nextState);
+            _nextState.Step();
 
-            for (int i = virtualButtons.Count - 1; i >= 0; i--)
+            for (int i = VirtualButtons.Count - 1; i >= 0; i--)
             {
-                var button = virtualButtons[i];
+                var button = VirtualButtons[i];
                 if (button.TryGetTarget(out var target))
                 {
                     target.Update();
                 }
                 else
                 {
-                    virtualButtons.RemoveAt(i);
+                    VirtualButtons.RemoveAt(i);
                 }
             }
         }
@@ -101,7 +101,7 @@ namespace Foster.Framework
         protected void OnText(char value)
         {
             OnTextEvent?.Invoke(value);
-            nextState.Keyboard.Text.Append(value);
+            _nextState.Keyboard.Text.Append(value);
         }
 
         protected void OnKeyDown(Keys key)
@@ -112,9 +112,9 @@ namespace Foster.Framework
                 throw new ArgumentOutOfRangeException(nameof(key), "Value is out of Range for supported keys");
             }
 
-            nextState.Keyboard.down[id] = true;
-            nextState.Keyboard.pressed[id] = true;
-            nextState.Keyboard.timestamp[id] = Time.Duration.Ticks;
+            _nextState.Keyboard.down[id] = true;
+            _nextState.Keyboard.pressed[id] = true;
+            _nextState.Keyboard.timestamp[id] = Time.Duration.Ticks;
         }
 
         protected void OnKeyUp(Keys key)
@@ -125,33 +125,33 @@ namespace Foster.Framework
                 throw new ArgumentOutOfRangeException(nameof(key), "Value is out of Range for supported keys");
             }
 
-            nextState.Keyboard.down[id] = false;
-            nextState.Keyboard.released[id] = true;
+            _nextState.Keyboard.down[id] = false;
+            _nextState.Keyboard.released[id] = true;
         }
 
         protected void OnMouseDown(MouseButtons button)
         {
-            nextState.Mouse.down[(int)button] = true;
-            nextState.Mouse.pressed[(int)button] = true;
-            nextState.Mouse.timestamp[(int)button] = Time.Duration.Ticks;
+            _nextState.Mouse.down[(int)button] = true;
+            _nextState.Mouse.pressed[(int)button] = true;
+            _nextState.Mouse.timestamp[(int)button] = Time.Duration.Ticks;
         }
 
         protected void OnMouseUp(MouseButtons button)
         {
-            nextState.Mouse.down[(int)button] = false;
-            nextState.Mouse.released[(int)button] = true;
+            _nextState.Mouse.down[(int)button] = false;
+            _nextState.Mouse.released[(int)button] = true;
         }
 
         protected void OnMouseWheel(float offsetX, float offsetY)
         {
-            nextState.Mouse.wheelValue = new Vector2(offsetX, offsetY);
+            _nextState.Mouse.wheelValue = new Vector2(offsetX, offsetY);
         }
 
         protected void OnJoystickConnect(uint index, string name, uint buttonCount, uint axisCount, bool isGamepad)
         {
             if (index < InputState.MaxControllers)
             {
-                nextState.Controllers[(int)index].Connect(name, buttonCount, axisCount, isGamepad);
+                _nextState.Controllers[(int)index].Connect(name, buttonCount, axisCount, isGamepad);
             }
         }
 
@@ -159,7 +159,7 @@ namespace Foster.Framework
         {
             if (index < InputState.MaxControllers)
             {
-                nextState.Controllers[(int)index].Disconnect();
+                _nextState.Controllers[(int)index].Disconnect();
             }
         }
 
@@ -167,9 +167,9 @@ namespace Foster.Framework
         {
             if (index < InputState.MaxControllers && button < Controller.MaxButtons)
             {
-                nextState.Controllers[(int)index].down[button] = true;
-                nextState.Controllers[(int)index].pressed[button] = true;
-                nextState.Controllers[(int)index].timestamp[button] = Time.Duration.Ticks;
+                _nextState.Controllers[(int)index].down[button] = true;
+                _nextState.Controllers[(int)index].pressed[button] = true;
+                _nextState.Controllers[(int)index].timestamp[button] = Time.Duration.Ticks;
             }
         }
 
@@ -177,8 +177,8 @@ namespace Foster.Framework
         {
             if (index < InputState.MaxControllers && button < Controller.MaxButtons)
             {
-                nextState.Controllers[(int)index].down[button] = false;
-                nextState.Controllers[(int)index].released[button] = true;
+                _nextState.Controllers[(int)index].down[button] = false;
+                _nextState.Controllers[(int)index].released[button] = true;
             }
         }
 
@@ -186,9 +186,9 @@ namespace Foster.Framework
         {
             if (index < InputState.MaxControllers && button != Buttons.None)
             {
-                nextState.Controllers[(int)index].down[(int)button] = true;
-                nextState.Controllers[(int)index].pressed[(int)button] = true;
-                nextState.Controllers[(int)index].timestamp[(int)button] = Time.Duration.Ticks;
+                _nextState.Controllers[(int)index].down[(int)button] = true;
+                _nextState.Controllers[(int)index].pressed[(int)button] = true;
+                _nextState.Controllers[(int)index].timestamp[(int)button] = Time.Duration.Ticks;
             }
         }
 
@@ -196,27 +196,27 @@ namespace Foster.Framework
         {
             if (index < InputState.MaxControllers && button != Buttons.None)
             {
-                nextState.Controllers[(int)index].down[(int)button] = false;
-                nextState.Controllers[(int)index].released[(int)button] = true;
+                _nextState.Controllers[(int)index].down[(int)button] = false;
+                _nextState.Controllers[(int)index].released[(int)button] = true;
             }
         }
 
         protected bool IsJoystickButtonDown(uint index, uint button)
         {
-            return (index < InputState.MaxControllers && button < Controller.MaxButtons && nextState.Controllers[(int)index].down[button]);
+            return (index < InputState.MaxControllers && button < Controller.MaxButtons && _nextState.Controllers[(int)index].down[button]);
         }
 
         protected bool IsGamepadButtonDown(uint index, Buttons button)
         {
-            return (index < InputState.MaxControllers && button != Buttons.None && nextState.Controllers[(int)index].down[(int)button]);
+            return (index < InputState.MaxControllers && button != Buttons.None && _nextState.Controllers[(int)index].down[(int)button]);
         }
 
         protected void OnJoystickAxis(uint index, uint axis, float value)
         {
             if (index < InputState.MaxControllers && axis < Controller.MaxAxis)
             {
-                nextState.Controllers[(int)index].axis[axis] = value;
-                nextState.Controllers[(int)index].axisTimestamp[axis] = Time.Duration.Ticks;
+                _nextState.Controllers[(int)index].axis[axis] = value;
+                _nextState.Controllers[(int)index].axisTimestamp[axis] = Time.Duration.Ticks;
             }
         }
 
@@ -224,7 +224,7 @@ namespace Foster.Framework
         {
             if (index < InputState.MaxControllers && axis < Controller.MaxAxis)
             {
-                return nextState.Controllers[(int)index].axis[axis];
+                return _nextState.Controllers[(int)index].axis[axis];
             }
 
             return 0;
@@ -234,8 +234,8 @@ namespace Foster.Framework
         {
             if (index < InputState.MaxControllers && axis != Axes.None)
             {
-                nextState.Controllers[(int)index].axis[(int)axis] = value;
-                nextState.Controllers[(int)index].axisTimestamp[(int)axis] = Time.Duration.Ticks;
+                _nextState.Controllers[(int)index].axis[(int)axis] = value;
+                _nextState.Controllers[(int)index].axisTimestamp[(int)axis] = Time.Duration.Ticks;
             }
         }
 
@@ -243,7 +243,7 @@ namespace Foster.Framework
         {
             if (index < InputState.MaxControllers && axis != Axes.None)
             {
-                return nextState.Controllers[(int)index].axis[(int)axis];
+                return _nextState.Controllers[(int)index].axis[(int)axis];
             }
 
             return 0;

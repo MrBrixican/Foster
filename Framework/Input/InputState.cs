@@ -15,40 +15,40 @@ namespace Foster.Framework
         /// <summary>
         /// Our Input Module
         /// </summary>
-        public readonly Input Input;
+        public Input Input { get; set; }
 
         /// <summary>
         /// The Keyboard State
         /// </summary>
-        public readonly Keyboard Keyboard;
+        public Keyboard Keyboard { get; set; }
 
         /// <summary>
         /// The Mouse State
         /// </summary>
-        public readonly Mouse Mouse;
+        public Mouse Mouse { get; set; }
 
         /// <summary>
         /// A list of all the Controllers
         /// </summary>
-        private readonly Controller[] controllers;
+        private readonly Controller[] _controllers;
 
         /// <summary>
         /// A Read-Only Collection of the Controllers
         /// Note that they aren't necessarily connected
         /// </summary>
-        public readonly ReadOnlyCollection<Controller> Controllers;
+        public ReadOnlyCollection<Controller> Controllers { get; }
 
         public InputState(Input input)
         {
             Input = input;
 
-            controllers = new Controller[MaxControllers];
-            for (int i = 0; i < controllers.Length; i++)
+            _controllers = new Controller[MaxControllers];
+            for (int i = 0; i < _controllers.Length; i++)
             {
-                controllers[i] = new Controller(input);
+                _controllers[i] = new Controller(input);
             }
 
-            Controllers = new ReadOnlyCollection<Controller>(controllers);
+            Controllers = new ReadOnlyCollection<Controller>(_controllers);
             Keyboard = new Keyboard(input);
             Mouse = new Mouse();
         }

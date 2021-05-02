@@ -19,8 +19,8 @@ namespace Foster.Framework
 
         public class KeyNode : INode
         {
-            public Input Input;
-            public Keys Key;
+            public Input Input { get; set; }
+            public Keys Key { get; set; }
 
             public bool Pressed(float buffer, long lastBufferConsumedTime)
             {
@@ -54,8 +54,8 @@ namespace Foster.Framework
 
         public class MouseButtonNode : INode
         {
-            public Input Input;
-            public MouseButtons MouseButton;
+            public Input Input { get; set; }
+            public MouseButtons MouseButton { get; set; }
 
             public bool Pressed(float buffer, long lastBufferConsumedTime)
             {
@@ -89,9 +89,9 @@ namespace Foster.Framework
 
         public class ButtonNode : INode
         {
-            public Input Input;
-            public int Index;
-            public Buttons Button;
+            public Input Input { get; set; }
+            public int Index { get; set; }
+            public Buttons Button { get; set; }
 
             public bool Pressed(float buffer, long lastBufferConsumedTime)
             {
@@ -126,13 +126,13 @@ namespace Foster.Framework
 
         public class AxisNode : INode
         {
-            public Input Input;
-            public int Index;
-            public Axes Axis;
-            public float Threshold;
+            public Input Input { get; set; }
+            public int Index { get; set; }
+            public Axes Axis { get; set; }
+            public float Threshold { get; set; }
 
-            private float pressedTimestamp;
-            private const float AXIS_EPSILON = 0.00001f;
+            private float _pressedTimestamp;
+            private const float AxisEpsilon = 0.00001f;
 
             public bool Pressed(float buffer, long lastBufferConsumedTime)
             {
@@ -143,7 +143,7 @@ namespace Foster.Framework
 
                 var time = Time.Duration.Ticks;
 
-                if (time - pressedTimestamp <= TimeSpan.FromSeconds(buffer).Ticks && pressedTimestamp > lastBufferConsumedTime)
+                if (time - _pressedTimestamp <= TimeSpan.FromSeconds(buffer).Ticks && _pressedTimestamp > lastBufferConsumedTime)
                 {
                     return true;
                 }
@@ -155,9 +155,9 @@ namespace Foster.Framework
             {
                 get
                 {
-                    if (Math.Abs(Threshold) <= AXIS_EPSILON)
+                    if (Math.Abs(Threshold) <= AxisEpsilon)
                     {
-                        return Math.Abs(Input.Controllers[Index].Axis(Axis)) > AXIS_EPSILON;
+                        return Math.Abs(Input.Controllers[Index].Axis(Axis)) > AxisEpsilon;
                     }
 
                     if (Threshold < 0)
@@ -173,9 +173,9 @@ namespace Foster.Framework
             {
                 get
                 {
-                    if (Math.Abs(Threshold) <= AXIS_EPSILON)
+                    if (Math.Abs(Threshold) <= AxisEpsilon)
                     {
-                        return Math.Abs(Input.LastState.Controllers[Index].Axis(Axis)) > AXIS_EPSILON && Math.Abs(Input.Controllers[Index].Axis(Axis)) < AXIS_EPSILON;
+                        return Math.Abs(Input.LastState.Controllers[Index].Axis(Axis)) > AxisEpsilon && Math.Abs(Input.Controllers[Index].Axis(Axis)) < AxisEpsilon;
                     }
 
                     if (Threshold < 0)
@@ -194,9 +194,9 @@ namespace Foster.Framework
 
             private bool Pressed()
             {
-                if (Math.Abs(Threshold) <= AXIS_EPSILON)
+                if (Math.Abs(Threshold) <= AxisEpsilon)
                 {
-                    return (Math.Abs(Input.LastState.Controllers[Index].Axis(Axis)) < AXIS_EPSILON && Math.Abs(Input.Controllers[Index].Axis(Axis)) > AXIS_EPSILON);
+                    return (Math.Abs(Input.LastState.Controllers[Index].Axis(Axis)) < AxisEpsilon && Math.Abs(Input.Controllers[Index].Axis(Axis)) > AxisEpsilon);
                 }
 
                 if (Threshold < 0)
@@ -211,7 +211,7 @@ namespace Foster.Framework
             {
                 if (Pressed())
                 {
-                    pressedTimestamp = Input.Controllers[Index].Timestamp(Axis);
+                    _pressedTimestamp = Input.Controllers[Index].Timestamp(Axis);
                 }
             }
 
@@ -224,13 +224,13 @@ namespace Foster.Framework
             }
         }
 
-        public readonly Input Input;
-        public readonly List<INode> Nodes = new List<INode>();
-        public float RepeatDelay;
-        public float RepeatInterval;
-        public float Buffer;
+        public Input Input { get; }
+        public List<INode> Nodes { get; } = new List<INode>();
+        public float RepeatDelay { get; set; }
+        public float RepeatInterval { get; set; }
+        public float Buffer { get; set; }
 
-        private long lastBufferConsumeTime;
+        private long _lastBufferConsumeTime;
 
         public bool Pressed
         {
@@ -238,7 +238,7 @@ namespace Foster.Framework
             {
                 for (int i = 0; i < Nodes.Count; i++)
                 {
-                    if (Nodes[i].Pressed(Buffer, lastBufferConsumeTime))
+                    if (Nodes[i].Pressed(Buffer, _lastBufferConsumeTime))
                     {
                         return true;
                     }
@@ -286,7 +286,7 @@ namespace Foster.Framework
             {
                 for (int i = 0; i < Nodes.Count; i++)
                 {
-                    if (Nodes[i].Pressed(Buffer, lastBufferConsumeTime) || Nodes[i].Repeated(RepeatDelay, RepeatInterval))
+                    if (Nodes[i].Pressed(Buffer, _lastBufferConsumeTime) || Nodes[i].Repeated(RepeatDelay, RepeatInterval))
                     {
                         return true;
                     }
@@ -304,7 +304,7 @@ namespace Foster.Framework
             // This way it's automatically collected if the user is no longer
             // using it, and we don't require the user to call a Dispose or 
             // Unsubscribe callback
-            Input.virtualButtons.Add(new WeakReference<VirtualButton>(this));
+            Input.VirtualButtons.Add(new WeakReference<VirtualButton>(this));
 
             RepeatDelay = Input.RepeatDelay;
             RepeatInterval = Input.RepeatInterval;
@@ -313,7 +313,7 @@ namespace Foster.Framework
 
         public void ConsumeBuffer()
         {
-            lastBufferConsumeTime = Time.Duration.Ticks;
+            _lastBufferConsumeTime = Time.Duration.Ticks;
         }
 
         public VirtualButton Add(params Keys[] keys)

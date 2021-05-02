@@ -9,30 +9,30 @@ namespace Foster.Framework
     /// </summary>
     public static class Rand
     {
-        public static Random Instance = new Random();
-        private static readonly Stack<Random> stack = new Stack<Random>();
+        public static Random Instance { get; private set; } = new Random();
+        private static readonly Stack<Random> _stack = new Stack<Random>();
 
         public static void Push(int newSeed)
         {
-            stack.Push(Instance);
+            _stack.Push(Instance);
             Instance = new Random(newSeed);
         }
 
         public static void Push(Random random)
         {
-            stack.Push(Instance);
+            _stack.Push(Instance);
             Instance = random;
         }
 
         public static void Push()
         {
-            stack.Push(Instance);
+            _stack.Push(Instance);
             Instance = new Random();
         }
 
         public static void Pop()
         {
-            Instance = stack.Pop();
+            Instance = _stack.Pop();
         }
 
         public static float NextFloat(this Random random)

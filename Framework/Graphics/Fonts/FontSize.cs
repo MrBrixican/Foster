@@ -17,88 +17,88 @@ namespace Foster.Framework
             /// <summary>
             /// The Unicode Value of the Character
             /// </summary>
-            public char Unicode;
+            public char Unicode { get; init; }
 
             /// <summary>
             /// The Associated Glyph of the Character
             /// </summary>
-            public int Glyph;
+            public int Glyph { get; init; }
 
             /// <summary>
             /// The Width (in pixels) of the Character
             /// </summary>
-            public int Width;
+            public int Width { get; init; }
 
             /// <summary>
             /// The Height (in pixels) of the Character
             /// </summary>
-            public int Height;
+            public int Height { get; init; }
 
             /// <summary>
             /// The Horizontal Advance (in pixels) of the Character
             /// </summary>
-            public float Advance;
+            public float Advance { get; init; }
 
             /// <summary>
             /// The X-Offset (in pixels) of the Character
             /// </summary>
-            public float OffsetX;
+            public float OffsetX { get; init; }
 
             /// <summary>
             /// The Y-Offset (in pixels) of the Character
             /// </summary>
-            public float OffsetY;
+            public float OffsetY { get; init; }
 
             /// <summary>
             /// Whether the Character has a Glyph. If not, this character cannot be rendered
             /// </summary>
-            public bool HasGlyph;
+            public bool HasGlyph { get; init; }
         };
 
         /// <summary>
         /// The Font associated with this Font Size
         /// </summary>
-        public readonly Font Font;
+        public Font Font { get; }
 
         /// <summary>
         /// The Size of the Font
         /// </summary>
-        public readonly int Size;
+        public int Size { get; }
 
         /// <summary>
         /// The Ascent of the Font. This is the Font.Ascent * our Scale
         /// </summary>
-        public readonly float Ascent;
+        public float Ascent { get; }
 
         /// <summary>
         /// The Descent of the Font. This is the Font.Descent * our Scale
         /// </summary>
-        public readonly float Descent;
+        public float Descent { get; }
 
         /// <summary>
         /// The LineGap of the Font. This is the Font.LineGap * our Scale
         /// </summary>
-        public readonly float LineGap;
+        public float LineGap { get; }
 
         /// <summary>
         /// The Height of the Font. This is the Font.Height * our Scale
         /// </summary>
-        public readonly float Height;
+        public float Height { get; }
 
         /// <summary>
         /// The LineHeight of the Font. This is the Font.LineHeight * our Scale
         /// </summary>
-        public readonly float LineHeight;
+        public float LineHeight { get; }
 
         /// <summary>
         /// The Scale of the Font Size
         /// </summary>
-        public readonly float Scale;
+        public float Scale { get; }
 
         /// <summary>
         /// The Character Set of the Font Size
         /// </summary>
-        public readonly Dictionary<char, Character> Charset = new Dictionary<char, Character>();
+        public Dictionary<char, Character> Charset { get; } = new Dictionary<char, Character>();
 
         public FontSize(Font font, int size, string charset)
         {
@@ -128,8 +128,8 @@ namespace Foster.Framework
                     {
                         int advance, offsetX, x0, y0, x1, y1;
 
-                        StbTrueType.stbtt_GetGlyphHMetrics(font.fontInfo, glyph, &advance, &offsetX);
-                        StbTrueType.stbtt_GetGlyphBitmapBox(font.fontInfo, glyph, Scale, Scale, &x0, &y0, &x1, &y1);
+                        StbTrueType.stbtt_GetGlyphHMetrics(font.FontInfo, glyph, &advance, &offsetX);
+                        StbTrueType.stbtt_GetGlyphBitmapBox(font.FontInfo, glyph, Scale, Scale, &x0, &y0, &x1, &y1);
 
                         int w = (x1 - x0);
                         int h = (y1 - y0);
@@ -143,9 +143,10 @@ namespace Foster.Framework
                             Height = h,
                             Advance = advance * Scale,
                             OffsetX = offsetX * Scale,
-                            OffsetY = y0
+                            OffsetY = y0,
+                            HasGlyph = (w > 0 && h > 0 && StbTrueType.stbtt_IsGlyphEmpty(font.FontInfo, glyph) == 0)
                         };
-                        ch.HasGlyph = (w > 0 && h > 0 && StbTrueType.stbtt_IsGlyphEmpty(font.fontInfo, ch.Glyph) == 0);
+
                         Charset[unicode] = ch;
                     }
                 }
@@ -164,7 +165,7 @@ namespace Foster.Framework
                     throw new Exception("Cannot get Font data as it is disposed");
                 }
 
-                return StbTrueType.stbtt_GetGlyphKernAdvance(Font.fontInfo, char0.Glyph, char1.Glyph) * Scale;
+                return StbTrueType.stbtt_GetGlyphKernAdvance(Font.FontInfo, char0.Glyph, char1.Glyph) * Scale;
             }
 
             return 0f;
@@ -210,7 +211,7 @@ namespace Foster.Framework
                     // kinda weird but it works & saves creating more memory
 
                     var input = (byte*)ptr;
-                    StbTrueType.stbtt_MakeGlyphBitmap(Font.fontInfo, input, ch.Width, ch.Height, ch.Width, Scale, Scale, ch.Glyph);
+                    StbTrueType.stbtt_MakeGlyphBitmap(Font.FontInfo, input, ch.Width, ch.Height, ch.Width, Scale, Scale, ch.Glyph);
 
                     for (int i = ch.Width * ch.Height - 1; i >= 0; i--)
                     {

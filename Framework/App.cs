@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading;
 
@@ -14,12 +15,12 @@ namespace Foster.Framework
         /// <summary>
         /// The Application Name
         /// </summary>
-        public static string Name = "";
+        public static string Name { get; set; } = "";
 
         /// <summary>
         /// Foster.Framework Version Number
         /// </summary>
-        public static readonly Version Version = new Version(0, 1, 0);
+        public static Version Version { get; } = new Version(0, 1, 0);
 
         /// <summary>
         /// Whether the Application is running
@@ -34,7 +35,7 @@ namespace Foster.Framework
         /// <summary>
         /// A List of all the Application Modules
         /// </summary>
-        public static readonly ModuleList Modules = new ModuleList();
+        public static ModuleList Modules { get; } = new ModuleList();
 
         /// <summary>
         /// Gets the System Module
@@ -59,17 +60,17 @@ namespace Foster.Framework
         /// <summary>
         /// Gets the Primary Window
         /// </summary>
-        public static Window Window => primaryWindow ?? throw new Exception("Application has not yet created a Primary Window");
+        public static Window Window => _primaryWindow ?? throw new Exception("Application has not yet created a Primary Window");
 
         /// <summary>
         /// When set to true, this forces the entire application to use Fixed Timestep, including normal Update methods.
         /// </summary>
-        public static bool ForceFixedTimestep;
+        public static bool ForceFixedTimestep { get; set; }
 
         /// <summary>
         /// Reference to the Primary Window
         /// </summary>
-        private static Window? primaryWindow;
+        private static Window? _primaryWindow;
 
         /// <summary>
         /// Starts running the Application
@@ -107,11 +108,13 @@ namespace Foster.Framework
             {
                 var path = System.DefaultUserDirectory(Name);
                 if (Modules.Has<System>())
+                {
                     path = Modules.Get<System>().UserDirectory(Name);
+                }
 
                 Log.Error(e);
                 Log.AppendToFile(Name, Path.Combine(path, "ErrorLog.txt"));
-                throw e;
+                throw;
             }
 #endif
             void Launch()
@@ -125,7 +128,7 @@ namespace Foster.Framework
                 }
 
                 // our primary Window
-                primaryWindow = new Window(System, title, width, height, flags);
+                _primaryWindow = new Window(System, title, width, height, flags);
                 Modules.FirstWindowCreated();
 
                 // startup application
@@ -239,7 +242,7 @@ namespace Foster.Framework
                 Modules.FrameEnd();
 
                 // Check if the Primary Window has been closed
-                if (primaryWindow == null || !primaryWindow.Opened)
+                if (_primaryWindow == null || !_primaryWindow.Opened)
                 {
                     Exit();
                 }
@@ -280,7 +283,7 @@ namespace Foster.Framework
 
             // finalize
             Modules.Shutdown();
-            primaryWindow = null;
+            _primaryWindow = null;
             Exiting = false;
 
             Log.Message("Exited");

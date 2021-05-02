@@ -10,11 +10,11 @@ namespace Foster.Framework
     {
         public const int MaxButtons = 5;
 
-        internal readonly bool[] pressed = new bool[MaxButtons];
-        internal readonly bool[] down = new bool[MaxButtons];
-        internal readonly bool[] released = new bool[MaxButtons];
-        internal readonly long[] timestamp = new long[MaxButtons];
-        internal Vector2 wheelValue;
+        internal bool[] pressed { get; } = new bool[MaxButtons];
+        internal bool[] down { get; } = new bool[MaxButtons];
+        internal bool[] released { get; } = new bool[MaxButtons];
+        internal long[] timestamp { get; } = new long[MaxButtons];
+        internal Vector2 wheelValue { get; set; }
 
         public bool Pressed(MouseButtons button) => pressed[(int)button];
         public bool Down(MouseButtons button) => down[(int)button];

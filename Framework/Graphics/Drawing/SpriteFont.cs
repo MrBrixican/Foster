@@ -18,27 +18,27 @@ namespace Foster.Framework
             /// <summary>
             /// The Unicode Value
             /// </summary>
-            public char Unicode;
+            public char Unicode { get; set; }
 
             /// <summary>
             /// The rendered Character Image
             /// </summary>            
-            public Subtexture Image;
+            public Subtexture Image { get; set; }
 
             /// <summary>
             /// The Offset to draw the Character at
             /// </summary>
-            public Vector2 Offset;
+            public Vector2 Offset { get; set; }
 
             /// <summary>
             /// The Amount to Advance the rendering by, horizontally
             /// </summary>
-            public float Advance;
+            public float Advance { get; set; }
 
             /// <summary>
             /// The Kerning value for following Characters
             /// </summary>
-            public Dictionary<char, float> Kerning = new Dictionary<char, float>();
+            public Dictionary<char, float> Kerning { get; set; } = new Dictionary<char, float>();
 
             public Character(char unicode, Subtexture image, Vector2 offset, float advance)
             {
@@ -52,47 +52,47 @@ namespace Foster.Framework
         /// <summary>
         /// A list of all the Characters in the Sprite Font
         /// </summary>
-        public readonly Dictionary<char, Character> Charset = new Dictionary<char, Character>();
+        public Dictionary<char, Character> Charset { get; } = new Dictionary<char, Character>();
 
         /// <summary>
         /// The Font Family Name
         /// </summary>
-        public string FamilyName;
+        public string FamilyName { get; set; }
 
         /// <summary>
         /// The Font Style Name
         /// </summary>
-        public string StyleName;
+        public string StyleName { get; set; }
 
         /// <summary>
         /// The Size of the Sprite Font
         /// </summary>
-        public int Size;
+        public int Size { get; set; }
 
         /// <summary>
         /// The Font Ascent
         /// </summary>
-        public float Ascent;
+        public float Ascent { get; set; }
 
         /// <summary>
         /// The Font Descent
         /// </summary>
-        public float Descent;
+        public float Descent { get; set; }
 
         /// <summary>
         /// The Line Gap of the Font. This is the vertical space between lines
         /// </summary>
-        public float LineGap;
+        public float LineGap { get; set; }
 
         /// <summary>
         /// The Height of the Font (Ascent - Descent)
         /// </summary>
-        public float Height;
+        public float Height { get; set; }
 
         /// <summary>
         /// The Line Height of the Font (Height + LineGap). This is the total height of a single line, including the line gap
         /// </summary>
-        public float LineHeight;
+        public float LineHeight { get; set; }
 
         public SpriteFont(string? familyName = null, string? styleName = null)
         {

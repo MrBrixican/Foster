@@ -11,12 +11,12 @@ namespace Foster.Framework
         /// List of all the Texture Pages of the Atlas
         /// Generally speaking it's ideal to have a single Page per atlas, but that's not always possible.
         /// </summary>
-        public readonly List<Texture> Pages = new List<Texture>();
+        public List<Texture> Pages { get; } = new List<Texture>();
 
         /// <summary>
         /// A Dictionary of all the Subtextures in this Atlas.
         /// </summary>
-        public readonly Dictionary<string, Subtexture> Subtextures = new Dictionary<string, Subtexture>();
+        public Dictionary<string, Subtexture> Subtextures { get; } = new Dictionary<string, Subtexture>();
 
         /// <summary>
         /// An empty Atlas

@@ -28,8 +28,8 @@ namespace Foster.Framework
             Adam7 = 1
         }
 
-        private static readonly byte[] header = { 137, 80, 78, 71, 13, 10, 26, 10 };
-        private static readonly uint[] crcTable = new uint[256];
+        private static readonly byte[] _header = { 137, 80, 78, 71, 13, 10, 26, 10 };
+        private static readonly uint[] _crcTable = new uint[256];
 
         static PNG()
         {
@@ -50,7 +50,7 @@ namespace Foster.Framework
                         c >>= 1;
                     }
                 }
-                crcTable[n] = c;
+                _crcTable[n] = c;
             }
         }
 
@@ -60,14 +60,14 @@ namespace Foster.Framework
 
             // check PNG header
             bool isPng =
-                stream.ReadByte() == header[0] && // 8-bit format
-                stream.ReadByte() == header[1] && // P
-                stream.ReadByte() == header[2] && // N
-                stream.ReadByte() == header[3] && // G
-                stream.ReadByte() == header[4] && // Carriage Return
-                stream.ReadByte() == header[5] && // Line Feed
-                stream.ReadByte() == header[6] && // Ctrl-Z
-                stream.ReadByte() == header[7];   // Line Feed
+                stream.ReadByte() == _header[0] && // 8-bit format
+                stream.ReadByte() == _header[1] && // P
+                stream.ReadByte() == _header[2] && // N
+                stream.ReadByte() == _header[3] && // G
+                stream.ReadByte() == _header[4] && // Carriage Return
+                stream.ReadByte() == _header[5] && // Line Feed
+                stream.ReadByte() == _header[6] && // Ctrl-Z
+                stream.ReadByte() == _header[7];   // Line Feed
 
             stream.Seek(pos, SeekOrigin.Begin);
 
@@ -435,12 +435,12 @@ namespace Foster.Framework
                     uint crc = 0xFFFFFFFFU;
                     for (int n = 0; n < title.Length; n++)
                     {
-                        crc = crcTable[(crc ^ (byte)title[n]) & 0xFF] ^ (crc >> 8);
+                        crc = _crcTable[(crc ^ (byte)title[n]) & 0xFF] ^ (crc >> 8);
                     }
 
                     for (int n = 0; n < buffer.Length; n++)
                     {
-                        crc = crcTable[(crc ^ buffer[n]) & 0xFF] ^ (crc >> 8);
+                        crc = _crcTable[(crc ^ buffer[n]) & 0xFF] ^ (crc >> 8);
                     }
 
                     writer.Write(SwapEndian((int)(crc ^ 0xFFFFFFFFU)));
@@ -478,7 +478,7 @@ namespace Foster.Framework
 
             // PNG header
             using BinaryWriter writer = new BinaryWriter(stream);
-            writer.Write(header);
+            writer.Write(_header);
 
             // IHDR Chunk
             {

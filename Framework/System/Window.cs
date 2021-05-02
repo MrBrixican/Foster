@@ -42,16 +42,16 @@ namespace Foster.Framework
             protected internal abstract void Present();
             protected internal abstract void Close();
 
-            protected internal Action? OnFocus;
-            protected internal Action? OnResize;
-            protected internal Action? OnClose;
-            protected internal Action? OnCloseRequested;
+            protected internal Action? OnFocus { get; set; }
+            protected internal Action? OnResize { get; set; }
+            protected internal Action? OnClose { get; set; }
+            protected internal Action? OnCloseRequested { get; set; }
         }
 
         /// <summary>
         /// A reference to the internal platform implementation of the Window
         /// </summary>
-        public readonly Platform Implementation;
+        public Platform Implementation { get; }
 
         /// <summary>
         /// A pointer to the underlying OS Window
@@ -184,28 +184,28 @@ namespace Foster.Framework
         /// <summary>
         /// A callback when the Window is redrawn
         /// </summary>
-        public Action<Window>? OnRender;
+        public Action<Window>? OnRender { get; set; }
 
         /// <summary>
         /// A callback when the Window is resized by the user
         /// </summary>
-        public Action<Window>? OnResize;
+        public Action<Window>? OnResize { get; set; }
 
         /// <summary>
         /// A callback when the Window is focused
         /// </summary>
-        public Action<Window>? OnFocus;
+        public Action<Window>? OnFocus { get; set; }
 
         /// <summary>
         /// A callback when the Window is about to close
         /// </summary>
-        public Action<Window>? OnClose;
+        public Action<Window>? OnClose { get; set; }
 
         /// <summary>
         /// A callback when the Window has been requested to be closed (ex. by pressing the Close menu button).
         /// By default this calls Window.Close()
         /// </summary>
-        public Action<Window>? OnCloseRequested;
+        public Action<Window>? OnCloseRequested { get; set; }
 
         /// <summary>
         /// Gets or Sets the Title of this Window

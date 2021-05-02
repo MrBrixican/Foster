@@ -12,7 +12,7 @@ namespace Foster.Framework
     /// </summary>
     public static class Charsets
     {
-        public static readonly string ASCII = Make(32, 126);
+        public static string ASCII { get; } = Make(32, 126);
 
         public static string Make(int from, int to)
         {
@@ -38,46 +38,46 @@ namespace Foster.Framework
     public class Font : IDisposable
     {
 
-        internal readonly StbTrueType.stbtt_fontinfo fontInfo;
+        internal StbTrueType.stbtt_fontinfo FontInfo { get; }
 
-        private readonly byte[] fontBuffer;
-        private readonly GCHandle fontHandle;
-        private readonly Dictionary<char, int> glyphs = new Dictionary<char, int>();
+        private readonly byte[] _fontBuffer;
+        private readonly GCHandle _fontHandle;
+        private readonly Dictionary<char, int> _glyphs = new Dictionary<char, int>();
 
         /// <summary>
         /// The Font Family Name
         /// </summary>
-        public readonly string FamilyName;
+        public string FamilyName { get; }
 
         /// <summary>
         /// The Font Style Name
         /// </summary>
-        public readonly string StyleName;
+        public string StyleName { get; }
 
         /// <summary>
         /// The Font Ascent
         /// </summary>
-        public readonly int Ascent;
+        public int Ascent { get; }
 
         /// <summary>
         /// The Font Descent
         /// </summary>
-        public readonly int Descent;
+        public int Descent { get; }
 
         /// <summary>
         /// The Line Gap of the Font. This is the vertical space between lines
         /// </summary>
-        public readonly int LineGap;
+        public int LineGap { get; }
 
         /// <summary>
         /// The Height of the Font (Ascent - Descent)
         /// </summary>
-        public readonly int Height;
+        public int Height { get; }
 
         /// <summary>
         /// The Line Height of the Font (Height + LineGap). This is the total height of a single line, including the line gap
         /// </summary>
-        public readonly int LineHeight;
+        public int LineHeight { get; }
 
         /// <summary>
         /// Whether the Font has been Disposed
@@ -105,18 +105,18 @@ namespace Foster.Framework
         /// </summary>
         public unsafe Font(byte[] buffer)
         {
-            fontBuffer = buffer;
-            fontHandle = GCHandle.Alloc(fontBuffer, GCHandleType.Pinned);
-            fontInfo = new StbTrueType.stbtt_fontinfo();
+            _fontBuffer = buffer;
+            _fontHandle = GCHandle.Alloc(_fontBuffer, GCHandleType.Pinned);
+            FontInfo = new StbTrueType.stbtt_fontinfo();
 
-            StbTrueType.stbtt_InitFont(fontInfo, (byte*)(fontHandle.AddrOfPinnedObject().ToPointer()), 0);
+            StbTrueType.stbtt_InitFont(FontInfo, (byte*)(_fontHandle.AddrOfPinnedObject().ToPointer()), 0);
 
-            FamilyName = GetName(fontInfo, 1);
-            StyleName = GetName(fontInfo, 2);
+            FamilyName = GetName(FontInfo, 1);
+            StyleName = GetName(FontInfo, 2);
 
             // properties
             int ascent, descent, linegap;
-            StbTrueType.stbtt_GetFontVMetrics(fontInfo, &ascent, &descent, &linegap);
+            StbTrueType.stbtt_GetFontVMetrics(FontInfo, &ascent, &descent, &linegap);
             Ascent = ascent;
             Descent = descent;
             LineGap = linegap;
@@ -157,7 +157,7 @@ namespace Foster.Framework
                 throw new Exception("Cannot get Font data as it is disposed");
             }
 
-            return StbTrueType.stbtt_ScaleForPixelHeight(fontInfo, height);
+            return StbTrueType.stbtt_ScaleForPixelHeight(FontInfo, height);
         }
 
         /// <summary>
@@ -165,15 +165,15 @@ namespace Foster.Framework
         /// </summary>
         public int GetGlyph(char unicode)
         {
-            if (!glyphs.TryGetValue(unicode, out var glyph))
+            if (!_glyphs.TryGetValue(unicode, out var glyph))
             {
                 if (Disposed)
                 {
                     throw new Exception("Cannot get Font data as it is disposed");
                 }
 
-                glyph = StbTrueType.stbtt_FindGlyphIndex(fontInfo, unicode);
-                glyphs[unicode] = glyph;
+                glyph = StbTrueType.stbtt_FindGlyphIndex(FontInfo, unicode);
+                _glyphs[unicode] = glyph;
             }
 
             return glyph;
@@ -186,9 +186,9 @@ namespace Foster.Framework
         {
             Disposed = true;
 
-            if (fontHandle.IsAllocated)
+            if (_fontHandle.IsAllocated)
             {
-                fontHandle.Free();
+                _fontHandle.Free();
             }
         }
 

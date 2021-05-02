@@ -39,15 +39,12 @@ namespace Foster.Framework
             Slice = 0x2022
         }
 
-        public Modes Mode { get; private set; }
         public int Width { get; private set; }
         public int Height { get; private set; }
-        private int frameCount;
-
-        public readonly List<Layer> Layers = new List<Layer>();
-        public readonly List<Frame> Frames = new List<Frame>();
-        public readonly List<Tag> Tags = new List<Tag>();
-        public readonly List<Slice> Slices = new List<Slice>();
+        public List<Layer> Layers { get; } = new List<Layer>();
+        public List<Frame> Frames { get; } = new List<Frame>();
+        public List<Tag> Tags { get; } = new List<Tag>();
+        public List<Slice> Slices { get; } = new List<Slice>();
 
         public Aseprite(string file)
         {
@@ -64,18 +61,8 @@ namespace Foster.Framework
 
         public class Frame
         {
-            public Aseprite Sprite;
-            public int Duration;
-            public Bitmap Bitmap;
-            public Color[] Pixels => Bitmap.Pixels;
-            public List<Cel> Cels;
-
-            public Frame(Aseprite sprite)
-            {
-                Sprite = sprite;
-                Cels = new List<Cel>();
-                Bitmap = new Bitmap(sprite.Width, sprite.Height);
-            }
+            public int Duration { get; set; }
+            public List<Cel> Cels { get; } = new List<Cel>();
         }
 
         public class Tag
@@ -87,11 +74,11 @@ namespace Foster.Framework
                 PingPong = 2
             }
 
-            public string Name = "";
-            public LoopDirections LoopDirection;
-            public int From;
-            public int To;
-            public Color Color;
+            public string Name { get; set; } = "";
+            public LoopDirections LoopDirection { get; set; }
+            public int From { get; set; }
+            public int To { get; set; }
+            public Color Color { get; set; }
         }
 
         public interface IUserData
@@ -102,38 +89,30 @@ namespace Foster.Framework
 
         public class Slice : IUserData
         {
-            public int Frame;
-            public string Name = "";
-            public int OriginX;
-            public int OriginY;
-            public int Width;
-            public int Height;
-            public Point2? Pivot;
-            public RectInt? NineSlice;
+            public int Frame { get; set; }
+            public string Name { get; set; } = "";
+            public int OriginX { get; set; }
+            public int OriginY { get; set; }
+            public int Width { get; set; }
+            public int Height { get; set; }
+            public Point2? Pivot { get; set; }
+            public RectInt? NineSlice { get; set; }
             public string UserDataText { get; set; } = "";
             public Color UserDataColor { get; set; }
         }
 
         public class Cel : IUserData
         {
-            public Layer Layer;
-            public Color[] Pixels;
-            public Cel? Link;
-
-            public int X;
-            public int Y;
-            public int Width;
-            public int Height;
-            public float Alpha;
-
+            public Layer Layer { get; set; }
+            public Color[] Pixels { get; set; }
+            public Cel? Link { get; set; }
+            public int X { get; set; }
+            public int Y { get; set; }
+            public int Width { get; set; }
+            public int Height { get; set; }
+            public float Alpha { get; set; }
             public string UserDataText { get; set; } = "";
             public Color UserDataColor { get; set; }
-
-            public Cel(Layer layer, Color[] pixels)
-            {
-                Layer = layer;
-                Pixels = pixels;
-            }
         }
 
         public class Layer : IUserData
@@ -156,14 +135,13 @@ namespace Foster.Framework
                 Group = 1
             }
 
-            public Flags Flag;
-            public Types Type;
-            public string Name = "";
-            public int ChildLevel;
-            public int BlendMode;
-            public float Alpha;
-            public bool Visible { get { return Flag.HasFlag(Flags.Visible); } }
-
+            public Flags Flag { get; set; }
+            public Types Type { get; set; }
+            public string Name { get; set; } = "";
+            public int ChildLevel { get; set; }
+            public int BlendMode { get; set; }
+            public float Alpha { get; set; }
+            public bool Visible => Flag.HasFlag(Flags.Visible);
             public string UserDataText { get; set; } = "";
             public Color UserDataColor { get; set; }
         }
@@ -175,6 +153,8 @@ namespace Foster.Framework
         private void Parse(Stream stream)
         {
             var reader = new BinaryReader(stream);
+            int frameCount;
+            Modes mode;
 
             // wrote these to match the documentation names so it's easier (for me, anyway) to parse
             byte BYTE() => reader.ReadByte();
@@ -202,7 +182,7 @@ namespace Foster.Framework
                 frameCount = WORD();
                 Width = WORD();
                 Height = WORD();
-                Mode = (Modes)(WORD() / 8);
+                mode = (Modes)(WORD() / 8);
 
                 // Other Info, Ignored
                 DWORD();       // Flags
@@ -218,14 +198,14 @@ namespace Foster.Framework
             }
 
             // temporary variables
-            var temp = new byte[Width * Height * (int)Mode];
+            var temp = new byte[Width * Height * (int)mode];
             var palette = new Color[256];
             IUserData? last = null;
 
             // Frames
             for (int i = 0; i < frameCount; i++)
             {
-                var frame = new Frame(this);
+                var frame = new Frame();
                 Frames.Add(frame);
 
                 long frameStart, frameEnd;
@@ -295,7 +275,7 @@ namespace Foster.Framework
                             width = WORD();
                             height = WORD();
 
-                            var count = width * height * (int)Mode;
+                            var count = width * height * (int)mode;
                             if (count > temp.Length)
                             {
                                 temp = new byte[count];
@@ -304,7 +284,7 @@ namespace Foster.Framework
                             // RAW
                             if (celType == 0)
                             {
-                                reader.Read(temp, 0, width * height * (int)Mode);
+                                reader.Read(temp, 0, width * height * (int)mode);
                             }
                             // DEFLATE
                             else
@@ -317,8 +297,7 @@ namespace Foster.Framework
 
                             // get pixel data
                             pixels = new Color[width * height];
-                            BytesToPixels(temp, pixels, Mode, palette);
-
+                            BytesToPixels(temp, pixels, mode, palette);
                         }
                         // REFERENCE
                         else if (celType == 1)
@@ -336,21 +315,17 @@ namespace Foster.Framework
                             throw new NotImplementedException();
                         }
 
-                        var cel = new Cel(layer, pixels)
+                        var cel = new Cel()
                         {
+                            Layer = layer,
                             X = x,
                             Y = y,
+                            Pixels = pixels,
                             Width = width,
                             Height = height,
                             Alpha = alpha,
                             Link = link
                         };
-
-                        // draw to frame if visible
-                        if (cel.Layer.Visible)
-                        {
-                            CelToFrame(frame, cel);
-                        }
 
                         last = cel;
                         frame.Cels.Add(cel);
@@ -510,7 +485,7 @@ namespace Foster.Framework
         /// <summary>
         /// Converts an array of Bytes to an array of Colors, using the specific Aseprite Mode & Palette
         /// </summary>
-        private void BytesToPixels(byte[] bytes, Color[] pixels, Modes mode, Color[] palette)
+        private static void BytesToPixels(byte[] bytes, Color[] pixels, Modes mode, Color[] palette)
         {
             int len = pixels.Length;
             if (mode == Modes.RGBA)
@@ -541,32 +516,50 @@ namespace Foster.Framework
         }
 
         /// <summary>
-        /// Applies a Cel's pixels to the Frame, using its Layer's BlendMode & Alpha
+        /// Converts all Frames to Bitmaps
         /// </summary>
-        private void CelToFrame(Frame frame, Cel cel)
+        /// <returns></returns>
+        public List<Bitmap> GetBitmaps()
         {
-            var opacity = (byte)((cel.Alpha * cel.Layer.Alpha) * 255);
-            var pxLen = frame.Bitmap.Pixels.Length;
+            var bitmaps = new List<Bitmap>();
 
-            var blend = BlendModes[0];
-            if (cel.Layer.BlendMode < BlendModes.Length)
+            foreach (var frame in Frames)
             {
-                blend = BlendModes[cel.Layer.BlendMode];
-            }
+                var bitmap = new Bitmap(Width, Height);
 
-            for (int sx = Math.Max(0, -cel.X), right = Math.Min(cel.Width, frame.Sprite.Width - cel.X); sx < right; sx++)
-            {
-                int dx = cel.X + sx;
-                int dy = cel.Y * frame.Sprite.Width;
-
-                for (int sy = Math.Max(0, -cel.Y), bottom = Math.Min(cel.Height, frame.Sprite.Height - cel.Y); sy < bottom; sy++, dy += frame.Sprite.Width)
+                foreach (var cel in frame.Cels)
                 {
-                    if (dx + dy >= 0 && dx + dy < pxLen)
+                    if (cel.Layer.Visible)
                     {
-                        blend(ref frame.Bitmap.Pixels[dx + dy], cel.Pixels[sx + sy * cel.Width], opacity);
+                        var opacity = (byte)((cel.Alpha * cel.Layer.Alpha) * 255);
+                        var pxLen = bitmap.Pixels.Length;
+
+                        var blend = BlendModes[0];
+                        if (cel.Layer.BlendMode < BlendModes.Length)
+                        {
+                            blend = BlendModes[cel.Layer.BlendMode];
+                        }
+
+                        for (int sx = Math.Max(0, -cel.X), right = Math.Min(cel.Width, bitmap.Width - cel.X); sx < right; sx++)
+                        {
+                            int dx = cel.X + sx;
+                            int dy = cel.Y * bitmap.Width;
+
+                            for (int sy = Math.Max(0, -cel.Y), bottom = Math.Min(cel.Height, bitmap.Height - cel.Y); sy < bottom; sy++, dy += bitmap.Width)
+                            {
+                                if (dx + dy >= 0 && dx + dy < pxLen)
+                                {
+                                    blend(ref bitmap.Pixels[dx + dy], cel.Pixels[sx + sy * cel.Width], opacity);
+                                }
+                            }
+                        }
                     }
                 }
+
+                bitmaps.Add(bitmap);
             }
+
+            return bitmaps;
         }
 
         /// <summary>
@@ -580,10 +573,10 @@ namespace Foster.Framework
             }
 
             int frameIndex = 0;
-            foreach (var frame in Frames)
+            foreach (var bitmap in GetBitmaps())
             {
                 var name = string.Format(namingFormat, frameIndex);
-                packer.AddPixels(name, Width, Height, frame.Bitmap.Pixels);
+                packer.AddPixels(name, Width, Height, bitmap.Pixels);
 
                 frameIndex++;
             }

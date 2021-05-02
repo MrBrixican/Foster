@@ -11,12 +11,12 @@ namespace Foster.Framework
         /// <summary>
         /// The Target Framerate of a Fixed Timestep update
         /// </summary>
-        public static int FixedStepTarget = 60;
+        public static int FixedStepTarget { get; set; } = 60;
 
         /// <summary>
         /// The Maximum elapsed time a fixed update can take before skipping update calls
         /// </summary>
-        public static TimeSpan FixedMaxElapsedTime = TimeSpan.FromMilliseconds(500);
+        public static TimeSpan FixedMaxElapsedTime { get; set; } = TimeSpan.FromMilliseconds(500);
 
         /// <summary>
         /// The time since the start of the Application
@@ -31,7 +31,7 @@ namespace Foster.Framework
         /// <summary>
         /// Multiplies the Delta Time per frame by the scale value
         /// </summary>
-        public static float DeltaScale = 1.0f;
+        public static float DeltaScale { get; set; } = 1.0f;
 
         /// <summary>
         /// The Delta Time from the last frame. Fixed or Variable depending on the current Update method.

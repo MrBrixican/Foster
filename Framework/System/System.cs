@@ -30,12 +30,12 @@ namespace Foster.Framework
         /// <summary>
         /// A list of all opened Windows
         /// </summary>
-        public readonly ReadOnlyCollection<Window> Windows;
+        public ReadOnlyCollection<Window> Windows { get; }
 
         /// <summary>
         /// A list of active Monitors
         /// </summary>
-        public readonly ReadOnlyCollection<Monitor> Monitors;
+        public ReadOnlyCollection<Monitor> Monitors { get; }
 
         /// <summary>
         /// System Input
@@ -54,12 +54,12 @@ namespace Foster.Framework
         /// <summary>
         /// Internal list of all Windows owned by the System.
         /// </summary>
-        internal readonly List<Window> windows = new List<Window>();
+        internal List<Window> windows { get; } = new List<Window>();
 
         /// <summary>
         /// Internal list of all Monitors owned by the System. The Platform implementation should maintain this.
         /// </summary>
-        protected readonly List<Monitor> monitors = new List<Monitor>();
+        protected List<Monitor> monitors { get; } = new List<Monitor>();
 
         protected System() : base(100)
         {

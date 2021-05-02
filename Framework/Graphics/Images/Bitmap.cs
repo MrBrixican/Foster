@@ -11,17 +11,17 @@ namespace Foster.Framework
         /// <summary>
         /// The Pixel array of the Bitmap
         /// </summary>
-        public readonly Color[] Pixels;
+        public Color[] Pixels { get; }
 
         /// <summary>
         /// The Width of the Bitmap, in Pixels
         /// </summary>
-        public readonly int Width;
+        public int Width { get; }
 
         /// <summary>
         /// The Height of the Bitmap, in Pixels
         /// </summary>
-        public readonly int Height;
+        public int Height { get; }
 
         public Bitmap(int width, int height)
             : this(width, height, new Color[width * height])
@@ -47,9 +47,11 @@ namespace Foster.Framework
 
         public Bitmap(Stream stream)
         {
-            if (Images.Read(stream, out Width, out Height, out var pixels) && pixels != null)
+            if (Images.Read(stream, out var width, out var height, out var pixels) && pixels != null)
             {
                 Pixels = pixels;
+                Width = width;
+                Height = height;
             }
             else
             {
@@ -59,18 +61,19 @@ namespace Foster.Framework
 
         public Bitmap(string path)
         {
-            using var stream = File.OpenRead(path);
-
-            if (Images.Read(stream, out Width, out Height, out var pixels) && pixels != null)
+            using (var stream = File.OpenRead(path))
             {
-                Pixels = pixels;
+                if (Images.Read(stream, out var width, out var height, out var pixels) && pixels != null)
+                {
+                    Pixels = pixels;
+                    Width = width;
+                    Height = height;
+                }
+                else
+                {
+                    throw new NotSupportedException("Stream is either an invalid or not supported image format");
+                }
             }
-            else
-            {
-                throw new NotSupportedException("Stream is either an invalid or not supported image format");
-            }
-
-            stream.Close();
         }
 
         /// <summary>

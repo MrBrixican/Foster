@@ -12,7 +12,7 @@ namespace Foster.Framework
 
         public abstract class Platform
         {
-            protected internal readonly List<Texture> Attachments = new List<Texture>();
+            protected internal List<Texture> Attachments { get; } = new List<Texture>();
             protected internal abstract void Resize(int width, int height);
             protected internal abstract void Dispose();
         }
@@ -30,15 +30,15 @@ namespace Foster.Framework
         /// <summary>
         /// Render Target Width
         /// </summary>
-        public override int RenderWidth => width;
+        public override int RenderWidth => _width;
 
         /// <summary>
         /// Render Target Height
         /// </summary>
-        public override int RenderHeight => height;
+        public override int RenderHeight => _height;
 
-        private int width;
-        private int height;
+        private int _width;
+        private int _height;
 
         public FrameBuffer(int width, int height)
             : this(App.Graphics, width, height)
@@ -54,8 +54,8 @@ namespace Foster.Framework
 
         public FrameBuffer(Graphics graphics, int width, int height, params TextureFormat[] attachments)
         {
-            this.width = width;
-            this.height = height;
+            this._width = width;
+            this._height = height;
 
             if (width <= 0 || height <= 0)
             {
@@ -74,10 +74,10 @@ namespace Foster.Framework
                 throw new Exception("FrameBuffer must have a size larger than 0");
             }
 
-            if (this.width != width || this.height != height)
+            if (this._width != width || this._height != height)
             {
-                this.width = width;
-                this.height = height;
+                this._width = width;
+                this._height = height;
 
                 Implementation.Resize(width, height);
             }

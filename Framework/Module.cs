@@ -8,12 +8,12 @@
         /// <summary>
         /// The Name of the Module
         /// </summary>
-        public string Name;
+        public string Name { get; set; }
 
         /// <summary>
         /// A lower priority is run first
         /// </summary>
-        protected internal readonly int Priority;
+        protected internal int Priority { get; }
 
         /// <summary>
         /// The Application Main Thread ID

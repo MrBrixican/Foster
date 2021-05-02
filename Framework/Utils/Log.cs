@@ -24,10 +24,10 @@ namespace Foster.Framework
             public string Text;
         }
 
-        private static readonly StringBuilder log = new StringBuilder();
-        public static readonly List<LogLine> Lines = new List<LogLine>();
+        private static readonly StringBuilder _log = new StringBuilder();
+        public static List<LogLine> Lines { get; } = new List<LogLine>();
 
-        public static bool PrintToConsole = true;
+        public static bool PrintToConsole { get; set; } = true;
 
         public static void Message(string message)
         {
@@ -59,7 +59,7 @@ namespace Foster.Framework
             var builder = new StringBuilder();
             builder.AppendLine($"{title} ERROR LOG");
             builder.AppendLine(DateTime.Now.ToString());
-            builder.AppendLine(log.ToString());
+            builder.AppendLine(_log.ToString());
             builder.AppendLine();
 
             if (File.Exists(file))
@@ -92,7 +92,7 @@ namespace Foster.Framework
 
             if (!consoleOnly)
             {
-                log.Append(text);
+                _log.Append(text);
             }
         }
 
@@ -103,7 +103,7 @@ namespace Foster.Framework
                 Console.WriteLine();
             }
 
-            log.AppendLine();
+            _log.AppendLine();
         }
 
     }

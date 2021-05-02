@@ -12,17 +12,17 @@ namespace Foster.Framework
         /// <summary>
         /// The Horizontal Axis
         /// </summary>
-        public VirtualAxis Horizontal;
+        public VirtualAxis Horizontal { get; set; }
 
         /// <summary>
         /// The Vertical Axis
         /// </summary>
-        public VirtualAxis Vertical;
+        public VirtualAxis Vertical { get; set; }
 
         /// <summary>
         /// This Deadzone is applied to the Length of the combined Horizontal and Vertical axis values
         /// </summary>
-        public float CircularDeadzone = 0f;
+        public float CircularDeadzone { get; set; } = 0f;
 
         /// <summary>
         /// Gets the current Virtual Stick value

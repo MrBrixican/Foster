@@ -18,7 +18,7 @@ namespace Foster.Framework
             /// <summary>
             /// Reference to the Parameter's Uniform
             /// </summary>
-            public readonly ShaderUniform Uniform;
+            public ShaderUniform Uniform { get; }
 
             /// <summary>
             /// The Name of the Parameter
@@ -360,14 +360,14 @@ namespace Foster.Framework
         /// <summary>
         /// The Shader this Material uses
         /// </summary>
-        public readonly Shader Shader;
+        public Shader Shader { get; }
 
         /// <summary>
         /// The list of all Parameters within this Material
         /// </summary>
-        public readonly ReadOnlyCollection<Parameter> Parameters;
+        public ReadOnlyCollection<Parameter> Parameters { get; }
 
-        private readonly Dictionary<string, Parameter> parametersByName = new Dictionary<string, Parameter>();
+        private Dictionary<string, Parameter> _parametersByName = new Dictionary<string, Parameter>();
 
         public Material(Shader shader)
         {
@@ -378,7 +378,7 @@ namespace Foster.Framework
             foreach (var uniform in shader.Uniforms.Values)
             {
                 var parameter = new Parameter(uniform);
-                parametersByName[uniform.Name] = parameter;
+                _parametersByName[uniform.Name] = parameter;
                 parameters.Add(parameter);
             }
 
@@ -390,7 +390,7 @@ namespace Foster.Framework
         /// </summary>
         public bool TryGetParameter(string name, [MaybeNullWhen(false)] out Parameter parameter)
         {
-            if (parametersByName.TryGetValue(name, out parameter!))
+            if (_parametersByName.TryGetValue(name, out parameter!))
             {
                 return true;
             }
@@ -401,7 +401,7 @@ namespace Foster.Framework
         /// <summary>
         /// Gets the Parameter with the given name
         /// </summary>
-        public Parameter this[string name] => parametersByName[name];
+        public Parameter this[string name] => _parametersByName[name];
 
     }
 }

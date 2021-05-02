@@ -12,25 +12,25 @@ namespace Foster.Framework
 
         public abstract class Platform
         {
-            protected internal readonly Dictionary<string, ShaderAttribute> Attributes = new Dictionary<string, ShaderAttribute>();
-            protected internal readonly Dictionary<string, ShaderUniform> Uniforms = new Dictionary<string, ShaderUniform>();
+            protected internal Dictionary<string, ShaderAttribute> Attributes { get; } = new Dictionary<string, ShaderAttribute>();
+            protected internal Dictionary<string, ShaderUniform> Uniforms { get; } = new Dictionary<string, ShaderUniform>();
             protected internal abstract void Dispose();
         }
 
         /// <summary>
         /// A reference to the internal platform implementation of the Shader
         /// </summary>
-        public readonly Platform Implementation;
+        public Platform Implementation { get; }
 
         /// <summary>
         /// List of all Vertex Attributes, by Name
         /// </summary>
-        public readonly ReadOnlyDictionary<string, ShaderAttribute> Attributes;
+        public ReadOnlyDictionary<string, ShaderAttribute> Attributes { get; }
 
         /// <summary>
         /// List of all Uniforms, by Name
         /// </summary>
-        public readonly ReadOnlyDictionary<string, ShaderUniform> Uniforms;
+        public ReadOnlyDictionary<string, ShaderUniform> Uniforms { get; }
 
         public Shader(Graphics graphics, ShaderSource source)
         {

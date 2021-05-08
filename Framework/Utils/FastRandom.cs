@@ -1,19 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Numerics;
 using System.Runtime.CompilerServices;
 
 namespace Foster.Framework
 {
     /// <summary>
-    /// A fast random number generator
+    /// A fast random number generator based on xorshift128+
     /// </summary>
     public class FastRandom
     {
         public static FastRandom Instance { get; } = new FastRandom();
 
-        private const double DoubleUnit = 1.0 / (int.MaxValue + 1.0);
-        private const float FloatUnit = 1.0f / (int.MaxValue + 256.0f);
+        private const double DoubleMult = 1.0 / (1ul << 53);
+        private const float FloatMult = 1.0f / (1u << 24);
 
         private ulong _a, _b;
         private ulong _buffer;
@@ -25,12 +23,17 @@ namespace Foster.Framework
 
         public FastRandom(ulong seed)
         {
+            seed = seed == 0 ? 1337 : seed;
             _a = seed << 3;
             _b = seed >> 3;
         }
 
+        /// <summary>
+        /// Returns random <see cref="ulong"/> with range [0, <see cref="ulong.MaxValue"/>]
+        /// </summary>
+        /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private ulong Next()
+        public ulong NextSample()
         {
             ulong t = _a;
             ulong s = _b;
@@ -42,6 +45,9 @@ namespace Foster.Framework
             return t + s;
         }
 
+        /// <summary>
+        /// Returns random <see cref="bool"/>
+        /// </summary>
         public bool NextBool()
         {
             if (_bufferMask > 0)
@@ -51,11 +57,21 @@ namespace Foster.Framework
                 return b;
             }
 
-            _buffer = Next();
+            _buffer = NextSample();
             _bufferMask = 0x4000000000000000;
             return (_buffer & 0x8000000000000000) == 0;
         }
 
+        /// <summary>
+        /// Returns random <see cref="bool"/> that is true with a probability of <paramref name="chance"/>
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool NextBool(float chance)
+            => NextFloat() <= chance;
+
+        /// <summary>
+        /// Returns random <see cref="byte"/> with range [0, <see cref="byte.MaxValue"/>]
+        /// </summary>
         public byte NextByte()
         {
             if (_bufferMask >= 0x80)
@@ -66,27 +82,72 @@ namespace Foster.Framework
                 return b;
             }
 
-            _buffer = Next();
+            _buffer = NextSample();
             _bufferMask = 0x80000000000000;
             var b2 = (byte)_buffer;
             _buffer >>= 8;
             return b2;
         }
 
-        public short NextShort() => (short)Next();
+        /// <summary>
+        /// Returns random <see cref="int"/> with range [0, <see cref="int.MaxValue"/>]
+        /// </summary>
+        public int NextInt() 
+            => ((int)NextSample()) & int.MaxValue;
 
-        public ushort NextUShort() => (ushort)Next();
+        /// <summary>
+        /// Returns random <see cref="int"/> with range [0, <paramref name="max"/>)
+        /// </summary>
+        public int NextInt(int max) 
+            => max > 1 ? (int)(NextSample() % (ulong)max) : 0;
 
-        public int NextInt() => (int)Next();
+        /// <summary>
+        /// Returns random <see cref="int"/> with range [<paramref name="min"/>, <paramref name="max"/>)
+        /// </summary>
+        public int NextInt(int min, int max) 
+            => max > min ? (int)(NextSample() % (ulong)((long)max - min)) + min : min;
 
-        public uint NextUInt() => (uint)Next();
+        /// <summary>
+        /// Return random <see cref="double"/> with range [0, 1)
+        /// </summary>
+        public double NextDouble()
+            // As described in http://prng.di.unimi.it/:
+            // "A standard double (64-bit) floating-point number in IEEE floating point format has 52 bits of significand,
+            //  plus an implicit bit at the left of the significand. Thus, the representation can actually store numbers with
+            //  53 significant binary digits. Because of this fact, in C99 a 64-bit unsigned integer x should be converted to
+            //  a 64-bit double using the expression
+            //  (x >> 11) * 0x1.0p-53"
+            => (NextSample() >> 11) * DoubleMult;
 
-        public long NextLong() => (long)Next();
+        /// <summary>
+        /// Returns random <see cref="double"/> with range [0, <paramref name="max"/>)
+        /// </summary>
+        public double NextDouble(double max)
+            => (NextSample() >> 11) * DoubleMult * max;
 
-        public ulong NextULong() => Next();
+        /// <summary>
+        /// Returns random <see cref="double"/> with range [<paramref name="min"/>, <paramref name="max"/>)
+        /// </summary>
+        public double NextDouble(double min, double max)
+            => (NextSample() >> 11) * DoubleMult * (max - min) + min;
 
-        public float NextFloat() => (Next() & int.MaxValue) * FloatUnit;
+        /// <summary>
+        /// Returns random <see cref="float"/> with range [0, 1)
+        /// </summary>
+        public float NextFloat()
+            // Same as NextDouble(), but with 24 bits instead of 53.
+            => (NextSample() >> 40) * FloatMult;
 
-        public double NextDouble() => (Next() & int.MaxValue) * DoubleUnit;
+        /// <summary>
+        /// Returns random <see cref="float"/> with range [0, <paramref name="max"/>)
+        /// </summary>
+        public float NextFloat(float max)
+            => (NextSample() >> 40) * FloatMult * max;
+
+        /// <summary>
+        /// Returns random <see cref="float"/> with range [<paramref name="min"/>, <paramref name="max"/>)
+        /// </summary>
+        public float NextFloat(float min, float max)
+            => (NextSample() >> 40) * FloatMult * (max - min) + min;
     }
 }

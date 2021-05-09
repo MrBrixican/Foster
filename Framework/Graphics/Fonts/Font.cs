@@ -37,7 +37,6 @@ namespace Foster.Framework
     /// </summary>
     public class Font : IDisposable
     {
-
         internal StbTrueType.stbtt_fontinfo FontInfo { get; }
 
         private readonly byte[] _fontBuffer;

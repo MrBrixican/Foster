@@ -23,7 +23,7 @@ namespace Foster.Framework
             /// <summary>
             /// The rendered Character Image
             /// </summary>            
-            public Subtexture Image { get; set; }
+            public TextureRegion Image { get; set; }
 
             /// <summary>
             /// The Offset to draw the Character at
@@ -40,7 +40,7 @@ namespace Foster.Framework
             /// </summary>
             public Dictionary<char, float> Kerning { get; set; } = new Dictionary<char, float>();
 
-            public Character(char unicode, Subtexture image, Vector2 offset, float advance)
+            public Character(char unicode, TextureRegion image, Vector2 offset, float advance)
             {
                 Unicode = unicode;
                 Image = image;
@@ -145,7 +145,7 @@ namespace Foster.Framework
                     }
 
                     // create character
-                    var sprChar = new Character(ch.Unicode, new Subtexture(), new Vector2(ch.OffsetX, ch.OffsetY), ch.Advance);
+                    var sprChar = new Character(ch.Unicode, new TextureRegion(), new Vector2(ch.OffsetX, ch.OffsetY), ch.Advance);
                     Charset.Add(ch.Unicode, sprChar);
 
                     // get all kerning
@@ -183,7 +183,6 @@ namespace Foster.Framework
                             character.Image.Reset(texture, entry.Source, entry.Frame);
                         }
                     }
-
                 }
             }
         }

@@ -193,16 +193,6 @@ namespace Foster.Framework
             PNG.Write(stream, Width, Height, Pixels);
         }
 
-        public void SaveJpg(string path)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void SaveJpg(Stream stream)
-        {
-            throw new NotImplementedException();
-        }
-
         /// <summary>
         /// Clones the Bitmap
         /// </summary>
@@ -210,6 +200,5 @@ namespace Foster.Framework
         {
             return new Bitmap(Width, Height, new Memory<Color>(Pixels).ToArray());
         }
-
     }
 }

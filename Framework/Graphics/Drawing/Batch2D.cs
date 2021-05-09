@@ -1130,42 +1130,42 @@ namespace Foster.Framework
             MatrixStack = was;
         }
 
-        public void Image(Subtexture subtex, Color color, bool washed = false)
+        public void Image(TextureRegion textureRegion, Color color, bool washed = false)
         {
-            SetTexture(subtex.Texture);
+            SetTexture(textureRegion.Texture);
             Quad(
-                subtex.DrawCoords[0], subtex.DrawCoords[1], subtex.DrawCoords[2], subtex.DrawCoords[3],
-                subtex.TexCoords[0], subtex.TexCoords[1], subtex.TexCoords[2], subtex.TexCoords[3],
+                textureRegion.DrawCoords[0], textureRegion.DrawCoords[1], textureRegion.DrawCoords[2], textureRegion.DrawCoords[3],
+                textureRegion.TexCoords[0], textureRegion.TexCoords[1], textureRegion.TexCoords[2], textureRegion.TexCoords[3],
                 color, washed);
         }
 
-        public void Image(Subtexture subtex, in Vector2 position, Color color, bool washed = false)
+        public void Image(TextureRegion textureRegion, in Vector2 position, Color color, bool washed = false)
         {
-            SetTexture(subtex.Texture);
-            Quad(position + subtex.DrawCoords[0], position + subtex.DrawCoords[1], position + subtex.DrawCoords[2], position + subtex.DrawCoords[3],
-                subtex.TexCoords[0], subtex.TexCoords[1], subtex.TexCoords[2], subtex.TexCoords[3],
+            SetTexture(textureRegion.Texture);
+            Quad(position + textureRegion.DrawCoords[0], position + textureRegion.DrawCoords[1], position + textureRegion.DrawCoords[2], position + textureRegion.DrawCoords[3],
+                textureRegion.TexCoords[0], textureRegion.TexCoords[1], textureRegion.TexCoords[2], textureRegion.TexCoords[3],
                 color, washed);
         }
 
-        public void Image(Subtexture subtex, in Vector2 position, in Vector2 scale, in Vector2 origin, float rotation, Color color, bool washed = false)
+        public void Image(TextureRegion textureRegion, in Vector2 position, in Vector2 scale, in Vector2 origin, float rotation, Color color, bool washed = false)
         {
             var was = MatrixStack;
 
             MatrixStack = Transform2D.CreateMatrix(position, origin, scale, rotation) * MatrixStack;
 
-            SetTexture(subtex.Texture);
+            SetTexture(textureRegion.Texture);
             Quad(
-                subtex.DrawCoords[0], subtex.DrawCoords[1], subtex.DrawCoords[2], subtex.DrawCoords[3],
-                subtex.TexCoords[0], subtex.TexCoords[1], subtex.TexCoords[2], subtex.TexCoords[3],
+                textureRegion.DrawCoords[0], textureRegion.DrawCoords[1], textureRegion.DrawCoords[2], textureRegion.DrawCoords[3],
+                textureRegion.TexCoords[0], textureRegion.TexCoords[1], textureRegion.TexCoords[2], textureRegion.TexCoords[3],
                 color, washed);
 
             MatrixStack = was;
         }
 
-        public void Image(Subtexture subtex, in Rect clip, in Vector2 position, in Vector2 scale, in Vector2 origin, float rotation, Color color, bool washed = false)
+        public void Image(TextureRegion textureRegion, in Rect clip, in Vector2 position, in Vector2 scale, in Vector2 origin, float rotation, Color color, bool washed = false)
         {
-            var (source, frame) = subtex.GetClip(clip);
-            var tex = subtex.Texture;
+            var (source, frame) = textureRegion.GetClip(clip);
+            var tex = textureRegion.Texture;
             var was = MatrixStack;
 
             MatrixStack = Transform2D.CreateMatrix(position, origin, scale, rotation) * MatrixStack;
@@ -1188,7 +1188,7 @@ namespace Foster.Framework
                 ty1 = source.Bottom / tex.Height;
             }
 
-            SetTexture(subtex.Texture);
+            SetTexture(textureRegion.Texture);
             Quad(
                 new Vector2(px0, py0), new Vector2(px1, py0), new Vector2(px1, py1), new Vector2(px0, py1),
                 new Vector2(tx0, ty0), new Vector2(tx1, ty0), new Vector2(tx1, ty1), new Vector2(tx0, ty1),

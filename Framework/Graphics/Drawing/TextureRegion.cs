@@ -4,9 +4,9 @@ using System.Numerics;
 namespace Foster.Framework
 {
     /// <summary>
-    /// A Subtexture, representing a rectangular segment of a Texture
+    /// A TextureRegion, representing a rectangular region of a Texture
     /// </summary>
-    public class Subtexture
+    public class TextureRegion
     {
         /// <summary>
         /// The Texture coordinates. These are set automatically based on the Source rectangle
@@ -19,7 +19,7 @@ namespace Foster.Framework
         public Vector2[] DrawCoords { get; } = new Vector2[4];
 
         /// <summary>
-        /// The Texture this Subtexture is... a subtexture of
+        /// The Texture this TextureRegion is... a TextureRegion of
         /// </summary>
         public Texture? Texture
         {
@@ -48,7 +48,7 @@ namespace Foster.Framework
         }
 
         /// <summary>
-        /// The frame of the Subtexture. This is useful if you trim transparency and want to store the original size of the image
+        /// The frame of the TextureRegion. This is useful if you trim transparency and want to store the original size of the image
         /// For example, if the original image was (64, 64), but the trimmed version is (32, 48), the Frame may be (-16, -8, 64, 64)
         /// </summary>
         public Rect Frame
@@ -62,12 +62,12 @@ namespace Foster.Framework
         }
 
         /// <summary>
-        /// The Draw Width of the Subtexture
+        /// The Draw Width of the TextureRegion
         /// </summary>
         public float Width => _frame.Width;
 
         /// <summary>
-        /// The Draw Height of the Subtexture
+        /// The Draw Height of the TextureRegion
         /// </summary>
         public float Height => _frame.Height;
 
@@ -75,24 +75,24 @@ namespace Foster.Framework
         private Rect _frame;
         private Rect _source;
 
-        public Subtexture()
+        public TextureRegion()
         {
 
         }
 
-        public Subtexture(Texture texture)
+        public TextureRegion(Texture texture)
             : this(texture, new Rect(0, 0, texture.Width, texture.Height))
         {
 
         }
 
-        public Subtexture(Texture texture, Rect source)
+        public TextureRegion(Texture texture, Rect source)
             : this(texture, source, new Rect(0, 0, source.Width, source.Height))
         {
 
         }
 
-        public Subtexture(Texture texture, Rect source, Rect frame)
+        public TextureRegion(Texture texture, Rect source, Rect frame)
         {
             this._texture = texture;
             this._source = source;
@@ -129,10 +129,10 @@ namespace Foster.Framework
             return GetClip(new Rect(x, y, w, h));
         }
 
-        public Subtexture GetClipSubtexture(Rect clip)
+        public TextureRegion GetClipTextureRegion(Rect clip)
         {
             var (source, frame) = GetClip(clip);
-            return new Subtexture(Texture!, source, frame);
+            return new TextureRegion(Texture!, source, frame);
         }
 
         private void UpdateCoords()

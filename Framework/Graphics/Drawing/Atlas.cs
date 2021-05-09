@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Foster.Framework
 {
@@ -14,9 +15,9 @@ namespace Foster.Framework
         public List<Texture> Pages { get; } = new List<Texture>();
 
         /// <summary>
-        /// A Dictionary of all the Subtextures in this Atlas.
+        /// A Dictionary of all the TextureRegions in this Atlas.
         /// </summary>
-        public Dictionary<string, Subtexture> Subtextures { get; } = new Dictionary<string, Subtexture>();
+        public Dictionary<string, TextureRegion> TextureRegions { get; } = new Dictionary<string, TextureRegion>();
 
         /// <summary>
         /// An empty Atlas
@@ -44,21 +45,21 @@ namespace Foster.Framework
                 foreach (var entry in output.Entries.Values)
                 {
                     var texture = Pages[entry.Page];
-                    var subtexture = new Subtexture(texture, entry.Source, entry.Frame);
+                    var textureRegion = new TextureRegion(texture, entry.Source, entry.Frame);
 
-                    Subtextures.Add(entry.Name, subtexture);
+                    TextureRegions.Add(entry.Name, textureRegion);
                 }
             }
         }
 
         /// <summary>
-        /// Gets or Sets a Subtexture by name
+        /// Gets or Sets a TextureRegion by name
         /// </summary>
-        public Subtexture? this[string name]
+        public TextureRegion? this[string name]
         {
             get
             {
-                if (Subtextures.TryGetValue(name, out var subtex))
+                if (TextureRegions.TryGetValue(name, out var subtex))
                 {
                     return subtex;
                 }
@@ -69,10 +70,9 @@ namespace Foster.Framework
             {
                 if (value != null)
                 {
-                    Subtextures[name] = value;
+                    TextureRegions[name] = value;
                 }
             }
         }
-
     }
 }

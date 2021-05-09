@@ -9,11 +9,10 @@ namespace Foster.Framework
 {
     /// <summary>
     /// Parses the Contents of an Aseprite file
-    ///
-    /// Aseprite File Spec: https://github.com/aseprite/aseprite/blob/master/docs/ase-file-specs.md
-    ///
+    /// <para />
+    /// Aseprite File Spec: <see href="https://github.com/aseprite/aseprite/blob/master/docs/ase-file-specs.md"/>
+    ///<para />
     /// TODO: This is not a true or full implementation, and is missing several features (ex. blendmodes)
-    /// 
     /// </summary>
     public class Aseprite
     {
@@ -516,7 +515,7 @@ namespace Foster.Framework
         }
 
         /// <summary>
-        /// Converts all Frames to Bitmaps
+        /// Converts all <see cref="Frames"/> to corresponding <see cref="Bitmap"/>s
         /// </summary>
         /// <returns></returns>
         public List<Bitmap> GetBitmaps()
@@ -580,7 +579,6 @@ namespace Foster.Framework
 
                 frameIndex++;
             }
-
         }
 
         #endregion

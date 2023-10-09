@@ -143,12 +143,12 @@ void FosterAudioListenerSetWorldUp(int index, Vector3 value)
 
 #pragma region Sound
 
-FosterSound* FosterSoundCreate(const wchar_t* path, FosterSoundFlags flags)
+FosterSound* FosterSoundCreate(const char* path, FosterSoundFlags flags)
 {
 	FosterState* state = FosterGetState();
 	ma_sound* sound = SDL_malloc(sizeof(ma_sound));
 
-	if (MA_SUCCESS != ma_sound_init_from_file_w(state->audioEngine, path, flags, NULL, NULL, sound))
+	if (MA_SUCCESS != ma_sound_init_from_file(state->audioEngine, path, flags, NULL, NULL, sound))
 	{
 		FosterLogError("Unable to create Sound from file");
 		SDL_free(sound);

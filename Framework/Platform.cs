@@ -322,7 +322,7 @@ internal static class Platform
 
 	// Sound
 	[DllImport(DLL)]
-	public static extern IntPtr FosterSoundCreate([MarshalAs(UnmanagedType.LPWStr)] string path, FosterSoundFlags flags);
+	public static extern IntPtr FosterSoundCreate(string path, FosterSoundFlags flags);
 	[DllImport(DLL)]
 	public static extern void FosterSoundPlay(IntPtr sound);
 	[DllImport(DLL)]

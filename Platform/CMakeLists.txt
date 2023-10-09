@@ -23,6 +23,8 @@ add_library(FosterPlatform SHARED
 	src/foster_renderer.c
 	src/foster_renderer_d3d11.c
 	src/foster_renderer_opengl.c
+	src/third_party/stb_vorbis.c
+	src/foster_audio.c
 )
 
 target_include_directories(FosterPlatform

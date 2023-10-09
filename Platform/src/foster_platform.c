@@ -1,5 +1,6 @@
 #include "foster_platform.h"
 #include "foster_renderer.h"
+#include "foster_audio.h"
 #include "foster_internal.h"
 #include <SDL.h>
 
@@ -105,6 +106,13 @@ void FosterStartup(FosterDesc desc)
 	// let renderer run any prep
 	if (fstate.device.prepare)
 		fstate.device.prepare();
+
+	// initialize audio
+	if (!FosterAudioStartup())
+	{
+		FosterLogError("Foster Failed to start Audio");
+		return;
+	}
 
 	// create the Window
 	fstate.window = SDL_CreateWindow(
@@ -308,6 +316,8 @@ void FosterShutdown()
 		return;
 	if (fstate.device.shutdown)
 		fstate.device.shutdown();
+	if (fstate.audioEngine != NULL)
+		FosterAudioStartup();
 	if (fstate.clipboardText != NULL)
 		SDL_free(fstate.clipboardText);
 	if (fstate.userPath != NULL)
@@ -401,7 +411,7 @@ const char* FosterGetClipboard()
 
 bool FosterGetFocused()
 {
-	FOSTER_ASSERT_RUNNING_RET(FosterGetClipboard, false);
+	FOSTER_ASSERT_RUNNING_RET(FosterGetFocused, false);
 	Uint32 flags = SDL_GetWindowFlags(fstate.window);
 	return (flags & (SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_MOUSE_FOCUS)) != 0;
 }

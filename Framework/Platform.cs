@@ -1,4 +1,6 @@
-﻿using System.Runtime.InteropServices;
+﻿using Foster.Framework.Audio;
+using System.Numerics;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace Foster.Framework;
@@ -14,6 +16,14 @@ internal static class Platform
 		VSYNC         = 1 << 1,
 		RESIZABLE     = 1 << 2,
 		MOUSE_VISIBLE = 1 << 3,
+	}
+
+	[Flags]
+	public enum FosterSoundFlags
+	{
+		STREAM = 0x00000001,
+		DECODE = 0x00000002,
+		NO_SPATIALIZATION = 0x00004000
 	}
 
 	[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
@@ -265,4 +275,162 @@ internal static class Platform
 	public static extern void FosterDraw(ref FosterDrawCommand command);
 	[DllImport(DLL)]
 	public static extern void FosterClear(ref FosterClearCommand command);
+
+	// Audio
+
+	[DllImport(DLL)]
+	public static extern float FosterAudioGetVolume();
+	[DllImport(DLL)]
+	public static extern void FosterAudioSetVolume(float value);
+	[DllImport(DLL)]
+	public static extern int FosterAudioGetChannels();
+	[DllImport(DLL)]
+	public static extern int FosterAudioGetSampleRate();
+	[DllImport(DLL)]
+	public static extern ulong FosterAudioGetTimePcmFrames();
+	[DllImport(DLL)]
+	public static extern void FosterAudioSetTimePcmFrames(ulong value);
+	[DllImport(DLL)]
+	public static extern int FosterAudioGetListenerCount();
+
+	// AudioListener
+
+	[DllImport(DLL)]
+	public static extern bool FosterAudioListenerGetEnabled(int index);
+	[DllImport(DLL)]
+	public static extern void FosterAudioListenerSetEnabled(int index, bool value);
+	[DllImport(DLL)]
+	public static extern Vector3 FosterAudioListenerGetPosition(int index);
+	[DllImport(DLL)]
+	public static extern void FosterAudioListenerSetPosition(int index, Vector3 value);
+	[DllImport(DLL)]
+	public static extern Vector3 FosterAudioListenerGetVelocity(int index);
+	[DllImport(DLL)]
+	public static extern void FosterAudioListenerSetVelocity(int index, Vector3 value);
+	[DllImport(DLL)]
+	public static extern Vector3 FosterAudioListenerGetDirection(int index);
+	[DllImport(DLL)]
+	public static extern void FosterAudioListenerSetDirection(int index, Vector3 value);
+	[DllImport(DLL)]
+	public static extern SoundCone FosterAudioListenerGetCone(int index);
+	[DllImport(DLL)]
+	public static extern void FosterAudioListenerSetCone(int index, SoundCone value);
+	[DllImport(DLL)]
+	public static extern Vector3 FosterAudioListenerGetWorldUp(int index);
+	[DllImport(DLL)]
+	public static extern void FosterAudioListenerSetWorldUp(int index, Vector3 value);
+
+	// Sound
+	[DllImport(DLL)]
+	public static extern IntPtr FosterSoundCreate([MarshalAs(UnmanagedType.LPWStr)] string path, FosterSoundFlags flags);
+	[DllImport(DLL)]
+	public static extern void FosterSoundPlay(IntPtr sound);
+	[DllImport(DLL)]
+	public static extern void FosterSoundStop(IntPtr sound);
+	[DllImport(DLL)]
+	public static extern void FosterSoundDestroy(IntPtr sound);
+	[DllImport(DLL)]
+	public static extern float FosterSoundGetVolume(IntPtr sound);
+	[DllImport(DLL)]
+	public static extern void FosterSoundSetVolume(IntPtr sound, float value);
+	[DllImport(DLL)]
+	public static extern float FosterSoundGetPitch(IntPtr sound);
+	[DllImport(DLL)]
+	public static extern void FosterSoundSetPitch(IntPtr sound, float value);
+	[DllImport(DLL)]
+	public static extern float FosterSoundGetPan(IntPtr sound);
+	[DllImport(DLL)]
+	public static extern void FosterSoundSetPan(IntPtr sound, float value);
+	[DllImport(DLL)]
+	public static extern bool FosterSoundGetPlaying(IntPtr sound);
+	[DllImport(DLL)]
+	public static extern bool FosterSoundGetFinished(IntPtr sound);
+	[DllImport(DLL)]
+	public static extern ulong FosterSoundGetLengthPcmFrames(IntPtr sound);
+	[DllImport(DLL)]
+	public static extern ulong FosterSoundGetCursorPcmFrames(IntPtr sound);
+	[DllImport(DLL)]
+	public static extern void FosterSoundSetCursorPcmFrames(IntPtr sound, ulong value);
+	[DllImport(DLL)]
+	public static extern bool FosterSoundGetLooping(IntPtr sound);
+	[DllImport(DLL)]
+	public static extern void FosterSoundSetLooping(IntPtr sound, bool value);
+	[DllImport(DLL)]
+	public static extern ulong FosterSoundGetLoopBeginPcmFrames(IntPtr sound);
+	[DllImport(DLL)]
+	public static extern void FosterSoundSetLoopBeginPcmFrames(IntPtr sound, ulong value);
+	[DllImport(DLL)]
+	public static extern ulong FosterSoundGetLoopEndPcmFrames(IntPtr sound);
+	[DllImport(DLL)]
+	public static extern void FosterSoundSetLoopEndPcmFrames(IntPtr sound, ulong value);
+	[DllImport(DLL)]
+	public static extern bool FosterSoundGetSpatialized(IntPtr sound);
+	[DllImport(DLL)]
+	public static extern void FosterSoundSetSpatialized(IntPtr sound, bool value);
+	[DllImport(DLL)]
+	public static extern Vector3 FosterSoundGetPosition(IntPtr sound);
+	[DllImport(DLL)]
+	public static extern void FosterSoundSetPosition(IntPtr sound, Vector3 value);
+	[DllImport(DLL)]
+	public static extern Vector3 FosterSoundGetVelocity(IntPtr sound);
+	[DllImport(DLL)]
+	public static extern void FosterSoundSetVelocity(IntPtr sound, Vector3 value);
+	[DllImport(DLL)]
+	public static extern Vector3 FosterSoundGetDirection(IntPtr sound);
+	[DllImport(DLL)]
+	public static extern void FosterSoundSetDirection(IntPtr sound, Vector3 value);
+	[DllImport(DLL)]
+	public static extern SoundPositioning FosterSoundGetPositioning(IntPtr sound);
+	[DllImport(DLL)]
+	public static extern void FosterSoundSetPositioning(IntPtr sound, SoundPositioning value);
+	[DllImport(DLL)]
+	public static extern int FosterSoundGetPinnedListenerIndex(IntPtr sound);
+	[DllImport(DLL)]
+	public static extern void FosterSoundSetPinnedListenerIndex(IntPtr sound, int value);
+	[DllImport(DLL)]
+	public static extern SoundAttenuationModel FosterSoundGetAttenuationModel(IntPtr sound);
+	[DllImport(DLL)]
+	public static extern void FosterSoundSetAttenuationModel(IntPtr sound, SoundAttenuationModel value);
+	[DllImport(DLL)]
+	public static extern float FosterSoundGetRolloff(IntPtr sound);
+	[DllImport(DLL)]
+	public static extern void FosterSoundSetRolloff(IntPtr sound, float value);
+	[DllImport(DLL)]
+	public static extern float FosterSoundGetMinGain(IntPtr sound);
+	[DllImport(DLL)]
+	public static extern void FosterSoundSetMinGain(IntPtr sound, float value);
+	[DllImport(DLL)]
+	public static extern float FosterSoundGetMaxGain(IntPtr sound);
+	[DllImport(DLL)]
+	public static extern void FosterSoundSetMaxGain(IntPtr sound, float value);
+	[DllImport(DLL)]
+	public static extern float FosterSoundGetMinDistance(IntPtr sound);
+	[DllImport(DLL)]
+	public static extern void FosterSoundSetMinDistance(IntPtr sound, float value);
+	[DllImport(DLL)]
+	public static extern float FosterSoundGetMaxDistance(IntPtr sound);
+	[DllImport(DLL)]
+	public static extern void FosterSoundSetMaxDistance(IntPtr sound, float value);
+	[DllImport(DLL)]
+	public static extern SoundCone FosterSoundGetCone(IntPtr sound);
+	[DllImport(DLL)]
+	public static extern void FosterSoundSetCone(IntPtr sound, SoundCone value);
+	[DllImport(DLL)]
+	public static extern float FosterSoundGetDirectionalAttenuationFactor(IntPtr sound);
+	[DllImport(DLL)]
+	public static extern void FosterSoundSetDirectionalAttenuationFactor(IntPtr sound, float value);
+	[DllImport(DLL)]
+	public static extern float FosterSoundGetDopplerFactor(IntPtr sound);
+	[DllImport(DLL)]
+	public static extern void FosterSoundSetDopplerFactor(IntPtr sound, float value);
+
+	// SoundGroup
+	[DllImport(DLL)]
+	public static extern IntPtr FosterSoundGroupCreate();
+	[DllImport(DLL)]
+	public static extern void FosterSoundGroupDestroy(IntPtr sound);
+	[DllImport(DLL)]
+	public static extern float FosterSoundGroupGetVolume(IntPtr soundGroup);
+	[DllImport(DLL)]
+	public static extern void FosterSoundGroupSetVolume(IntPtr soundGroup, float value);
 }

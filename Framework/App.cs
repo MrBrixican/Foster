@@ -1,3 +1,4 @@
+using Foster.Framework.Audio;
 using System.Diagnostics;
 using System.Numerics;
 using System.Runtime.InteropServices;
@@ -267,6 +268,7 @@ public static class App
 
 		UserPath = Platform.ParseUTF8(Platform.FosterGetUserPath());
 		Graphics.Initialize();
+		Audio.Audio.Initialize();
 
 		// register & startup all modules in order
 		// this is in a loop in case a module registers more modules
@@ -311,6 +313,7 @@ public static class App
 			Time.Advance(delta);
 
 			Graphics.Step();
+			Audio.Audio.Step();
 			Input.Step();
 			Platform.FosterPollEvents();
 			FramePool.NextFrame();

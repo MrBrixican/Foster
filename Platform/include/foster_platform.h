@@ -392,6 +392,27 @@ typedef enum FosterLogging
 	FOSTER_LOGGING_NONE
 } FosterLogging;
 
+typedef enum FosterSoundFlags
+{
+    FOSTER_SOUND_FLAG_STREAM                = 0x00000001,
+    FOSTER_SOUND_FLAG_DECODE                = 0x00000002,
+    FOSTER_SOUND_FLAG_NO_SPATIALIZATION     = 0x00004000
+} FosterSoundFlags;
+
+typedef enum FosterSoundPositioning
+{
+	FOSTER_SOUND_POSITIONING_ABSOLUTE,
+	FOSTER_SOUND_POSITIONING_RELATIVE
+} FosterSoundPositioning;
+
+typedef enum FosterSoundAttenuationModel
+{
+	FOSTER_SOUND_ATTENUATION_MODEL_NONE,
+	FOSTER_SOUND_ATTENUATION_MODEL_INVERSE,
+	FOSTER_SOUND_ATTENUATION_MODEL_LINEAR,
+	FOSTER_SOUND_ATTENUATION_MODEL_EXPONENTIAL
+} FosterSoundAttenuationModel;
+
 typedef void (FOSTER_CALL * FosterLogFn)(const char *msg);
 typedef void (FOSTER_CALL * FosterExitRequestFn)();
 typedef void (FOSTER_CALL * FosterOnTextFn)(const char* txt);
@@ -408,7 +429,9 @@ typedef void (FOSTER_CALL * FosterWriteFn)(void *context, void *data, int size);
 typedef struct FosterTexture FosterTexture; 
 typedef struct FosterTarget FosterTarget; 
 typedef struct FosterShader FosterShader; 
-typedef struct FosterMesh FosterMesh; 
+typedef struct FosterMesh FosterMesh;
+typedef struct FosterSound FosterSound;
+typedef struct FosterSoundGroup FosterSoundGroup;
 
 typedef struct FosterDesc
 {
@@ -433,6 +456,11 @@ typedef struct FosterDesc
 	FosterOnControllerAxisFn onControllerAxis;
 	FosterLogging logging;
 } FosterDesc;
+
+typedef struct Vector3
+{
+	float x, y, z;
+} Vector3;
 
 typedef struct FosterRect
 {
@@ -519,6 +547,11 @@ typedef struct FosterClearCommand
 } FosterClearCommand;
 
 typedef struct FosterFont FosterFont;
+
+typedef struct FosterSoundCone
+{
+	float innerAngleInRadians, outerAngleInRadians, outerGain;
+} FosterSoundCone;
 
 #if __cplusplus
 extern "C" {
@@ -619,6 +652,162 @@ FOSTER_API void FosterMeshDestroy(FosterMesh* mesh);
 FOSTER_API void FosterDraw(FosterDrawCommand* command);
 
 FOSTER_API void FosterClear(FosterClearCommand* clear);
+
+// Audio
+
+FOSTER_API float FosterAudioGetVolume();
+
+FOSTER_API void FosterAudioSetVolume(int index, float value);
+
+FOSTER_API int FosterAudioGetChannels();
+
+FOSTER_API int FosterAudioGetSampleRate();
+
+FOSTER_API uint64_t FosterAudioGetTimePcmFrames();
+
+FOSTER_API void FosterAudioSetTimePcmFrames(int index, uint64_t value);
+
+FOSTER_API int FosterAudioGetListenerCount();
+
+// AudioListener
+
+FOSTER_API bool FosterAudioListenerGetEnabled(int index);
+
+FOSTER_API void FosterAudioListenerSetEnabled(int index, bool value);
+
+FOSTER_API Vector3 FosterAudioListenerGetPosition(int index);
+
+FOSTER_API void FosterAudioListenerSetPosition(int index, Vector3 value);
+
+FOSTER_API Vector3 FosterAudioListenerGetVelocity(int index);
+
+FOSTER_API void FosterAudioListenerSetVelocity(int index, Vector3 value);
+
+FOSTER_API Vector3 FosterAudioListenerGetDirection(int index);
+
+FOSTER_API void FosterAudioListenerSetDirection(int index, Vector3 value);
+
+FOSTER_API FosterSoundCone FosterAudioListenerGetCone(int index);
+
+FOSTER_API void FosterAudioListenerSetCone(int index, FosterSoundCone value);
+
+FOSTER_API Vector3 FosterAudioListenerGetWorldUp(int index);
+
+FOSTER_API void FosterAudioListenerSetWorldUp(int index, Vector3 value);
+
+// Sound
+
+FOSTER_API FosterSound* FosterSoundCreate(const wchar_t* path, FosterSoundFlags flags);
+
+FOSTER_API void FosterSoundPlay(FosterSound* sound);
+
+FOSTER_API void FosterSoundStop(FosterSound* sound);
+
+FOSTER_API void FosterSoundDestroy(FosterSound* sound);
+
+FOSTER_API float FosterSoundGetVolume(FosterSound* sound);
+
+FOSTER_API void FosterSoundSetVolume(FosterSound* sound, float value);
+
+FOSTER_API float FosterSoundGetPitch(FosterSound* sound);
+
+FOSTER_API void FosterSoundSetPitch(FosterSound* sound, float value);
+
+FOSTER_API float FosterSoundGetPan(FosterSound* sound);
+
+FOSTER_API void FosterSoundSetPan(FosterSound* sound, float value);
+
+FOSTER_API bool FosterSoundGetPlaying(FosterSound* sound);
+
+FOSTER_API bool FosterSoundGetFinished(FosterSound* sound);
+
+FOSTER_API uint64_t FosterSoundGetLengthPcmFrames(FosterSound* sound);
+
+FOSTER_API uint64_t FosterSoundGetCursorPcmFrames(FosterSound* sound);
+
+FOSTER_API void FosterSoundSetCursorPcmFrames(FosterSound* sound, uint64_t value);
+
+FOSTER_API bool FosterSoundGetLooping(FosterSound* sound);
+
+FOSTER_API void FosterSoundSetLooping(FosterSound* sound, bool value);
+
+FOSTER_API uint64_t FosterSoundGetLoopBeginPcmFrames(FosterSound* sound);
+
+FOSTER_API void FosterSoundSetLoopBeginPcmFrames(FosterSound* sound, uint64_t value);
+
+FOSTER_API uint64_t FosterSoundGetLoopEndPcmFrames(FosterSound* sound);
+
+FOSTER_API void FosterSoundSetLoopEndPcmFrames(FosterSound* sound, uint64_t value);
+
+FOSTER_API bool FosterSoundGetSpatialized(FosterSound* sound);
+
+FOSTER_API void FosterSoundSetSpatialized(FosterSound* sound, bool value);
+
+FOSTER_API Vector3 FosterSoundGetPosition(FosterSound* sound);
+
+FOSTER_API void FosterSoundSetPosition(FosterSound* sound, Vector3 value);
+
+FOSTER_API Vector3 FosterSoundGetVelocity(FosterSound* sound);
+
+FOSTER_API void FosterSoundSetVelocity(FosterSound* sound, Vector3 value);
+
+FOSTER_API Vector3 FosterSoundGetDirection(FosterSound* sound);
+
+FOSTER_API void FosterSoundSetDirection(FosterSound* sound, Vector3 value);
+
+FOSTER_API FosterSoundPositioning FosterSoundGetPositioning(FosterSound* sound);
+
+FOSTER_API void FosterSoundSetPositioning(FosterSound* sound, FosterSoundPositioning value);
+
+FOSTER_API int FosterSoundGetPinnedListenerIndex(FosterSound* sound);
+
+FOSTER_API void FosterSoundSetPinnedListenerIndex(FosterSound* sound, int value);
+
+FOSTER_API FosterSoundAttenuationModel FosterSoundGetAttenuationModel(FosterSound* sound);
+
+FOSTER_API void FosterSoundSetAttenuationModel(FosterSound* sound, FosterSoundAttenuationModel value);
+
+FOSTER_API float FosterSoundGetRolloff(FosterSound* sound);
+
+FOSTER_API void FosterSoundSetRolloff(FosterSound* sound, float value);
+
+FOSTER_API float FosterSoundGetMinGain(FosterSound* sound);
+
+FOSTER_API void FosterSoundSetMinGain(FosterSound* sound, float value);
+
+FOSTER_API float FosterSoundGetMaxGain(FosterSound* sound);
+
+FOSTER_API void FosterSoundSetMaxGain(FosterSound* sound, float value);
+
+FOSTER_API float FosterSoundGetMinDistance(FosterSound* sound);
+
+FOSTER_API void FosterSoundSetMinDistance(FosterSound* sound, float value);
+
+FOSTER_API float FosterSoundGetMaxDistance(FosterSound* sound);
+
+FOSTER_API void FosterSoundSetMaxDistance(FosterSound* sound, float value);
+
+FOSTER_API FosterSoundCone FosterSoundGetCone(FosterSound* sound);
+
+FOSTER_API void FosterSoundSetCone(FosterSound* sound, FosterSoundCone value);
+
+FOSTER_API float FosterSoundGetDirectionalAttenuationFactor(FosterSound* sound);
+
+FOSTER_API void FosterSoundSetDirectionalAttenuationFactor(FosterSound* sound, float value);
+
+FOSTER_API float FosterSoundGetDopplerFactor(FosterSound* sound);
+
+FOSTER_API void FosterSoundSetDopplerFactor(FosterSound* sound, float value);
+
+// SoundGroup
+
+FOSTER_API FosterSoundGroup* FosterSoundGroupCreate();
+
+FOSTER_API void FosterSoundGroupDestroy(FosterSoundGroup* soundGroup);
+
+FOSTER_API float FosterSoundGroupGetVolume(FosterSoundGroup* soundGroup);
+
+FOSTER_API void FosterSoundGroupSetVolume(FosterSoundGroup* soundGroup, float value);
 
 #if __cplusplus
 }

@@ -11,7 +11,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{4F0E
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Froggymark", "Samples\Froggymark\Froggymark.csproj", "{7B65169D-2979-4E73-9F76-4ADD93F60AFE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TinyLink", "Samples\TinyLink\TinyLink.csproj", "{6214A7C8-148B-48C4-9741-ECA910FF6D00}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TinyLink", "Samples\TinyLink\TinyLink.csproj", "{6214A7C8-148B-48C4-9741-ECA910FF6D00}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BasicAudio", "Samples\BasicAudio\BasicAudio.csproj", "{A0804478-057A-4E6D-8D9A-ACFC224B9845}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -35,6 +37,10 @@ Global
 		{6214A7C8-148B-48C4-9741-ECA910FF6D00}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6214A7C8-148B-48C4-9741-ECA910FF6D00}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6214A7C8-148B-48C4-9741-ECA910FF6D00}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A0804478-057A-4E6D-8D9A-ACFC224B9845}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A0804478-057A-4E6D-8D9A-ACFC224B9845}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A0804478-057A-4E6D-8D9A-ACFC224B9845}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A0804478-057A-4E6D-8D9A-ACFC224B9845}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -43,6 +49,7 @@ Global
 		{7FFD70B2-B337-477E-9F1E-4C791DCD75B9} = {4F0E672E-B329-4A57-B5C4-1A41BFEA7782}
 		{7B65169D-2979-4E73-9F76-4ADD93F60AFE} = {4F0E672E-B329-4A57-B5C4-1A41BFEA7782}
 		{6214A7C8-148B-48C4-9741-ECA910FF6D00} = {4F0E672E-B329-4A57-B5C4-1A41BFEA7782}
+		{A0804478-057A-4E6D-8D9A-ACFC224B9845} = {4F0E672E-B329-4A57-B5C4-1A41BFEA7782}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {755B23DD-0EA7-4D86-99FD-09CD78D4F936}

@@ -3,7 +3,9 @@
 
 #include "foster_platform.h"
 #include "foster_renderer.h"
+#include "foster_audio.h"
 #include <SDL.h>
+#include "third_party/miniaudio.h"
 
 // foster global state
 typedef struct
@@ -18,6 +20,7 @@ typedef struct
 	SDL_GameController* gamepads[FOSTER_MAX_CONTROLLERS];
 	char* clipboardText;
 	char* userPath;
+	ma_engine* audioEngine;
 } FosterState;
 
 FosterState* FosterGetState();

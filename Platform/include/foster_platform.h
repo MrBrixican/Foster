@@ -697,7 +697,7 @@ FOSTER_API void FosterAudioListenerSetWorldUp(int index, Vector3 value);
 
 // Sound
 
-FOSTER_API FosterSound* FosterSoundCreate(const wchar_t* path, FosterSoundFlags flags);
+FOSTER_API FosterSound* FosterSoundCreate(const char* path, FosterSoundFlags flags);
 
 FOSTER_API void FosterSoundPlay(FosterSound* sound);
 

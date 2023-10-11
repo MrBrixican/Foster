@@ -20,7 +20,7 @@ class Game : Module
 	private readonly SpriteFont font = new SpriteFont(Path.Join("Assets", "monogram.ttf"), 32);
 	private SoundInstance instance;
 	private double instanceLength;
-	private double lastX;
+	private Vector3 lastPosition;
 
 	public override void Startup()
 	{
@@ -79,10 +79,11 @@ class Game : Module
 			instance.Spatialized = !instance.Spatialized;
 		}
 
-		var x = Math.Sin(Time.Duration.TotalSeconds * 1) * 20;
-		instance.Velocity = new((float)(lastX - x), 0, 0);
-		lastX = x;
-		instance.Position = new((float)x, .1f, 0);
+		var x = Math.Sin(Time.Duration.TotalSeconds) * 20;
+		var position = new Vector3((float)x, .1f, 0);
+		instance.Velocity = position - lastPosition;
+		instance.Position = position;
+		lastPosition = position;
 	}
 
 	public override void Render()

@@ -1,15 +1,26 @@
 ﻿namespace Foster.Framework.Audio;
 
-// Maybe flags would be better? Not sure since Stream is not compatible with others
-// Preload simply creates a special sound instance (not connected to engine nor cleaned up by Audio) to keep sound loaded
-// Decoded suffix just keeps the decoded copy in memory
-// Load on demand will load a file when the first active instance is created, and unload it when all active instances are recycled
-// Stream streams from disk
 public enum SoundLoadingMethod
 {
+	/// <summary>
+	/// Loads encoded data into memory
+	/// </summary>
 	Preload,
+	/// <summary>
+	/// Loads decoded data into memory
+	/// </summary>
 	PreloadDecoded,
+	/// <summary>
+	/// While at least one instance is active, loads encoded data into memory
+	/// </summary>
 	LoadOnDemand,
+	/// <summary>
+	/// While at least one instance is active, loads decoded data into memory
+	/// </summary>
 	LoadOnDemandDecoded,
+	/// <summary>
+	/// Streams data from file system <br/>
+	/// Limitation: ogg files do not work properly in respect to <see cref="SoundInstance.Length"/>, <see cref="SoundInstance.LengthPcmFrames"/>, <see cref="SoundInstance.Cursor"/>, and <see cref="SoundInstance.CursorPcmFrames"/>
+	/// </summary>
 	Stream
 }

@@ -275,9 +275,6 @@ internal static class Platform
 	public static extern void FosterDraw(ref FosterDrawCommand command);
 	[DllImport(DLL)]
 	public static extern void FosterClear(ref FosterClearCommand command);
-
-	// Audio
-
 	[DllImport(DLL)]
 	public static extern float FosterAudioGetVolume();
 	[DllImport(DLL)]
@@ -292,8 +289,16 @@ internal static class Platform
 	public static extern void FosterAudioSetTimePcmFrames(ulong value);
 	[DllImport(DLL)]
 	public static extern int FosterAudioGetListenerCount();
-
-	// AudioListener
+	[DllImport(DLL)]
+	public static extern IntPtr FosterAudioDecode(IntPtr data, int length, ref AudioFormat format, ref int channels, ref int sampleRate, out ulong decodedFrameCount);
+	[DllImport(DLL)]
+	public static extern void FosterAudioFree(IntPtr data);
+	[DllImport(DLL)]
+	public static extern void FosterAudioRegisterEncodedData(string name, IntPtr data, int length);
+	[DllImport(DLL)]
+	public static extern void FosterAudioRegisterDecodedData(string name, IntPtr data, ulong frameCount, AudioFormat format, int channels, int sampleRate);
+	[DllImport(DLL)]
+	public static extern void FosterAudioUnregisterData(string name);
 
 	[DllImport(DLL)]
 	public static extern bool FosterAudioListenerGetEnabled(int index);
@@ -320,9 +325,8 @@ internal static class Platform
 	[DllImport(DLL)]
 	public static extern void FosterAudioListenerSetWorldUp(int index, Vector3 value);
 
-	// Sound
 	[DllImport(DLL)]
-	public static extern IntPtr FosterSoundCreate(string path, FosterSoundFlags flags);
+	public static extern IntPtr FosterSoundCreate(string path, FosterSoundFlags flags, IntPtr soundGroup);
 	[DllImport(DLL)]
 	public static extern void FosterSoundPlay(IntPtr sound);
 	[DllImport(DLL)]
@@ -423,14 +427,16 @@ internal static class Platform
 	public static extern float FosterSoundGetDopplerFactor(IntPtr sound);
 	[DllImport(DLL)]
 	public static extern void FosterSoundSetDopplerFactor(IntPtr sound, float value);
-
-	// SoundGroup
 	[DllImport(DLL)]
-	public static extern IntPtr FosterSoundGroupCreate();
+	public static extern IntPtr FosterSoundGroupCreate(IntPtr parent);
 	[DllImport(DLL)]
-	public static extern void FosterSoundGroupDestroy(IntPtr sound);
+	public static extern void FosterSoundGroupDestroy(IntPtr soundGroup);
 	[DllImport(DLL)]
 	public static extern float FosterSoundGroupGetVolume(IntPtr soundGroup);
 	[DllImport(DLL)]
 	public static extern void FosterSoundGroupSetVolume(IntPtr soundGroup, float value);
+	[DllImport(DLL)]
+	public static extern float FosterSoundGroupGetPitch(IntPtr soundGroup);
+	[DllImport(DLL)]
+	public static extern void FosterSoundGroupSetPitch(IntPtr soundGroup, float value);
 }

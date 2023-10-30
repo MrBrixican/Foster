@@ -297,6 +297,7 @@ public static class App
 		for (int i = 0; i < modules.Count; i ++)
 			modules[i].Shutdown();
 
+		Audio.Audio.Shutdown();
 		Platform.FosterShutdown();
 		Platform.FreeUTF8(name);
 		started = false;

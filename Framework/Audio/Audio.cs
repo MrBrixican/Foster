@@ -1,46 +1,92 @@
 ﻿using System.Collections.ObjectModel;
+using System.Runtime.InteropServices;
 
 namespace Foster.Framework.Audio;
 
 public static class Audio
 {
+	/// <summary>
+	/// Master volume
+	/// </summary>
 	public static float Volume
 	{
 		get => Platform.FosterAudioGetVolume();
 		set => Platform.FosterAudioSetVolume(value);
 	}
 
+	/// <summary>
+	/// Audio engine channel count
+	/// </summary>
 	public static int Channels { get; private set; }
 
+	/// <summary>
+	/// Audio engine sample rate
+	/// </summary>
 	public static int SampleRate { get; private set; }
 
+	/// <summary>
+	/// Audio engine clock in PCM frames (see <seealso cref="SampleRate"/>)
+	/// </summary>
 	public static ulong TimePcmFrames
 	{
 		get => Platform.FosterAudioGetTimePcmFrames();
 		set => Platform.FosterAudioSetTimePcmFrames(value);
 	}
 
-	public static TimeSpan Time { get; set; } // TODO
+	/// <summary>
+	/// Audio engine clock
+	/// </summary>
+	public static TimeSpan Time
+	{
+		get => TimeSpan.FromSeconds(1.0 * TimePcmFrames / SampleRate);
+		set => TimePcmFrames = (ulong)Math.Floor(value.TotalSeconds * SampleRate);
+	}
 
-	public static int MaxInstances { get; set; } = 100;
+	/// <summary>
+	/// The maximum number of simultaneously active <see cref="SoundInstance"/>s allowed.
+	/// Instances created after this threshold are inactive and do not play any audio.
+	/// </summary>
+	public static int MaxActiveInstances { get; set; } = 100;
 
-	public static int ActiveInstances => instances.Count;
+	/// <summary>
+	/// The number of currently active <see cref="SoundInstance"/>s
+	/// </summary>
+	public static int ActiveInstances { get; internal set; }
 
+	/// <summary>
+	/// The primary (index 0) <see cref="AudioListener"/>
+	/// </summary>
 	public static AudioListener Listener { get; private set; } = null!;
 
+	/// <summary>
+	/// All available <see cref="AudioListener"/>s
+	/// </summary>
 	public static ReadOnlyCollection<AudioListener> Listeners { get; private set; } = null!;
 
-	private static long nextInstanceId = 1;
-	private static readonly Dictionary<long, SoundInstanceState> instances = new();
-	private static readonly List<long> instancesToDestroy = new();
+	/// <summary>
+	/// All instances currently being tracked, some may be inactive
+	/// </summary>
+	public static ReadOnlySpan<SoundInstance> Instances => CollectionsMarshal.AsSpan(instances);
 
-	public static void PlayAll() { }
-	public static void PauseAll() { }
-	public static void StopAll() { }
+	private static readonly List<SoundInstance> instances = new();
+
+	public static void PlayAll() => ApplyAll(m => m.Play());
+
+	public static void PauseAll() => ApplyAll(m => m.Pause());
+
+	public static void StopAll() => ApplyAll(m => m.Stop());
+
+	public static void ReleaseAll() => ApplyAll(m => m.Release());
 
 	public static void ApplyAll(Action<SoundInstance> action)
 	{
-		
+		foreach (var instance in Instances)
+		{
+			if(instance.Active)
+			{
+				action(instance);
+			}
+		}
 	}
 
 	internal static void Initialize()
@@ -57,111 +103,41 @@ public static class Audio
 	internal static void Step()
 	{
 		// Go through all instances and destroy all that are non-protected, finished
-		foreach (var pair in instances)
+		for (int i = 0;i<instances.Count;i++)
 		{
-			if (pair.Value.Protected)
+			var instance = instances[i];
+			if (instance.Protected)
 			{
 				continue;
 			}
 
-			var instance = new SoundInstance(pair.Key);
 			if (instance.Finished)
 			{
-				instancesToDestroy.Add(pair.Key);
+				instance.Release();
 			}
 		}
 
-		foreach (var id in instancesToDestroy)
+		// Remove inactive instances
+		lock (instances)
 		{
-			DestroySoundInstance(id);
-		}
-
-		instancesToDestroy.Clear();
-	}
-
-	internal static bool TryCreateSoundInstance(Sound sound, SoundInstanceCreateFlags flags, out SoundInstance instance)
-	{
-		instance = default;
-
-		// Ensure max sound threshold hasn't been reached
-		if (sound.ActiveInstances >= sound.MaxInstances || ActiveInstances >= MaxInstances)
-		{
-			return false;
-		}
-
-		// Set some initial flags
-		Platform.FosterSoundFlags fosterFlags = 0;
-
-		if (flags.HasFlag(SoundInstanceCreateFlags.Streamed))
-		{
-			fosterFlags |= Platform.FosterSoundFlags.STREAM;
-		}
-
-		if (!flags.HasFlag(SoundInstanceCreateFlags.Spatialized))
-		{
-			fosterFlags |= Platform.FosterSoundFlags.NO_SPATIALIZATION;
-		}
-
-		// Attempt to create the sound
-		var ptr = Platform.FosterSoundCreate(sound.Path, fosterFlags);
-
-		// Ensure sound was actually created
-		if (ptr == IntPtr.Zero)
-		{
-			return false;
-		}
-
-		// Create and store the instance
-		var id = nextInstanceId++;
-
-		var state = new SoundInstanceState(
-			ptr,
-			sound,
-			null,
-			flags.HasFlag(SoundInstanceCreateFlags.Protected)
-			);
-
-		instances[id] = state;
-
-		// Increment active count
-		sound.ActiveInstances++;
-
-		instance = new(id);
-		return true;
-	}
-
-	internal static void DestroySoundInstance(long id)
-	{
-		if (instances.TryGetValue(id, out var state))
-		{
-			// Attempt to destroy the sound
-			Platform.FosterSoundDestroy(state.Ptr);
-
-			// Remove the instance
-			instances.Remove(id);
-
-			// Decrement active count
-			state.Sound.ActiveInstances--;
+			instances.RemoveAll(i => !i.Active);
 		}
 	}
 
-	internal static bool TryGetSoundInstanceState(long id, out SoundInstanceState state)
+	internal static void Shutdown()
 	{
-		return instances.TryGetValue(id, out state);
-	}
-
-	internal static bool TrySetSoundInstanceProtected(long id, bool isProtected)
-	{
-		if(TryGetSoundInstanceState(id, out var state))
+		ReleaseAll();
+		lock (instances)
 		{
-			instances[id] = state with { Protected = isProtected };
-			return true;
+			instances.Clear();
 		}
-		return false;
 	}
 
-	internal static bool IsSoundInstanceActive(long id)
+	internal static void OnSoundInstanceCreate(SoundInstance instance)
 	{
-		return instances.ContainsKey(id);
+		lock(instances)
+		{
+			instances.Add(instance);
+		}
 	}
 }

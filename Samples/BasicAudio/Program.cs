@@ -16,7 +16,7 @@ class Game : Module
 	private static readonly Vector2 PlayBarSize = new(1000, 30);
 
 	private readonly Batcher batch = new();
-	private readonly Sound sound = new(Path.Join("Assets", "boss battle - star run.mp3"), SoundLoadingMethod.LoadOnDemand);
+	private Sound sound = null!;
 	private readonly SpriteFont font = new SpriteFont(Path.Join("Assets", "monogram.ttf"), 32);
 	private SoundInstance instance;
 	private double instanceLength;
@@ -24,6 +24,8 @@ class Game : Module
 
 	public override void Startup()
 	{
+		sound = new Sound(Path.Join("Assets", "boss battle - star run.mp3"));
+
 		instance = sound.CreateInstance();
 		instance.Protected = true;
 		instance.Looping = true;
@@ -34,7 +36,6 @@ class Game : Module
 
 	public override void Shutdown()
 	{
-		instance.Dispose();
 		sound.Dispose();
 	}
 
@@ -91,11 +92,12 @@ class Game : Module
 		Graphics.Clear(Color.Black);
 
 		batch.PushMatrix(new Vector2(App.WidthInPixels, App.HeightInPixels) / 2 - PlayBarSize / 2);
-		batch.Rect(new Rect(Vector2.Zero, PlayBarSize), Color.Gray);
-		batch.Rect(new Rect((float)(PlayBarSize.X * instance.Cursor.TotalSeconds / instanceLength), PlayBarSize.Y), Color.Blue);
+
+		batch.Rect(new Rect(Vector2.Zero, PlayBarSize), Color.Gray *.75f);
+		batch.Rect(new Rect((float)(PlayBarSize.X * instance.Cursor.TotalSeconds / instanceLength), PlayBarSize.Y), Color.Blue * .75f);
 		batch.Text(font, $"{instance.Cursor:mm':'ss}/{TimeSpan.FromSeconds(instanceLength):mm':'ss}", new(PlayBarSize.X / 2, PlayBarSize.Y / 2), new(0.5f, 0.5f), Color.White);
 		batch.Text(font, $"x{instance.Pitch}", new(PlayBarSize.X / 2, PlayBarSize.Y + 5), new(0.5f, 0f), Color.White);
-
+		
 		if(instance.Spatialized)
 		{
 			batch.Circle(new(instance.Position.X * 10 + PlayBarSize.X/2, -20), 5, 10, Color.Red);

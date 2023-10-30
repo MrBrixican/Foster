@@ -399,6 +399,16 @@ typedef enum FosterSoundFlags
     FOSTER_SOUND_FLAG_NO_SPATIALIZATION     = 0x00004000
 } FosterSoundFlags;
 
+typedef enum FosterAudioFormat
+{
+	FOSTER_AUDIO_FORMAT_UNKNOWN = 0,
+	FOSTER_AUDIO_FORMAT_U8 = 1,
+	FOSTER_AUDIO_FORMAT_S16 = 2,
+	FOSTER_AUDIO_FORMAT_S24 = 3,
+	FOSTER_AUDIO_FORMAT_S32 = 4,
+	FOSTER_AUDIO_FORMAT_F32 = 5
+} FosterAudioFormat;
+
 typedef enum FosterSoundPositioning
 {
 	FOSTER_SOUND_POSITIONING_ABSOLUTE,
@@ -653,8 +663,6 @@ FOSTER_API void FosterDraw(FosterDrawCommand* command);
 
 FOSTER_API void FosterClear(FosterClearCommand* clear);
 
-// Audio
-
 FOSTER_API float FosterAudioGetVolume();
 
 FOSTER_API void FosterAudioSetVolume(int index, float value);
@@ -669,7 +677,15 @@ FOSTER_API void FosterAudioSetTimePcmFrames(int index, uint64_t value);
 
 FOSTER_API int FosterAudioGetListenerCount();
 
-// AudioListener
+FOSTER_API void* FosterAudioDecode(void* data, int length, FosterAudioFormat* format, int* channels, int* sampleRate, uint64_t* decodedFrameCount);
+
+FOSTER_API void FosterAudioFree(void* data);
+
+FOSTER_API void FosterAudioRegisterEncodedData(const char* name, void* data, int length);
+
+FOSTER_API void FosterAudioRegisterDecodedData(const char* name, const void* data, uint64_t frameCount, FosterAudioFormat format, int channels, int sampleRate);
+
+FOSTER_API void FosterAudioUnregisterData(const char* name);
 
 FOSTER_API bool FosterAudioListenerGetEnabled(int index);
 
@@ -695,9 +711,7 @@ FOSTER_API Vector3 FosterAudioListenerGetWorldUp(int index);
 
 FOSTER_API void FosterAudioListenerSetWorldUp(int index, Vector3 value);
 
-// Sound
-
-FOSTER_API FosterSound* FosterSoundCreate(const char* path, FosterSoundFlags flags);
+FOSTER_API FosterSound* FosterSoundCreate(const char* path, FosterSoundFlags flags, FosterSoundGroup* soundGroup);
 
 FOSTER_API void FosterSoundPlay(FosterSound* sound);
 
@@ -799,15 +813,17 @@ FOSTER_API float FosterSoundGetDopplerFactor(FosterSound* sound);
 
 FOSTER_API void FosterSoundSetDopplerFactor(FosterSound* sound, float value);
 
-// SoundGroup
-
-FOSTER_API FosterSoundGroup* FosterSoundGroupCreate();
+FOSTER_API FosterSoundGroup* FosterSoundGroupCreate(FosterSoundGroup* parent);
 
 FOSTER_API void FosterSoundGroupDestroy(FosterSoundGroup* soundGroup);
 
 FOSTER_API float FosterSoundGroupGetVolume(FosterSoundGroup* soundGroup);
 
 FOSTER_API void FosterSoundGroupSetVolume(FosterSoundGroup* soundGroup, float value);
+
+FOSTER_API float FosterSoundGroupGetPitch(FosterSoundGroup* soundGroup);
+
+FOSTER_API void FosterSoundGroupSetPitch(FosterSoundGroup* soundGroup, float value);
 
 #if __cplusplus
 }

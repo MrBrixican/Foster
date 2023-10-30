@@ -3,83 +3,141 @@
 namespace Foster.Framework.Audio;
 
 /// <summary>
-/// A lightweight handle for interacting with sound instances.
-/// Will automatically be disposed if <see cref="Finished"/> is true and <see cref="Protected"/> is false.
-/// <see cref="Active"/> will return false if this sound instance has been disposed of.
+/// A lightweight handle for interacting with sound instances. <br/>
+/// Will be released automatically if <see cref="Finished"/> is true and <see cref="Protected"/> is false, <br/>
+/// or if <see cref="Stop"/> is called and <see cref="Protected"/> is false. <br/>
+/// Can be explicitly released via <see cref="Release"/>. <br/>
+/// Released instances are marked as inactive. <br/>
+/// <see cref="Active"/> will return false if this sound instance is inactive. <br/>
+/// Additionally, instances will be created as inactive if <see cref="Audio.MaxActiveInstances"/> or <see cref="Sound.MaxActiveInstances"/> has been reached. <br/>
+/// Attempting to access or modify an inactive instance will not throw any exceptions and instead silently fail.
 /// </summary>
 public readonly struct SoundInstance
 {
+	/// <summary>
+	/// Instance volume.
+	/// </summary>
 	public float Volume
 	{
-		get => Get(s => Platform.FosterSoundGetVolume(s.Ptr));
-		set => Set(value, (s, v) => Platform.FosterSoundSetVolume(s.Ptr, v));
+		get => GetPlatform(Platform.FosterSoundGetVolume);
+		set => SetPlatform(value, Platform.FosterSoundSetVolume);
 	}
 
+	/// <summary>
+	/// Instance pitch.
+	/// </summary>
 	public float Pitch
 	{
-		get => Get(s => Platform.FosterSoundGetPitch(s.Ptr));
-		set => Set(value, (s, v) => Platform.FosterSoundSetPitch(s.Ptr, v));
+		get => GetPlatform(Platform.FosterSoundGetPitch);
+		set => SetPlatform(value, Platform.FosterSoundSetPitch);
 	}
 
+	/// <summary>
+	/// Instance pan.
+	/// </summary>
 	public float Pan
 	{
-		get => Get(s => Platform.FosterSoundGetPan(s.Ptr));
-		set => Set(value, (s, v) => Platform.FosterSoundSetPan(s.Ptr, v));
+		get => GetPlatform(Platform.FosterSoundGetPan);
+		set => SetPlatform(value, Platform.FosterSoundSetPan);
 	}
 
+	/// <summary>
+	/// Whether instance is playing.
+	/// </summary>
 	public bool Playing
 	{
-		get => Get(s => Platform.FosterSoundGetPlaying(s.Ptr));
+		get => GetPlatform(Platform.FosterSoundGetPlaying);
 	}
 
+	/// <summary>
+	/// Whether instance is finished playing. <br/>
+	/// If <see cref="Finished"/> is true and <see cref="Protected"/> is false, the instance will be automatically released.
+	/// </summary>
 	public bool Finished
 	{
-		get => Get(s => Platform.FosterSoundGetFinished(s.Ptr));
+		get => GetPlatform(Platform.FosterSoundGetFinished);
 	}
 
+	/// <summary>
+	/// Instance length in PCM frames. <br/>
+	/// This can be <i>extremely</i> slow for certain codecs (mp3). <br/>
+	/// Limitation: This will always return 0 for an ogg loaded with <see cref="SoundLoadingMethod.Stream"/>.
+	/// </summary>
 	public ulong LengthPcmFrames
 	{
-		get => Get(s => Platform.FosterSoundGetLengthPcmFrames(s.Ptr));
+		get => GetPlatform(Platform.FosterSoundGetLengthPcmFrames);
 	}
 
-	public TimeSpan Length => TimeSpan.FromSeconds(1.0 * LengthPcmFrames / Audio.SampleRate);
+	/// <summary>
+	/// Instance length. <br/>
+	/// This can be <i>extremely</i> slow for certain codecs (mp3). <br/>
+	/// Limitation: This will always return <see cref="TimeSpan.Zero"/> for an ogg loaded with <see cref="SoundLoadingMethod.Stream"/>.
+	/// </summary>
+	public TimeSpan Length => TimeSpan.FromSeconds(1.0 * LengthPcmFrames / Audio.SampleRate); //TODO: We can't depend on this in practice. Need to use instance sample rate.
 
+	/// <summary>
+	/// Instance cursor in PCM frames. <br/>
+	/// Setting does not have an immediate effect and must be processed by the audio thread. <br/>
+	/// Limitation: This will return total frames played for an ogg loaded with <see cref="SoundLoadingMethod.Stream"/> that is looped.
+	/// </summary>
 	public ulong CursorPcmFrames
 	{
-		get => Get(s => Platform.FosterSoundGetCursorPcmFrames(s.Ptr));
-		set => Set(value, (s, v) => Platform.FosterSoundSetCursorPcmFrames(s.Ptr, v));
+		get => GetPlatform(Platform.FosterSoundGetCursorPcmFrames);
+		set => SetPlatform(value, Platform.FosterSoundSetCursorPcmFrames);
 	}
 
+	/// <summary>
+	/// Instance cursor. <br/>
+	/// Setting does not have an immediate effect and must be processed by the audio thread. <br/>
+	/// Limitation: This will return total time played for an ogg loaded with <see cref="SoundLoadingMethod.Stream"/> that is looped.
+	/// </summary>
 	public TimeSpan Cursor
 	{
 		get => TimeSpan.FromSeconds(1.0 * CursorPcmFrames / Audio.SampleRate);
 		set => CursorPcmFrames = (ulong)Math.Floor(value.TotalSeconds * Audio.SampleRate);
 	}
 
+	/// <summary>
+	/// Whether instance is looping. <br/>
+	/// A looping instance will never be <see cref="Finished"/> or be automatically released.
+	/// </summary>
 	public bool Looping
 	{
-		get => Get(s => Platform.FosterSoundGetLooping(s.Ptr));
-		set => Set(value, (s, v) => Platform.FosterSoundSetLooping(s.Ptr, v));
+		get => GetPlatform(Platform.FosterSoundGetLooping);
+		set => SetPlatform(value, Platform.FosterSoundSetLooping);
 	}
 
+	/// <summary>
+	/// Instance loop begin in PCM frames.
+	/// </summary>
 	public ulong LoopBeginPcmFrames
 	{
-		get => Get(s => Platform.FosterSoundGetLoopBeginPcmFrames(s.Ptr));
-		set => Set(value, (s, v) => Platform.FosterSoundSetLoopBeginPcmFrames(s.Ptr, v));
+		get => GetPlatform(Platform.FosterSoundGetLoopBeginPcmFrames);
+		set => SetPlatform(value, Platform.FosterSoundSetLoopBeginPcmFrames);
 	}
 
+	/// <summary>
+	/// Instance loop begin.
+	/// </summary>
 	public TimeSpan LoopBegin
 	{
 		get => TimeSpan.FromSeconds(1.0 * LoopBeginPcmFrames / Audio.SampleRate);
 		set => LoopBeginPcmFrames = (ulong)Math.Floor(value.TotalSeconds * Audio.SampleRate);
 	}
 
+	/// <summary>
+	/// Instance loop end in PCM frames. <br/>
+	/// <see cref="ulong.MaxValue"/> indicates no loop end.
+	/// </summary>
 	public ulong LoopEndPcmFrames
 	{
-		get => Get(s => Platform.FosterSoundGetLoopEndPcmFrames(s.Ptr));
-		set => Set(value, (s, v) => Platform.FosterSoundSetLoopEndPcmFrames(s.Ptr, v));
+		get => GetPlatform(Platform.FosterSoundGetLoopEndPcmFrames);
+		set => SetPlatform(value, Platform.FosterSoundSetLoopEndPcmFrames);
 	}
 
+	/// <summary>
+	/// Instance loop end.
+	/// </summary>
 	public TimeSpan? LoopEnd
 	{
 		get
@@ -90,10 +148,10 @@ public readonly struct SoundInstance
 				return null; // Special case
 			}
 			return TimeSpan.FromSeconds(1.0 * end / Audio.SampleRate);
-		} 
+		}
 		set
 		{
-			if(value.HasValue)
+			if (value.HasValue)
 			{
 				LoopEndPcmFrames = (ulong)Math.Floor(value.Value.TotalSeconds * Audio.SampleRate);
 			}
@@ -104,141 +162,327 @@ public readonly struct SoundInstance
 		}
 	}
 
+	/// <summary>
+	/// Whether this instance is spatialized.
+	/// </summary>
 	public bool Spatialized
 	{
-		get => Get(s => Platform.FosterSoundGetSpatialized(s.Ptr));
-		set => Set(value, (s, v) => Platform.FosterSoundSetSpatialized(s.Ptr, v));
+		get => GetPlatform(Platform.FosterSoundGetSpatialized);
+		set => SetPlatform(value, Platform.FosterSoundSetSpatialized);
 	}
 
+	/// <summary>
+	/// Instance position. <br/>
+	/// Has no effect if <see cref="Spatialized"/> is false.
+	/// </summary>
 	public Vector3 Position
 	{
-		get => Get(s => Platform.FosterSoundGetPosition(s.Ptr));
-		set => Set(value, (s, v) => Platform.FosterSoundSetPosition(s.Ptr, v));
+		get => GetPlatform(Platform.FosterSoundGetPosition);
+		set => SetPlatform(value, Platform.FosterSoundSetPosition);
 	}
 
+	/// <summary>
+	/// Instance velocity. <br/>
+	/// Has no effect if <see cref="Spatialized"/> is false.
+	/// </summary>
 	public Vector3 Velocity
 	{
-		get => Get(s => Platform.FosterSoundGetVelocity(s.Ptr));
-		set => Set(value, (s, v) => Platform.FosterSoundSetVelocity(s.Ptr, v));
+		get => GetPlatform(Platform.FosterSoundGetVelocity);
+		set => SetPlatform(value, Platform.FosterSoundSetVelocity);
 	}
 
+	/// <summary>
+	/// Instance direction. <br/>
+	/// Has no effect if <see cref="Spatialized"/> is false.
+	/// </summary>
 	public Vector3 Direction
 	{
-		get => Get(s => Platform.FosterSoundGetDirection(s.Ptr));
-		set => Set(value, (s, v) => Platform.FosterSoundSetDirection(s.Ptr, v));
+		get => GetPlatform(Platform.FosterSoundGetDirection);
+		set => SetPlatform(value, Platform.FosterSoundSetDirection);
 	}
 
+	/// <summary>
+	/// Instance positioning. <br/>
+	/// Has no effect if <see cref="Spatialized"/> is false.
+	/// </summary>
 	public SoundPositioning Positioning
 	{
-		get => Get(s => Platform.FosterSoundGetPositioning(s.Ptr));
-		set => Set(value, (s, v) => Platform.FosterSoundSetPositioning(s.Ptr, v));
+		get => GetPlatform(Platform.FosterSoundGetPositioning);
+		set => SetPlatform(value, Platform.FosterSoundSetPositioning);
 	}
 
+	/// <summary>
+	/// Pinned <see cref="AudioListener"/> index. <br/>
+	/// Instance spatial audio effects will be relative to the specified <see cref="AudioListener"/>. <br/>
+	/// -1 is used to specify closest <see cref="AudioListener"/>. <br/>
+	/// Has no effect if <see cref="Spatialized"/> is false.
+	/// </summary>
 	public int PinnedListenerIndex
 	{
-		get => Get(s => Platform.FosterSoundGetPinnedListenerIndex(s.Ptr));
-		set => Set(value, (s, v) => Platform.FosterSoundSetPinnedListenerIndex(s.Ptr, v));
+		get => GetPlatform(Platform.FosterSoundGetPinnedListenerIndex);
+		set => SetPlatform(value, Platform.FosterSoundSetPinnedListenerIndex);
 	}
 
+	/// <summary>
+	/// Instance attenuation model. <br/>
+	/// Has no effect if <see cref="Spatialized"/> is false.
+	/// </summary>
 	public SoundAttenuationModel AttenuationModel
 	{
-		get => Get(s => Platform.FosterSoundGetAttenuationModel(s.Ptr));
-		set => Set(value, (s, v) => Platform.FosterSoundSetAttenuationModel(s.Ptr, v));
+		get => GetPlatform(Platform.FosterSoundGetAttenuationModel);
+		set => SetPlatform(value, Platform.FosterSoundSetAttenuationModel);
 	}
 
+	/// <summary>
+	/// Instance rolloff. <br/>
+	/// Has no effect if <see cref="Spatialized"/> is false.
+	/// </summary>
 	public float Rolloff
 	{
-		get => Get(s => Platform.FosterSoundGetRolloff(s.Ptr));
-		set => Set(value, (s, v) => Platform.FosterSoundSetRolloff(s.Ptr, v));
+		get => GetPlatform(Platform.FosterSoundGetRolloff);
+		set => SetPlatform(value, Platform.FosterSoundSetRolloff);
 	}
 
+	/// <summary>
+	/// Instance minimum gain. <br/>
+	/// Has no effect if <see cref="Spatialized"/> is false.
+	/// </summary>
 	public float MinGain
 	{
-		get => Get(s => Platform.FosterSoundGetMinGain(s.Ptr));
-		set => Set(value, (s, v) => Platform.FosterSoundSetMinGain(s.Ptr, v));
+		get => GetPlatform(Platform.FosterSoundGetMinGain);
+		set => SetPlatform(value, Platform.FosterSoundSetMinGain);
 	}
 
+	/// <summary>
+	/// Instance maximum gain. <br/>
+	/// Has no effect if <see cref="Spatialized"/> is false.
+	/// </summary>
 	public float MaxGain
 	{
-		get => Get(s => Platform.FosterSoundGetMaxGain(s.Ptr));
-		set => Set(value, (s, v) => Platform.FosterSoundSetMaxGain(s.Ptr, v));
+		get => GetPlatform(Platform.FosterSoundGetMaxGain);
+		set => SetPlatform(value, Platform.FosterSoundSetMaxGain);
 	}
 
+	/// <summary>
+	/// Instance minimum distance. <br/>
+	/// Has no effect if <see cref="Spatialized"/> is false.
+	/// </summary>
 	public float MinDistance
 	{
-		get => Get(s => Platform.FosterSoundGetMinDistance(s.Ptr));
-		set => Set(value, (s, v) => Platform.FosterSoundSetMinDistance(s.Ptr, v));
+		get => GetPlatform(Platform.FosterSoundGetMinDistance);
+		set => SetPlatform(value, Platform.FosterSoundSetMinDistance);
 	}
 
+	/// <summary>
+	/// Instance maximum distance. <br/>
+	/// Has no effect if <see cref="Spatialized"/> is false.
+	/// </summary>
 	public float MaxDistance
 	{
-		get => Get(s => Platform.FosterSoundGetMaxDistance(s.Ptr));
-		set => Set(value, (s, v) => Platform.FosterSoundSetMaxDistance(s.Ptr, v));
+		get => GetPlatform(Platform.FosterSoundGetMaxDistance);
+		set => SetPlatform(value, Platform.FosterSoundSetMaxDistance);
 	}
 
+	/// <summary>
+	/// Instance cone. <br/>
+	/// Has no effect if <see cref="Spatialized"/> is false.
+	/// </summary>
 	public SoundCone Cone
 	{
-		get => Get(s => Platform.FosterSoundGetCone(s.Ptr));
-		set => Set(value, (s, v) => Platform.FosterSoundSetCone(s.Ptr, v));
+		get => GetPlatform(Platform.FosterSoundGetCone);
+		set => SetPlatform(value, Platform.FosterSoundSetCone);
 	}
 
+	/// <summary>
+	/// Instance directional attenuation factor. <br/>
+	/// Has no effect if <see cref="Spatialized"/> is false.
+	/// </summary>
 	public float DirectionalAttenuationFactor
 	{
-		get => Get(s => Platform.FosterSoundGetDirectionalAttenuationFactor(s.Ptr));
-		set => Set(value, (s, v) => Platform.FosterSoundSetDirectionalAttenuationFactor(s.Ptr, v));
+		get => GetPlatform(Platform.FosterSoundGetDirectionalAttenuationFactor);
+		set => SetPlatform(value, Platform.FosterSoundSetDirectionalAttenuationFactor);
 	}
 
+	/// <summary>
+	/// Instance doppler factor. <br/>
+	/// Has no effect if <see cref="Spatialized"/> is false.
+	/// </summary>
 	public float DopplerFactor
 	{
-		get => Get(s => Platform.FosterSoundGetDopplerFactor(s.Ptr));
-		set => Set(value, (s, v) => Platform.FosterSoundSetDopplerFactor(s.Ptr, v));
+		get => GetPlatform(Platform.FosterSoundGetDopplerFactor);
+		set => SetPlatform(value, Platform.FosterSoundSetDopplerFactor);
 	}
 
+	/// <summary>
+	/// When true, this instance will not be automatically released once <see cref="Finished"/> is true or when <see cref="Stop"/> is called
+	/// </summary>
 	public bool Protected
 	{
-		get => Get(s => s.Protected);
-		set => Audio.TrySetSoundInstanceProtected(Id, value);
+		get => ActiveState?.Protected ?? false;
+		set
+		{
+			if(Active)
+			{
+				state!.Protected = value;
+			}
+		}
 	}
 
-	public Sound? Sound => Get(s => s.Sound);
-	public bool Active => Audio.IsSoundInstanceActive(Id);
+	/// <summary>
+	/// Instance sound. <br/>
+	/// Returns null if <see cref="Active"/> is false.
+	/// </summary>
+	public Sound? Sound => ActiveState?.Sound;
 
+	/// <summary>
+	/// Instance sound group. <br/>
+	/// Returns null if the instance was not created with a sound group or <see cref="Active"/> is false.
+	/// </summary>
+	public SoundGroup? Group => ActiveState?.Group;
 
-	internal readonly long Id;
+	/// <summary>
+	/// Whether the instance is active.
+	/// </summary>
+	public bool Active => state?.Id == Id;
 
-	internal SoundInstance(long id)
+	private State? ActiveState => state?.Id == Id ? state : null;
+
+	private readonly long Id;
+	private readonly State? state;
+
+	private static long nextInstanceId = 1;
+	private static readonly Stack<State> statePool = new();
+
+	internal SoundInstance(Sound sound, SoundGroup? group, bool spatialized)
 	{
-		Id = id;
+		if (sound is null)
+		{
+			throw new ArgumentNullException(nameof(sound));
+		}
+
+		Id = 0;
+		state = null;
+
+		// Ensure max sound threshold hasn't been reached
+		if (sound.ActiveInstances >= sound.MaxActiveInstances || Audio.ActiveInstances >= Audio.MaxActiveInstances)
+		{
+			return;
+		}
+
+		// Set some initial flags
+		Platform.FosterSoundFlags fosterFlags = 0;
+
+		if (sound.LoadingMethod == SoundLoadingMethod.Stream)
+		{
+			fosterFlags |= Platform.FosterSoundFlags.STREAM;
+		}
+		else if (sound.LoadingMethod is SoundLoadingMethod.PreloadDecoded or SoundLoadingMethod.LoadOnDemandDecoded)
+		{
+			fosterFlags |= Platform.FosterSoundFlags.DECODE;
+		}
+
+		if (!spatialized)
+		{
+			fosterFlags |= Platform.FosterSoundFlags.NO_SPATIALIZATION;
+		}
+
+		// Attempt to create the sound
+		var ptr = Platform.FosterSoundCreate(sound.Path, fosterFlags, group?.Ptr ?? IntPtr.Zero);
+
+		// Ensure sound was actually created
+		if (ptr == IntPtr.Zero)
+		{
+			return;
+		}
+		
+		lock(statePool)
+		{
+			// Get new id while we have a lock
+			Id = nextInstanceId++;
+
+			// Acquire and set state
+			if (!statePool.TryPop(out state))
+			{
+				state = new State();
+			}
+
+			state.Id = Id;
+			state.Ptr = ptr;
+			state.Sound = sound;
+			state.Group = group;
+			state.Protected = false;
+
+			// Increment counts while we have a lock
+			Audio.ActiveInstances++;
+			sound.ActiveInstances++;
+		}
+
+		Audio.OnSoundInstanceCreate(this);
 	}
 
+	/// <summary>
+	/// Releases this instance, making it inactive and freeing memory in the process
+	/// </summary>
+	public void Release()
+	{
+		if (Active && state != null)
+		{
+			var ptr = state.Ptr;
+			
+			lock (statePool)
+			{
+				// Decrement counts while we have a lock
+				Audio.ActiveInstances--;
+				state.Sound.ActiveInstances--;
+
+				// Clear and free state
+				state.Clear();
+				statePool.Push(state);
+			}
+
+			// Attempt to destroy the sound
+			Platform.FosterSoundDestroy(ptr);
+		}
+	}
+
+	/// <summary>
+	/// Plays the instance
+	/// </summary>
 	public void Play()
 	{
-		if (Audio.TryGetSoundInstanceState(Id, out var state))
+		if (Active)
 		{
-			Platform.FosterSoundPlay(state.Ptr);
+			Platform.FosterSoundPlay(state!.Ptr);
 		}
 	}
 
+	/// <summary>
+	/// Pauses the instance
+	/// </summary>
 	public void Pause()
 	{
-		if (Audio.TryGetSoundInstanceState(Id, out var state))
+		if (Active)
 		{
-			Platform.FosterSoundStop(state.Ptr);
+			Platform.FosterSoundStop(state!.Ptr);
 		}
 	}
 
+	/// <summary>
+	/// If the instance is <see cref="Protected"/>, stops the instance and seeks back to the beginning.
+	/// Otherwise, releases the instance.
+	/// </summary>
 	public void Stop()
 	{
-		if (Audio.TryGetSoundInstanceState(Id, out var state))
+		if (Active)
 		{
-			if (state.Protected)
+			if (state!.Protected)
 			{
-				Platform.FosterSoundStop(state.Ptr);
+				Platform.FosterSoundStop(state!.Ptr);
 				CursorPcmFrames = 0;
 			}
 			else
 			{
-				Dispose();
+				Release();
 			}
 		}
 	}
@@ -251,25 +495,38 @@ public readonly struct SoundInstance
 
 	//public void ScheduleFade(...) { }
 
-	private T Get<T>(Func<SoundInstanceState, T> func)
+	private T GetPlatform<T>(Func<IntPtr, T> getter)
 	{
-		if (Audio.TryGetSoundInstanceState(Id, out var state))
+		if (Active)
 		{
-			return func(state);
+			return getter(state!.Ptr);
 		}
 		return default!;
 	}
 
-	private void Set<T>(T value, Action<SoundInstanceState, T> func)
+	private void SetPlatform<T>(T value, Action<IntPtr, T> setter)
 	{
-		if (Audio.TryGetSoundInstanceState(Id, out var state))
+		if (Active)
 		{
-			func(state, value);
+			setter(state!.Ptr, value);
 		}
 	}
 
-	public void Dispose()
+	private class State
 	{
-		Audio.DestroySoundInstance(Id);
+		public long Id { get; set; }
+		public IntPtr Ptr { get; set; }
+		public Sound Sound { get; set; } = null!;
+		public SoundGroup? Group { get; set; }
+		public bool Protected { get; set; }
+
+		public void Clear()
+		{
+			Id = -1;
+			Ptr = default;
+			Sound = default!;
+			Group = default;
+			Protected = default;
+		}
 	}
 }

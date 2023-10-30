@@ -10,7 +10,7 @@
 
 static Vector3 vec3f_to_Vector3(ma_vec3f v)
 {
-	Vector3 value = { v.x, v.y, v.z };
+	Vector3 value = {v.x, v.y, v.z};
 	return value;
 }
 
@@ -71,6 +71,40 @@ void FosterAudioSetTimePcmFrames(int index, uint64_t value)
 int FosterAudioGetListenerCount()
 {
 	return ma_engine_get_listener_count(FosterGetState()->audioEngine);
+}
+
+void *FosterAudioDecode(void *data, int length, FosterAudioFormat *format, int *channels, int *sampleRate, uint64_t *decodedFrameCount)
+{
+	void *frames = NULL;
+	ma_decoder_config config = ma_decoder_config_init(*format, *channels, *sampleRate);
+	ma_decode_memory(data, length, &config, decodedFrameCount, &frames);
+	*format = config.format;
+	*channels = config.channels;
+	*sampleRate = config.sampleRate;
+	return frames;
+}
+
+void FosterAudioFree(void *data)
+{
+	ma_free(data, NULL);
+}
+
+void FosterAudioRegisterEncodedData(const char *name, void *data, int length)
+{
+	ma_resource_manager *manager = ma_engine_get_resource_manager(FosterGetState()->audioEngine);
+	ma_resource_manager_register_encoded_data(manager, name, data, length);
+}
+
+void FosterAudioRegisterDecodedData(const char *name, const void *data, uint64_t frameCount, FosterAudioFormat format, int channels, int sampleRate)
+{
+	ma_resource_manager *manager = ma_engine_get_resource_manager(FosterGetState()->audioEngine);
+	ma_resource_manager_register_decoded_data(manager, name, data, frameCount, format, channels, sampleRate);
+}
+
+void FosterAudioUnregisterData(const char *name)
+{
+	ma_resource_manager *manager = ma_engine_get_resource_manager(FosterGetState()->audioEngine);
+	ma_resource_manager_unregister_data(manager, name);
 }
 
 #pragma endregion Audio
@@ -143,35 +177,35 @@ void FosterAudioListenerSetWorldUp(int index, Vector3 value)
 
 #pragma region Sound
 
-FosterSound* FosterSoundCreate(const char* path, FosterSoundFlags flags)
+FosterSound *FosterSoundCreate(const char *path, FosterSoundFlags flags, FosterSoundGroup *soundGroup)
 {
-	FosterState* state = FosterGetState();
-	ma_sound* sound = SDL_malloc(sizeof(ma_sound));
+	FosterState *state = FosterGetState();
+	ma_sound *sound = SDL_malloc(sizeof(ma_sound));
 
-	if (MA_SUCCESS != ma_sound_init_from_file(state->audioEngine, path, flags, NULL, NULL, sound))
+	if (MA_SUCCESS != ma_sound_init_from_file(state->audioEngine, path, flags, (ma_sound_group *)soundGroup, NULL, sound))
 	{
 		FosterLogError("Unable to create Sound from file");
 		SDL_free(sound);
 		return NULL;
 	}
 
-	return (FosterSound*)sound;
+	return (FosterSound *)sound;
 }
 
-void FosterSoundPlay(FosterSound* sound)
+void FosterSoundPlay(FosterSound *sound)
 {
-	ma_sound_start((ma_sound*)sound);
+	ma_sound_start((ma_sound *)sound);
 }
 
-void FosterSoundStop(FosterSound* sound)
+void FosterSoundStop(FosterSound *sound)
 {
-	ma_sound_stop((ma_sound*)sound);
+	ma_sound_stop((ma_sound *)sound);
 }
 
-void FosterSoundDestroy(FosterSound* sound)
+void FosterSoundDestroy(FosterSound *sound)
 {
-	ma_sound_uninit((ma_sound*)sound);
-	SDL_free((ma_sound*)sound);
+	ma_sound_uninit((ma_sound *)sound);
+	SDL_free((ma_sound *)sound);
 }
 
 float FosterSoundGetVolume(FosterSound *sound)
@@ -217,7 +251,7 @@ bool FosterSoundGetFinished(FosterSound *sound)
 uint64_t FosterSoundGetLengthPcmFrames(FosterSound *sound)
 {
 	uint64_t value = 0;
-	ma_sound_get_length_in_pcm_frames((ma_sound*)sound, &value);
+	ma_sound_get_length_in_pcm_frames((ma_sound *)sound, &value);
 	return value;
 }
 
@@ -246,29 +280,29 @@ void FosterSoundSetLooping(FosterSound *sound, bool value)
 uint64_t FosterSoundGetLoopBeginPcmFrames(FosterSound *sound)
 {
 	uint64_t value = 0;
-	ma_data_source* source = ma_sound_get_data_source((ma_sound*)sound);
+	ma_data_source *source = ma_sound_get_data_source((ma_sound *)sound);
 	ma_data_source_get_loop_point_in_pcm_frames(source, &value, NULL);
 	return value;
 }
 
 void FosterSoundSetLoopBeginPcmFrames(FosterSound *sound, uint64_t value)
 {
-	ma_data_source* source = ma_sound_get_data_source((ma_sound*)sound);
-	ma_data_source_set_loop_point_in_pcm_frames(source, value, FosterSoundGetLoopEndPcmFrames(sound)); //TODO
+	ma_data_source *source = ma_sound_get_data_source((ma_sound *)sound);
+	ma_data_source_set_loop_point_in_pcm_frames(source, value, FosterSoundGetLoopEndPcmFrames(sound)); // TODO
 }
 
 uint64_t FosterSoundGetLoopEndPcmFrames(FosterSound *sound)
 {
 	uint64_t value = 0;
-	ma_data_source* source = ma_sound_get_data_source((ma_sound*)sound);
+	ma_data_source *source = ma_sound_get_data_source((ma_sound *)sound);
 	ma_data_source_get_loop_point_in_pcm_frames(source, NULL, &value);
 	return value;
 }
 
 void FosterSoundSetLoopEndPcmFrames(FosterSound *sound, uint64_t value)
 {
-	ma_data_source* source = ma_sound_get_data_source((ma_sound*)sound);
-	ma_data_source_set_loop_point_in_pcm_frames(source, FosterSoundGetLoopBeginPcmFrames(sound), value); //TODO
+	ma_data_source *source = ma_sound_get_data_source((ma_sound *)sound);
+	ma_data_source_set_loop_point_in_pcm_frames(source, FosterSoundGetLoopBeginPcmFrames(sound), value); // TODO
 }
 
 bool FosterSoundGetSpatialized(FosterSound *sound)
@@ -293,22 +327,22 @@ void FosterSoundSetPosition(FosterSound *sound, Vector3 value)
 
 Vector3 FosterSoundGetVelocity(FosterSound *sound)
 {
-	return vec3f_to_Vector3(ma_sound_get_velocity((ma_sound*)sound));
+	return vec3f_to_Vector3(ma_sound_get_velocity((ma_sound *)sound));
 }
 
 void FosterSoundSetVelocity(FosterSound *sound, Vector3 value)
 {
-	ma_sound_set_velocity((ma_sound*)sound, value.x, value.y, value.z);
+	ma_sound_set_velocity((ma_sound *)sound, value.x, value.y, value.z);
 }
 
 Vector3 FosterSoundGetDirection(FosterSound *sound)
 {
-	return vec3f_to_Vector3(ma_sound_get_direction((ma_sound*)sound));
+	return vec3f_to_Vector3(ma_sound_get_direction((ma_sound *)sound));
 }
 
 void FosterSoundSetDirection(FosterSound *sound, Vector3 value)
 {
-	ma_sound_set_direction((ma_sound*)sound, value.x, value.y, value.z);
+	ma_sound_set_direction((ma_sound *)sound, value.x, value.y, value.z);
 }
 
 FosterSoundPositioning FosterSoundGetPositioning(FosterSound *sound)
@@ -427,25 +461,25 @@ void FosterSoundSetDopplerFactor(FosterSound *sound, float value)
 
 #pragma region SoundGroup
 
-FosterSoundGroup* FosterSoundGroupCreate()
+FosterSoundGroup *FosterSoundGroupCreate(FosterSoundGroup* parent)
 {
-	FosterState* state = FosterGetState();
-	ma_sound_group* soundGroup = SDL_malloc(sizeof(ma_sound_group));
+	FosterState *state = FosterGetState();
+	ma_sound_group *soundGroup = SDL_malloc(sizeof(ma_sound_group));
 
-	if (MA_SUCCESS != ma_sound_group_init(state->audioEngine, 0, NULL, soundGroup))
+	if (MA_SUCCESS != ma_sound_group_init(state->audioEngine, 0, (ma_sound_group*)parent, soundGroup))
 	{
 		FosterLogError("Unable to create SoundGroup");
 		SDL_free(soundGroup);
 		return NULL;
 	}
 
-	return (FosterSoundGroup*)soundGroup;
+	return (FosterSoundGroup *)soundGroup;
 }
 
-void FosterSoundGroupDestroy(FosterSoundGroup* soundGroup)
+void FosterSoundGroupDestroy(FosterSoundGroup *soundGroup)
 {
-	ma_sound_group_uninit((ma_sound_group*)soundGroup);
-	SDL_free((ma_sound_group*)soundGroup);
+	ma_sound_group_uninit((ma_sound_group *)soundGroup);
+	SDL_free((ma_sound_group *)soundGroup);
 }
 
 float FosterSoundGroupGetVolume(FosterSoundGroup *soundGroup)
@@ -456,6 +490,16 @@ float FosterSoundGroupGetVolume(FosterSoundGroup *soundGroup)
 void FosterSoundGroupSetVolume(FosterSoundGroup *soundGroup, float value)
 {
 	ma_sound_group_set_volume((ma_sound_group *)soundGroup, value);
+}
+
+float FosterSoundGroupGetPitch(FosterSoundGroup* soundGroup)
+{
+	return ma_sound_group_get_pitch((ma_sound_group*)soundGroup);
+}
+
+void FosterSoundGroupSetPitch(FosterSoundGroup* soundGroup, float value)
+{
+	ma_sound_group_set_pitch((ma_sound_group*)soundGroup, value);
 }
 
 #pragma endregion SoundGroup

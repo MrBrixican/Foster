@@ -519,6 +519,9 @@ public readonly struct SoundInstance
 		public Sound Sound { get; set; } = null!;
 		public SoundGroup? Group { get; set; }
 		public bool Protected { get; set; }
+		public AudioFormat Format { get; set; } // TODO
+		public int Channels { get; set; }
+		public int SampleRate { get; set; }
 
 		public void Clear()
 		{

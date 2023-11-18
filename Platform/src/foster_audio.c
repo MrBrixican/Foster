@@ -1,8 +1,7 @@
-#define STB_VORBIS_HEADER_ONLY
-#include "third_party/stb_vorbis.c"
-
 #define MINIAUDIO_IMPLEMENTATION
 #include "third_party/miniaudio.h"
+#include "third_party/miniaudio_libvorbis.h"
+#include "third_party/miniaudio_qoa.h"
 
 #include "foster_platform.h"
 #include "foster_internal.h"
@@ -14,17 +13,182 @@ static Vector3 vec3f_to_Vector3(ma_vec3f v)
 	return value;
 }
 
-#pragma region Audio
+// begin Vorbis
+
+static ma_result ma_decoding_backend_init__libvorbis(void* pUserData, ma_read_proc onRead, ma_seek_proc onSeek, ma_tell_proc onTell, void* pReadSeekTellUserData, const ma_decoding_backend_config* pConfig, const ma_allocation_callbacks* pAllocationCallbacks, ma_data_source** ppBackend)
+{
+    ma_result result;
+    ma_libvorbis* pVorbis;
+
+    (void)pUserData;
+
+    pVorbis = (ma_libvorbis*)ma_malloc(sizeof(*pVorbis), pAllocationCallbacks);
+    if (pVorbis == NULL) {
+        return MA_OUT_OF_MEMORY;
+    }
+
+    result = ma_libvorbis_init(onRead, onSeek, onTell, pReadSeekTellUserData, pConfig, pAllocationCallbacks, pVorbis);
+    if (result != MA_SUCCESS) {
+        ma_free(pVorbis, pAllocationCallbacks);
+        return result;
+    }
+
+    *ppBackend = pVorbis;
+
+    return MA_SUCCESS;
+}
+
+static ma_result ma_decoding_backend_init_file__libvorbis(void* pUserData, const char* pFilePath, const ma_decoding_backend_config* pConfig, const ma_allocation_callbacks* pAllocationCallbacks, ma_data_source** ppBackend)
+{
+    ma_result result;
+    ma_libvorbis* pVorbis;
+
+    (void)pUserData;
+
+    pVorbis = (ma_libvorbis*)ma_malloc(sizeof(*pVorbis), pAllocationCallbacks);
+    if (pVorbis == NULL) {
+        return MA_OUT_OF_MEMORY;
+    }
+
+    result = ma_libvorbis_init_file(pFilePath, pConfig, pAllocationCallbacks, pVorbis);
+    if (result != MA_SUCCESS) {
+        ma_free(pVorbis, pAllocationCallbacks);
+        return result;
+    }
+
+    *ppBackend = pVorbis;
+
+    return MA_SUCCESS;
+}
+
+static void ma_decoding_backend_uninit__libvorbis(void* pUserData, ma_data_source* pBackend, const ma_allocation_callbacks* pAllocationCallbacks)
+{
+    ma_libvorbis* pVorbis = (ma_libvorbis*)pBackend;
+
+    (void)pUserData;
+
+    ma_libvorbis_uninit(pVorbis, pAllocationCallbacks);
+    ma_free(pVorbis, pAllocationCallbacks);
+}
+
+static ma_result ma_decoding_backend_get_channel_map__libvorbis(void* pUserData, ma_data_source* pBackend, ma_channel* pChannelMap, size_t channelMapCap)
+{
+    ma_libvorbis* pVorbis = (ma_libvorbis*)pBackend;
+
+    (void)pUserData;
+
+    return ma_libvorbis_get_data_format(pVorbis, NULL, NULL, NULL, pChannelMap, channelMapCap);
+}
+
+static ma_decoding_backend_vtable g_ma_decoding_backend_vtable_libvorbis =
+{
+    ma_decoding_backend_init__libvorbis,
+    ma_decoding_backend_init_file__libvorbis,
+    NULL, /* onInitFileW() */
+    NULL, /* onInitMemory() */
+    ma_decoding_backend_uninit__libvorbis
+};
+
+// end Vorbis
+
+// begin QOA
+
+static ma_result ma_decoding_backend_init__qoa(void* pUserData, ma_read_proc onRead, ma_seek_proc onSeek, ma_tell_proc onTell, void* pReadSeekTellUserData, const ma_decoding_backend_config* pConfig, const ma_allocation_callbacks* pAllocationCallbacks, ma_data_source** ppBackend)
+{
+	ma_result result;
+	ma_qoa* pQoa;
+
+	(void)pUserData;
+
+	pQoa = (ma_qoa*)ma_malloc(sizeof(*pQoa), pAllocationCallbacks);
+	if (pQoa == NULL) {
+		return MA_OUT_OF_MEMORY;
+	}
+
+	result = ma_qoa_init(onRead, onSeek, onTell, pReadSeekTellUserData, pConfig, pAllocationCallbacks, pQoa);
+	if (result != MA_SUCCESS) {
+		ma_free(pQoa, pAllocationCallbacks);
+		return result;
+	}
+
+	*ppBackend = pQoa;
+
+	return MA_SUCCESS;
+}
+
+static void ma_decoding_backend_uninit__qoa(void* pUserData, ma_data_source* pBackend, const ma_allocation_callbacks* pAllocationCallbacks)
+{
+	ma_qoa* pQoa = (ma_qoa*)pBackend;
+
+	(void)pUserData;
+
+	ma_qoa_uninit(pQoa, pAllocationCallbacks);
+	ma_free(pQoa, pAllocationCallbacks);
+}
+
+static ma_result ma_decoding_backend_get_channel_map__qoa(void* pUserData, ma_data_source* pBackend, ma_channel* pChannelMap, size_t channelMapCap)
+{
+	ma_qoa* pQoa = (ma_qoa*)pBackend;
+
+	(void)pUserData;
+
+	return ma_qoa_get_data_format(pQoa, NULL, NULL, NULL, pChannelMap, channelMapCap);
+}
+
+static ma_decoding_backend_vtable g_ma_decoding_backend_vtable_qoa =
+{
+	ma_decoding_backend_init__qoa,
+	NULL, /* onInitFile() */
+	NULL, /* onInitFileW() */
+	NULL, /* onInitMemory() */
+	ma_decoding_backend_uninit__qoa
+};
+
+// end QOA
+
+// begin Audio
+
+/*
+Add your custom backend vtables here. The order in the array defines the order of priority. The
+vtables will be passed in to the resource manager config.
+*/
+static ma_decoding_backend_vtable* pCustomBackendVTables[] =
+{
+	&g_ma_decoding_backend_vtable_qoa,
+	&g_ma_decoding_backend_vtable_libvorbis,
+};
 
 bool FosterAudioStartup()
 {
 	FosterState *state = FosterGetState();
 	state->audioEngine = SDL_malloc(sizeof(ma_engine));
 
-	if (MA_SUCCESS != ma_engine_init(NULL, state->audioEngine))
+	ma_resource_manager_config resourceManagerConfig;
+	ma_resource_manager* resourceManager = SDL_malloc(sizeof(ma_resource_manager));
+	ma_engine_config engineConfig;
+
+	/* Using custom decoding backends requires a resource manager. */
+	resourceManagerConfig = ma_resource_manager_config_init();
+	resourceManagerConfig.ppCustomDecodingBackendVTables = pCustomBackendVTables;
+	resourceManagerConfig.customDecodingBackendCount = sizeof(pCustomBackendVTables) / sizeof(pCustomBackendVTables[0]);
+	resourceManagerConfig.pCustomDecodingBackendUserData = NULL;  /* <-- This will be passed in to the pUserData parameter of each function in the decoding backend vtables. */
+
+	if (MA_SUCCESS != ma_resource_manager_init(&resourceManagerConfig, resourceManager)) {
+		FosterLogError("Unable to create Audio Engine (Resource Manager)");
+		SDL_free(state->audioEngine);
+		SDL_free(resourceManager);
+		return false;
+	}
+
+	/* Once we have a resource manager we can create the engine. */
+	engineConfig = ma_engine_config_init();
+	engineConfig.pResourceManager = resourceManager;
+
+	if (MA_SUCCESS != ma_engine_init(&engineConfig, state->audioEngine))
 	{
 		FosterLogError("Unable to create Audio Engine");
 		SDL_free(state->audioEngine);
+		SDL_free(resourceManager);
 		return false;
 	}
 
@@ -77,11 +241,25 @@ void *FosterAudioDecode(void *data, int length, FosterAudioFormat *format, int *
 {
 	void *frames = NULL;
 	ma_decoder_config config = ma_decoder_config_init(*format, *channels, *sampleRate);
+	config.pCustomBackendUserData = NULL;  /* In this example our backend objects are contained within a ma_decoder_ex object to avoid a malloc. Our vtables need to know about this. */
+	config.ppCustomBackendVTables = pCustomBackendVTables;
+	config.customBackendCount = sizeof(pCustomBackendVTables) / sizeof(pCustomBackendVTables[0]);
+
 	ma_decode_memory(data, length, &config, decodedFrameCount, &frames);
 	*format = config.format;
 	*channels = config.channels;
 	*sampleRate = config.sampleRate;
 	return frames;
+}
+
+void *FosterAudioEncodeWAV(void* data, uint64_t frameCount, FosterAudioFormat format, int channels, int sampleRate)
+{
+	return NULL; // TODO
+}
+
+void* FosterAudioEncodeQOA(void* data, uint64_t frameCount, FosterAudioFormat format, int channels, int sampleRate)
+{
+	return NULL; // TODO
 }
 
 void FosterAudioFree(void *data)
@@ -107,9 +285,9 @@ void FosterAudioUnregisterData(const char *name)
 	ma_resource_manager_unregister_data(manager, name);
 }
 
-#pragma endregion Audio
+// end Audio
 
-#pragma region AudioListener
+// begin AudioListener
 
 bool FosterAudioListenerGetEnabled(int index)
 {
@@ -173,9 +351,9 @@ void FosterAudioListenerSetWorldUp(int index, Vector3 value)
 	ma_engine_listener_set_world_up(FosterGetState()->audioEngine, index, value.x, value.y, value.z);
 }
 
-#pragma endregion AudioListener
+// end AudioListener
 
-#pragma region Sound
+// begin Sound
 
 FosterSound *FosterSoundCreate(const char *path, FosterSoundFlags flags, FosterSoundGroup *soundGroup)
 {
@@ -248,6 +426,11 @@ bool FosterSoundGetFinished(FosterSound *sound)
 	return ma_sound_at_end((ma_sound *)sound);
 }
 
+void FosterSoundGetDataFormat(FosterSound *sound, FosterAudioFormat *format, int *channels, int *sampleRate)
+{
+	ma_sound_get_data_format((ma_sound*)sound, format, channels, sampleRate, NULL, 0);
+}
+
 uint64_t FosterSoundGetLengthPcmFrames(FosterSound *sound)
 {
 	uint64_t value = 0;
@@ -288,7 +471,7 @@ uint64_t FosterSoundGetLoopBeginPcmFrames(FosterSound *sound)
 void FosterSoundSetLoopBeginPcmFrames(FosterSound *sound, uint64_t value)
 {
 	ma_data_source *source = ma_sound_get_data_source((ma_sound *)sound);
-	ma_data_source_set_loop_point_in_pcm_frames(source, value, FosterSoundGetLoopEndPcmFrames(sound)); // TODO
+	ma_data_source_set_loop_point_in_pcm_frames(source, value, FosterSoundGetLoopEndPcmFrames(sound));
 }
 
 uint64_t FosterSoundGetLoopEndPcmFrames(FosterSound *sound)
@@ -302,7 +485,7 @@ uint64_t FosterSoundGetLoopEndPcmFrames(FosterSound *sound)
 void FosterSoundSetLoopEndPcmFrames(FosterSound *sound, uint64_t value)
 {
 	ma_data_source *source = ma_sound_get_data_source((ma_sound *)sound);
-	ma_data_source_set_loop_point_in_pcm_frames(source, FosterSoundGetLoopBeginPcmFrames(sound), value); // TODO
+	ma_data_source_set_loop_point_in_pcm_frames(source, FosterSoundGetLoopBeginPcmFrames(sound), value);
 }
 
 bool FosterSoundGetSpatialized(FosterSound *sound)
@@ -457,9 +640,9 @@ void FosterSoundSetDopplerFactor(FosterSound *sound, float value)
 	ma_sound_set_doppler_factor((ma_sound *)sound, value);
 }
 
-#pragma endregion Sound
+// end Sound
 
-#pragma region SoundGroup
+// begin SoundGroup
 
 FosterSoundGroup *FosterSoundGroupCreate(FosterSoundGroup* parent)
 {
@@ -502,4 +685,4 @@ void FosterSoundGroupSetPitch(FosterSoundGroup* soundGroup, float value)
 	ma_sound_group_set_pitch((ma_sound_group*)soundGroup, value);
 }
 
-#pragma endregion SoundGroup
+// end SoundGroup

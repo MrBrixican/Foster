@@ -436,9 +436,9 @@ typedef void (FOSTER_CALL * FosterOnControllerButtonFn)(int index, int button, b
 typedef void (FOSTER_CALL * FosterOnControllerAxisFn)(int index, int axis, float value);
 typedef void (FOSTER_CALL * FosterWriteFn)(void *context, void *data, int size);
 
-typedef struct FosterTexture FosterTexture; 
-typedef struct FosterTarget FosterTarget; 
-typedef struct FosterShader FosterShader; 
+typedef struct FosterTexture FosterTexture;
+typedef struct FosterTarget FosterTarget;
+typedef struct FosterShader FosterShader;
 typedef struct FosterMesh FosterMesh;
 typedef struct FosterSound FosterSound;
 typedef struct FosterSoundGroup FosterSoundGroup;
@@ -734,6 +734,8 @@ FOSTER_API void FosterSoundSetPan(FosterSound* sound, float value);
 FOSTER_API bool FosterSoundGetPlaying(FosterSound* sound);
 
 FOSTER_API bool FosterSoundGetFinished(FosterSound* sound);
+
+FOSTER_API void FosterSoundGetDataFormat(FosterSound* sound, FosterAudioFormat* format, int* channels, int* sampleRate);
 
 FOSTER_API uint64_t FosterSoundGetLengthPcmFrames(FosterSound* sound);
 

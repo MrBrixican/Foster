@@ -350,6 +350,8 @@ internal static class Platform
 	[DllImport(DLL)]
 	public static extern bool FosterSoundGetFinished(IntPtr sound);
 	[DllImport(DLL)]
+	public static extern void FosterSoundGetDataFormat(IntPtr sound, out AudioFormat format, out int channels, out int sampleRate);
+	[DllImport(DLL)]
 	public static extern ulong FosterSoundGetLengthPcmFrames(IntPtr sound);
 	[DllImport(DLL)]
 	public static extern ulong FosterSoundGetCursorPcmFrames(IntPtr sound);

@@ -58,6 +58,33 @@ public readonly struct SoundInstance
 		get => GetPlatform(Platform.FosterSoundGetFinished);
 	}
 
+	public AudioFormat Format
+	{
+		get
+		{
+			GetDataFormat();
+			return ActiveState?.Format ?? default;
+		}
+	}
+
+	public int Channels
+	{
+		get
+		{
+			GetDataFormat();
+			return ActiveState?.Channels ?? default;
+		}
+	}
+
+	public int SampleRate
+	{
+		get
+		{
+			GetDataFormat();
+			return ActiveState?.SampleRate ?? default;
+		}
+	}
+
 	/// <summary>
 	/// Instance length in PCM frames. <br/>
 	/// This can be <i>extremely</i> slow for certain codecs (mp3). <br/>
@@ -73,7 +100,7 @@ public readonly struct SoundInstance
 	/// This can be <i>extremely</i> slow for certain codecs (mp3). <br/>
 	/// Limitation: This will always return <see cref="TimeSpan.Zero"/> for an ogg loaded with <see cref="SoundLoadingMethod.Stream"/>.
 	/// </summary>
-	public TimeSpan Length => TimeSpan.FromSeconds(1.0 * LengthPcmFrames / Audio.SampleRate); //TODO: We can't depend on this in practice. Need to use instance sample rate.
+	public TimeSpan Length => TimeSpan.FromSeconds(1.0 * LengthPcmFrames / SampleRate);
 
 	/// <summary>
 	/// Instance cursor in PCM frames. <br/>
@@ -93,8 +120,8 @@ public readonly struct SoundInstance
 	/// </summary>
 	public TimeSpan Cursor
 	{
-		get => TimeSpan.FromSeconds(1.0 * CursorPcmFrames / Audio.SampleRate);
-		set => CursorPcmFrames = (ulong)Math.Floor(value.TotalSeconds * Audio.SampleRate);
+		get => TimeSpan.FromSeconds(1.0 * CursorPcmFrames / SampleRate);
+		set => CursorPcmFrames = (ulong)Math.Floor(value.TotalSeconds * SampleRate);
 	}
 
 	/// <summary>
@@ -121,8 +148,8 @@ public readonly struct SoundInstance
 	/// </summary>
 	public TimeSpan LoopBegin
 	{
-		get => TimeSpan.FromSeconds(1.0 * LoopBeginPcmFrames / Audio.SampleRate);
-		set => LoopBeginPcmFrames = (ulong)Math.Floor(value.TotalSeconds * Audio.SampleRate);
+		get => TimeSpan.FromSeconds(1.0 * LoopBeginPcmFrames / SampleRate);
+		set => LoopBeginPcmFrames = (ulong)Math.Floor(value.TotalSeconds * SampleRate);
 	}
 
 	/// <summary>
@@ -147,13 +174,13 @@ public readonly struct SoundInstance
 			{
 				return null; // Special case
 			}
-			return TimeSpan.FromSeconds(1.0 * end / Audio.SampleRate);
+			return TimeSpan.FromSeconds(1.0 * end / SampleRate);
 		}
 		set
 		{
 			if (value.HasValue)
 			{
-				LoopEndPcmFrames = (ulong)Math.Floor(value.Value.TotalSeconds * Audio.SampleRate);
+				LoopEndPcmFrames = (ulong)Math.Floor(value.Value.TotalSeconds * SampleRate);
 			}
 			else
 			{
@@ -512,6 +539,17 @@ public readonly struct SoundInstance
 		}
 	}
 
+	private void GetDataFormat()
+	{
+		if (Active && state!.Format == AudioFormat.Unknown)
+		{
+			Platform.FosterSoundGetDataFormat(state.Ptr, out var format, out var channels, out var sampleRate);
+			state.Format = format;
+			state.Channels = channels;
+			state.SampleRate = sampleRate;
+		}
+	}
+
 	private class State
 	{
 		public long Id { get; set; }
@@ -519,7 +557,7 @@ public readonly struct SoundInstance
 		public Sound Sound { get; set; } = null!;
 		public SoundGroup? Group { get; set; }
 		public bool Protected { get; set; }
-		public AudioFormat Format { get; set; } // TODO
+		public AudioFormat Format { get; set; }
 		public int Channels { get; set; }
 		public int SampleRate { get; set; }
 
@@ -530,6 +568,9 @@ public readonly struct SoundInstance
 			Sound = default!;
 			Group = default;
 			Protected = default;
+			Format = default;
+			Channels = default;
+			SampleRate = default;
 		}
 	}
 }

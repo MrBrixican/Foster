@@ -7,7 +7,7 @@ if (WIN32)
 	option(FOSTER_D3D11_ENABLED "Make D3D11 Renderer available" ON)
 endif()
 
-# Set flag for building a universal binary on macOS 
+# Set flag for building a universal binary on macOS
 if(APPLE)
 	set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64")
 endif()
@@ -23,7 +23,6 @@ add_library(FosterPlatform SHARED
 	src/foster_renderer.c
 	src/foster_renderer_d3d11.c
 	src/foster_renderer_opengl.c
-	src/third_party/stb_vorbis.c
 	src/foster_audio.c
 )
 
@@ -70,7 +69,7 @@ endif()
 
 # Emscripten can import SDL2 directly
 if (EMSCRIPTEN)
-	
+
 	set_target_properties(FosterPlatform PROPERTIES COMPILE_FLAGS "-s USE_SDL=2")
 	target_link_libraries(FosterPlatform "-s USE_SDL=2 -s USE_WEBGL2=1")
 
